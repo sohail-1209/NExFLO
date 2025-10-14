@@ -43,12 +43,12 @@ function createEmailHtml(body: string, registration: Registration, event: Event,
         <body>
           <div class="container">
             <img src="${logoUrl}" alt="Nexus Logo" style="max-width: 150px; margin-bottom: 20px;" />
+            ${processedBody}
+            <br><br>
+            ${downloadButton}
+            <br>
+            ${submissionButton}
           </div>
-          ${processedBody}
-          <br><br>
-          ${downloadButton}
-          <br>
-          ${submissionButton}
         </body>
       </html>
     `;
@@ -125,18 +125,18 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
         <body>
           <div class="container">
             <img src="${logoUrl}" alt="Nexus Logo" style="max-width: 150px; margin-bottom: 20px;" />
-          </div>
-          ${processedBody}
-          
-          <div class="details">
-            <p><strong>Name:</strong> ${registration.studentName}</p>
-            <p><strong>Roll Number:</strong> ${registration.rollNumber}</p>
-            <p><strong>Branch:</strong> ${registration.branch}</p>
-            <p><strong>Year of Study:</strong> ${registration.yearOfStudy}</p>
-            <p><strong>Status:</strong> <span class="status">${registration.status}</span></p>
-            <div class="qr-container">
-              <p style="font-size: 0.9em; color: #666;">Scan for event check-in:</p>
-              <img src="${imageUrl}" alt="Event Pass QR Code" style="max-width:150px; border-radius: 8px;"/>
+            ${processedBody}
+            
+            <div class="details">
+              <p><strong>Name:</strong> ${registration.studentName}</p>
+              <p><strong>Roll Number:</strong> ${registration.rollNumber}</p>
+              <p><strong>Branch:</strong> ${registration.branch}</p>
+              <p><strong>Year of Study:</strong> ${registration.yearOfStudy}</p>
+              <p><strong>Status:</strong> <span class="status">${registration.status}</span></p>
+              <div class="qr-container">
+                <p style="font-size: 0.9em; color: #666;">Scan for event check-in:</p>
+                <img src="${imageUrl}" alt="Event Pass QR Code" style="max-width:150px; border-radius: 8px;"/>
+              </div>
             </div>
           </div>
         </body>
@@ -151,5 +151,3 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
     throw new Error(`Could not send pass email. Reason: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
-
-    
