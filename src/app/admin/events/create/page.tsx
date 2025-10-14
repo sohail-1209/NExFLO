@@ -1,6 +1,6 @@
 "use client";
 
-import { useFormState } from "react-dom";
+import { useActionState } from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createEvent } from "@/lib/actions";
@@ -22,7 +22,7 @@ function SubmitButton() {
 }
 
 export default function CreateEventPage() {
-  const [state, formAction] = useFormState(createEvent, initialState);
+  const [state, formAction] = useActionState(createEvent, initialState);
   const router = useRouter();
   const { toast } = useToast();
 

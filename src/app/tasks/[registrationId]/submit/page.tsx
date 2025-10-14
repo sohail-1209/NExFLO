@@ -1,7 +1,6 @@
 "use client";
 
-import { useFormState } from "react-dom";
-import { useEffect, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { submitTask } from "@/lib/actions";
 import { getRegistrationById, getEventById } from "@/lib/data";
 import { Button } from "@/components/ui/button";
@@ -29,7 +28,7 @@ export default function SubmitTaskPage({ params }: { params: { registrationId: s
   const [submitted, setSubmitted] = useState(false);
 
   const submitTaskWithId = submitTask.bind(null, params.registrationId);
-  const [state, formAction] = useFormState(submitTaskWithId, initialState);
+  const [state, formAction] = useActionState(submitTaskWithId, initialState);
   const { toast } = useToast();
 
   useEffect(() => {

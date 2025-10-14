@@ -1,7 +1,6 @@
 "use client";
 
-import { useFormState } from "react-dom";
-import { useEffect, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { registerForEvent } from "@/lib/actions";
 import { getEventById } from "@/lib/data";
 import { Button } from "@/components/ui/button";
@@ -27,7 +26,7 @@ export default function RegisterPage({ params }: { params: { eventId: string } }
   const [loading, setLoading] = useState(true);
   
   const registerForEventWithId = registerForEvent.bind(null, params.eventId);
-  const [state, formAction] = useFormState(registerForEventWithId, initialState);
+  const [state, formAction] = useActionState(registerForEventWithId, initialState);
 
   useEffect(() => {
     async function fetchEvent() {
