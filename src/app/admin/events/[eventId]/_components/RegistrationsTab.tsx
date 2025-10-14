@@ -41,8 +41,8 @@ interface RegistrationsTabProps {
 }
 
 const statusConfig = {
-    booked: { label: 'Booked', color: 'bg-green-500', icon: <Check className="h-3 w-3" /> },
-    waitlisted: { label: 'Waitlisted', color: 'bg-yellow-500', icon: <List className="h-3 w-3" /> },
+    booked: { label: 'Booked', color: 'bg-green-500', icon: <>✅</> },
+    waitlisted: { label: 'Waitlisted', color: 'bg-yellow-500', icon: <>⚠️</> },
     pending: { label: 'Pending', color: 'bg-gray-500', icon: <Clock className="h-3 w-3" /> },
     denied: { label: 'Denied', color: 'bg-red-500', icon: <Ban className="h-3 w-3" /> },
 };
