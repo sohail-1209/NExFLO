@@ -4,7 +4,6 @@
 import nodemailer from "nodemailer";
 import type { Registration, Event } from "./types";
 import 'dotenv/config';
-import { generatePassImage } from "./pass";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -85,12 +84,15 @@ export async function sendPassEmail(registration: Registration, event: Event) {
   }
 
   try {
-    const passImageBuffer = await generatePassImage(registration, event);
-    
     let processedBody = event.passBody
       .replace(/{studentName}/g, registration.studentName)
       .replace(/{eventName}/g, event.name)
       .replace(/\n/g, "<br>");
+    
+    // We get the base URL from the environment variable if available, otherwise default to a generic localhost for dev
+    const host = process.env.NEXT_PUBLIC_HOST_URL || 'http://localhost:9002';
+    const passPageUrl = `${host}/mypass/${registration.id}`;
+    const imageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x700&data=${encodeURIComponent(passPageUrl)}&format=png`;
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -108,18 +110,10 @@ export async function sendPassEmail(registration: Registration, event: Event) {
         <body>
           ${processedBody}
           <br><br>
-          <img src="cid:eventpass" alt="Event Pass" style="max-width:400px;"/>
+          <img src="${imageUrl}" alt="Event Pass" style="max-width:500px;"/>
         </body>
         </html>
       `,
-      attachments: [
-        {
-          filename: 'event-pass.png',
-          content: passImageBuffer,
-          contentType: 'image/png',
-          cid: 'eventpass'
-        }
-      ]
     };
 
     const info = await transporter.sendMail(mailOptions);
