@@ -2,7 +2,7 @@
 
 import { useUser } from "@/firebase/auth/use-user";
 import Link from "next/link";
-import { Home, PlusCircle, Calendar, Settings, LogOut, LogIn } from "lucide-react";
+import { Home, PlusCircle, Calendar, LogOut, LogIn } from "lucide-react";
 import {
   SidebarProvider,
   Sidebar,
@@ -21,8 +21,11 @@ import { getEvents } from "@/lib/data";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useEffect, useState } from "react";
 import type { Event } from "@/lib/types";
-import { signOut as firebaseSignOut, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import { signOut as firebaseSignOut, signInWithEmailAndPassword } from "firebase/auth";
 import { useAuth } from "@/firebase";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminLayout({
   children,
@@ -32,21 +35,42 @@ export default function AdminLayout({
   const user = useUser();
   const auth = useAuth();
   const [events, setEvents] = useState<Event[]>([]);
+  const { toast } = useToast();
 
   useEffect(() => {
     async function fetchEvents() {
       const eventData = await getEvents();
       setEvents(eventData);
     }
-    fetchEvents();
-  }, []);
+    if (user) {
+        fetchEvents();
+    }
+  }, [user]);
 
-  const signInWithGoogle = async () => {
-    const provider = new GoogleAuthProvider();
+   const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    if (!email || !password) {
+      toast({
+        title: "Login Failed",
+        description: "Please enter both email and password.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     try {
-      await signInWithPopup(auth, provider);
-    } catch (error) {
-      console.error("Error signing in with Google: ", error);
+      await signInWithEmailAndPassword(auth, email, password);
+    } catch (error: any) {
+      console.error("Error signing in: ", error);
+      toast({
+        title: "Login Failed",
+        description: error.message || "An unknown error occurred.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -67,13 +91,23 @@ export default function AdminLayout({
                 EventFlow Admin
             </h1>
         </div>
-        <div className="text-center">
-            <h2 className="text-2xl font-bold tracking-tight">Access Restricted</h2>
-            <p className="text-muted-foreground mb-4">You need to be signed in to view this page.</p>
-            <Button onClick={signInWithGoogle}>
+        <div className="w-full max-w-md p-6">
+            <h2 className="text-2xl font-bold tracking-tight text-center">Admin Sign In</h2>
+            <p className="text-muted-foreground mb-4 text-center">Enter your credentials to access the dashboard.</p>
+            <form onSubmit={handleSignIn} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <Input id="email" name="email" type="email" placeholder="admin@example.com" required />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <Input id="password" name="password" type="password" required />
+              </div>
+              <Button type="submit" className="w-full">
                 <LogIn className="mr-2" />
-                Sign in with Google
-            </Button>
+                Sign In
+              </Button>
+            </form>
         </div>
       </div>
     );
@@ -129,11 +163,11 @@ export default function AdminLayout({
           <div className="flex items-center gap-2">
             <Avatar className="h-9 w-9">
               <AvatarImage src={user.photoURL ?? ''} alt={user.displayName ?? 'User'} />
-              <AvatarFallback>{user.displayName?.substring(0,2) ?? 'U'}</AvatarFallback>
+              <AvatarFallback>{user.email?.substring(0,2).toUpperCase() ?? 'A'}</AvatarFallback>
             </Avatar>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium">{user.displayName}</span>
-              <span className="text-xs text-muted-foreground">{user.email}</span>
+            <div className="flex flex-col overflow-hidden">
+              <span className="text-sm font-medium truncate">{user.displayName ?? user.email}</span>
+              <span className="text-xs text-muted-foreground truncate">{user.email}</span>
             </div>
              <Button variant="ghost" size="icon" className="ml-auto" onClick={signOut}>
                 <LogOut className="w-4 h-4"/>
