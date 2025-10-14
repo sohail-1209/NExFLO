@@ -14,7 +14,7 @@ const eventSchema = z.object({
   confirmationMessage: z.string().min(10, "Confirmation message must be at least 10 characters long"),
   mailSubject: z.string().min(5, "Mail subject must be at least 5 characters long"),
   mailBody: z.string().min(20, "Mail body must be at least 20 characters long"),
-  taskPdfUrl: z.instanceof(File).refine(file => file.size > 0, "A task PDF is required."),
+  taskPdfUrl: z.instanceof(File).refine(file => file.size > 0, "A task PDF is required.").or(z.string().url()),
 });
 
 export async function createEvent(prevState: any, formData: FormData) {
@@ -29,6 +29,7 @@ export async function createEvent(prevState: any, formData: FormData) {
   });
 
   if (!validatedFields.success) {
+    console.log(validatedFields.error.flatten().fieldErrors);
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: "Error: Please check your input.",
@@ -44,7 +45,14 @@ export async function createEvent(prevState: any, formData: FormData) {
       taskPdfFile: taskPdfUrl,
     });
     revalidatePath("/admin");
+    
+    // This was missing. We need to redirect on success.
+    if (newEvent.id) {
+        redirect(`/admin/events/${newEvent.id}`);
+    }
+
     return { message: "success", eventId: newEvent.id };
+
   } catch (e: any) {
     console.error(e);
     return { message: `Error: Failed to create event: ${e.message}` };

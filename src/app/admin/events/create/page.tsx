@@ -29,13 +29,7 @@ export default function CreateEventPage() {
   const { toast } = useToast();
 
   useEffect(() => {
-    if (state.message === "success" && state.eventId) {
-      toast({
-        title: "Event Created!",
-        description: "Your new event has been successfully created.",
-      });
-      router.push(`/admin/events/${state.eventId}`);
-    } else if (state.message && state.message.startsWith("Error")) {
+    if (state?.message && state.message.startsWith("Error")) {
       toast({
         title: "Error",
         description: state.message,
