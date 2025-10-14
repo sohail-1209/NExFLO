@@ -6,16 +6,15 @@ const Logo = (props: SVGProps<SVGSVGElement>) => (
     viewBox="0 0 24 24"
     fill="none"
     stroke="currentColor"
-    strokeWidth="2"
+    strokeWidth="1.5"
     strokeLinecap="round"
     strokeLinejoin="round"
     {...props}
   >
-    <path d="M21 4H3" />
-    <path d="M18 8H6" />
-    <path d="M15 12H9" />
-    <path d="M12 16h-1" />
-    <path d="M9 20h2" />
+    <path d="M12 12c-3 0-6 2-6 5s3 5 6 5 6-2 6-5" />
+    <path d="M12 12c3 0 6-2 6-5s-3-5-6-5-6 2-6 5" />
+    <path d="M19 9a2 2 0 0 0 2 2" />
+    <path d="M5 15a2 2 0 0 0-2-2" />
   </svg>
 );
 
