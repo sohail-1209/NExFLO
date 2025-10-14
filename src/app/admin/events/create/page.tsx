@@ -12,7 +12,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Mail } from "lucide-react";
+import { ArrowLeft, Mail, Shield } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
 const initialState = {
@@ -101,6 +101,25 @@ export default function CreateEventPage() {
                 <Input id="taskPdfUrl" name="taskPdfUrl" type="file" accept=".pdf" />
                 {state?.errors?.taskPdfUrl && <p className="text-destructive text-sm">{state.errors.taskPdfUrl[0]}</p>}
             </div>
+          </div>
+          
+           <Separator />
+
+          <div className="space-y-4">
+             <h3 className="text-lg font-medium flex items-center gap-2"><Shield className="w-5 h-5" /> Custom Email Sender (Optional)</h3>
+             <p className="text-sm text-muted-foreground">If you want to send emails from a specific Gmail account for this event, provide the credentials below. Otherwise, the default system email will be used.</p>
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="appMail">Custom App Email</Label>
+                    <Input id="appMail" name="appMail" type="email" placeholder="your-email@gmail.com" />
+                    {state?.errors?.appMail && <p className="text-destructive text-sm">{state.errors.appMail[0]}</p>}
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="appPass">Custom App Password</Label>
+                    <Input id="appPass" name="appPass" type="password" placeholder="16-digit app password" />
+                    {state?.errors?.appPass && <p className="text-destructive text-sm">{state.errors.appPass[0]}</p>}
+                </div>
+             </div>
           </div>
         </CardContent>
         <CardFooter className="flex justify-between">

@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Send, UploadCloud, Users, X } from "lucide-react";
+import { Send, UploadCloud, Users, Shield } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import Papa from "papaparse";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -143,6 +143,25 @@ export default function ManualPassPage() {
                 <Switch id="sendWithoutPass" name="sendWithoutPass" />
                 <Label htmlFor="sendWithoutPass">Send normal email (without pass attachment)</Label>
             </div>
+
+            <Separator/>
+            <div className="space-y-4">
+                 <h3 className="text-lg font-medium flex items-center gap-2"><Shield className="w-5 h-5" /> Custom Email Sender (Optional)</h3>
+                 <p className="text-sm text-muted-foreground">Provide credentials to send this email from a specific account.</p>
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="appMail">Custom App Email</Label>
+                        <Input id="appMail" name="appMail" type="email" placeholder="your-email@gmail.com" />
+                        {singleState?.errors?.appMail && <p className="text-destructive text-sm">{singleState.errors.appMail[0]}</p>}
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="appPass">Custom App Password</Label>
+                        <Input id="appPass" name="appPass" type="password" placeholder="16-digit app password" />
+                        {singleState?.errors?.appPass && <p className="text-destructive text-sm">{singleState.errors.appPass[0]}</p>}
+                    </div>
+                 </div>
+            </div>
+
             </CardContent>
             <CardFooter>
             <Button type="submit" className="w-full md:w-auto">

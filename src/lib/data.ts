@@ -24,10 +24,14 @@ const db = firestore;
 // Type converters for Firestore
 const eventConverter = {
   toFirestore: (event: Omit<Event, 'id'>) => {
-    return {
-      ...event,
-      date: Timestamp.fromDate(event.date),
-    };
+    const data: any = { ...event };
+     if (event.date) {
+        data.date = Timestamp.fromDate(event.date);
+    }
+    // Remove undefined fields so Firestore doesn't store them
+    if (data.appMail === undefined) delete data.appMail;
+    if (data.appPass === undefined) delete data.appPass;
+    return data;
   },
   fromFirestore: (snapshot: any, options: any): Event => {
     const data = snapshot.data(options);
@@ -43,6 +47,8 @@ const eventConverter = {
       mailBody: data.mailBody,
       passSubject: data.passSubject,
       passBody: data.passBody,
+      appMail: data.appMail,
+      appPass: data.appPass,
     };
   },
 };
@@ -134,7 +140,7 @@ export const createEventInData = async (eventData: CreateEventData): Promise<Eve
   const eventsCol = collection(db, 'events').withConverter(eventConverter);
   const docRef = await addDoc(eventsCol, newEventData);
   
-  return { ...newEventData, id: docRef.id };
+  return { ...newEventData, id: docRef.id, date: newEventData.date };
 };
 
 export const updateEvent = async (id: string, updates: Partial<Omit<Event, 'id'>>) => {

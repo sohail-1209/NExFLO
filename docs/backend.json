@@ -50,6 +50,14 @@
         "passBody": {
             "type": "string",
             "description": "Body of the event pass email."
+        },
+        "appMail": {
+            "type": "string",
+            "description": "Optional custom email address for sending event-related emails."
+        },
+        "appPass": {
+            "type": "string",
+            "description": "Optional app password for the custom email address."
         }
       },
       "required": ["name", "description", "date", "venue", "confirmationMessage", "taskPdfUrl", "mailSubject", "mailBody", "passSubject", "passBody"]

@@ -21,6 +21,8 @@ const eventSchema = z.object({
   mailSubject: z.string().min(5, "Mail subject must be at least 5 characters long"),
   mailBody: z.string().min(20, "Mail body must be at least 20 characters long"),
   taskPdfUrl: z.instanceof(File).refine(file => file.size > 0, "A task PDF is required.").or(z.string().url()),
+  appMail: z.string().email().optional().or(z.literal('')),
+  appPass: z.string().optional(),
 });
 
 export async function createEvent(prevState: any, formData: FormData) {
@@ -33,6 +35,8 @@ export async function createEvent(prevState: any, formData: FormData) {
     mailSubject: formData.get("mailSubject"),
     mailBody: formData.get("mailBody"),
     taskPdfUrl: formData.get("taskPdfUrl"),
+    appMail: formData.get("appMail"),
+    appPass: formData.get("appPass"),
   });
 
   if (!validatedFields.success) {
@@ -224,13 +228,18 @@ export async function submitTask(registrationId: string, prevState: any, formDat
 
 export async function updateRegistrationStatus(registrationId: string, eventId: string, status: Registration['status']) {
     try {
+        
+        const event = await getEventById(eventId);
+        if(!event) {
+            throw new Error("Event not found");
+        }
+
         await updateRegistration(registrationId, { status });
 
         // If status is booked or waitlisted, send the pass email
         if (status === 'booked' || status === 'waitlisted') {
             const registration = await getRegistrationByIdData(registrationId);
-            const event = await getEventById(eventId);
-            if(registration && event) {
+            if(registration) {
                 const headersList = headers();
                 const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
                 const protocol = headersList.get('x-forwarded-proto') || 'http';
@@ -324,6 +333,8 @@ const manualPassSchema = z.object({
   emailSubject: z.string().min(5, "Email subject is required"),
   emailBody: z.string().min(10, "Email body is required"),
   sendWithoutPass: z.preprocess((val) => val === 'on', z.boolean()),
+  appMail: z.string().email().optional().or(z.literal('')),
+  appPass: z.string().optional(),
 });
 
 export async function sendManualPass(prevState: any, formData: FormData) {
@@ -398,4 +409,3 @@ export async function sendBulkPasses(prevState: any, formData: FormData) {
     return { message: `Error: Failed to send emails: ${e.message}` };
   }
 }
-

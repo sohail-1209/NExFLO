@@ -11,6 +11,8 @@ export type Event = {
   mailBody: string;
   passSubject: string;
   passBody: string;
+  appMail?: string;
+  appPass?: string;
 };
 
 export type Registration = {
