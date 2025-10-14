@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, Clock, ExternalLink, List, MoreVertical, BookImage, Settings, Ban } from "lucide-react";
+import { Clock, ExternalLink, MoreVertical, BookImage, Settings, Ban } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -155,7 +155,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="px-2">Student</TableHead>
+                  <TableHead className="pl-1 pr-2">Student</TableHead>
                   <TableHead className="hidden md:table-cell px-2">Details</TableHead>
                   <TableHead className="px-2">Submission</TableHead>
                   <TableHead className="text-center px-2">Status</TableHead>
@@ -165,7 +165,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
               <TableBody>
                 {sortedRegistrations.map((reg) => (
                   <TableRow key={reg.id}>
-                    <TableCell className="p-2">
+                    <TableCell className="py-2 pl-1 pr-2">
                       <div className="font-medium break-all">{reg.studentName}</div>
                       <div className="text-sm text-muted-foreground break-all">{reg.studentEmail}</div>
                        <div className="text-sm text-muted-foreground md:hidden mt-1">
@@ -229,13 +229,13 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                             disabled={!reg.taskSubmission || reg.status === "booked"}
                             onClick={() => handleStatusChange(reg.id, "booked")}
                           >
-                            <Check className="mr-2 h-4 w-4" /> Approve (Book)
+                            ✅ Approve (Book)
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             disabled={!reg.taskSubmission || reg.status === "waitlisted"}
                             onClick={() => handleStatusChange(reg.id, "waitlisted")}
                           >
-                            <List className="mr-2 h-4 w-4" /> Waitlist
+                            ⚠️ Waitlist
                           </DropdownMenuItem>
                            <DropdownMenuSeparator />
                            <DropdownMenuItem
