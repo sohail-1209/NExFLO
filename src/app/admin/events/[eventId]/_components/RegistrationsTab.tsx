@@ -161,7 +161,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                     <Eye className="h-4 w-4 mx-auto" />
                   </TableHead>
                   <TableHead className="text-center px-1">Status</TableHead>
-                  <TableHead className="text-right"></TableHead>
+                  <TableHead className="pr-0"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -219,7 +219,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                             {statusConfig[reg.status].label}
                         </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right pr-0">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" disabled={isPending}>
