@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Clock, ExternalLink, MoreVertical, BookImage, Settings, Ban, Eye } from "lucide-react";
+import { Clock, ExternalLink, MoreVertical, BookImage, Settings, Ban, FileText } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -155,10 +155,10 @@ export default function RegistrationsTab({ registrations, event }: Registrations
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Student</TableHead>
+                  <TableHead className="pl-0">Student</TableHead>
                   <TableHead className="hidden md:table-cell px-1">Details</TableHead>
                   <TableHead className="px-1 text-center">
-                    <Eye className="h-4 w-4 mx-auto" />
+                    <FileText className="h-4 w-4 mx-auto" />
                   </TableHead>
                   <TableHead className="text-center px-0">Status</TableHead>
                   <TableHead className="pr-0"></TableHead>
@@ -310,3 +310,6 @@ export default function RegistrationsTab({ registrations, event }: Registrations
     
 
 
+
+
+    
