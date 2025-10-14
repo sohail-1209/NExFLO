@@ -1,7 +1,7 @@
 
 "use server";
 
-import { revalidatePath } from "next/revalidate";
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -311,4 +311,6 @@ export async function suggestEmailCorrection(
     return { suggestion: null };
   }
 }
+    
+
     
