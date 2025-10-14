@@ -24,7 +24,13 @@ function replacePlaceholders(body: string, registration: Registration, event: Ev
     const taskSubmissionUrl = `${baseUrl}/tasks/${registration.id}/submit`;
     finalBody = finalBody.replace(/{taskSubmissionLink}/g, `<a href="${taskSubmissionUrl}" target="_blank" rel="noopener noreferrer">Submit Your Task Here</a>`);
     
-    return finalBody;
+    return `
+      <html>
+        <body>
+          ${finalBody.replace(/\n/g, "<br>")}
+        </body>
+      </html>
+    `;
 }
 
 
@@ -52,3 +58,4 @@ export async function sendRegistrationEmail(registration: Registration, event: E
     throw new Error(`Could not send email. Reason: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
+
