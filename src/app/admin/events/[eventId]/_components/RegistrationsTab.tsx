@@ -213,7 +213,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                         <span className="text-muted-foreground text-sm">Not submitted</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-center p-1">
+                    <TableCell className="text-center px-0 py-1">
                         <Badge className="flex items-center gap-1.5 w-fit mx-auto" style={{ backgroundColor: statusConfig[reg.status].color }}>
                             {statusConfig[reg.status].icon}
                             {statusConfig[reg.status].label}
@@ -308,3 +308,4 @@ export default function RegistrationsTab({ registrations, event }: Registrations
 
 
     
+
