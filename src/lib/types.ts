@@ -21,4 +21,5 @@ export type Registration = {
   taskSubmission: string | null;
   registeredAt: Date;
   attended: boolean;
+  laptop: boolean;
 };

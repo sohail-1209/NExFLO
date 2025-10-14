@@ -66,7 +66,7 @@ export default function RegistrationsTab({ registrations, eventId }: Registratio
                     {reg.rollNumber} &bull; {reg.branch} &bull; Year {reg.yearOfStudy}
                   </div>
                   <div className="text-sm text-muted-foreground">
-                    {reg.mobileNumber} &bull; {reg.gender}
+                    {reg.mobileNumber} &bull; {reg.gender} &bull; Laptop: {reg.laptop ? "Yes" : "No"}
                   </div>
                 </TableCell>
                 <TableCell>

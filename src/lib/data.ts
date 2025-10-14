@@ -35,6 +35,7 @@ let registrations: Registration[] = [
         taskSubmission: 'https://github.com/example/alice-submission',
         registeredAt: new Date('2024-09-01T10:00:00'),
         attended: true,
+        laptop: true,
     },
     {
         id: 'reg-2',
@@ -50,6 +51,7 @@ let registrations: Registration[] = [
         taskSubmission: 'https://github.com/example/bob-submission',
         registeredAt: new Date('2024-09-02T11:30:00'),
         attended: false,
+        laptop: false,
     },
     {
         id: 'reg-3',
@@ -65,6 +67,7 @@ let registrations: Registration[] = [
         taskSubmission: null,
         registeredAt: new Date('2024-09-03T14:00:00'),
         attended: false,
+        laptop: true,
     },
     {
         id: 'reg-4',
@@ -80,6 +83,7 @@ let registrations: Registration[] = [
         taskSubmission: 'https://github.com/example/diana-submission',
         registeredAt: new Date('2024-09-01T15:00:00'),
         attended: false,
+        laptop: false,
     }
 ];
 

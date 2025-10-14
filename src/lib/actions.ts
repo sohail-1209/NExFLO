@@ -50,6 +50,9 @@ const registrationSchema = z.object({
   branch: z.string().min(1, "Branch is required"),
   yearOfStudy: z.coerce.number().min(1, "Year of study is required"),
   mobileNumber: z.string().min(10, "A valid mobile number is required"),
+  laptop: z.enum(['true', 'false']).transform(val => val === 'true').refine(val => typeof val === 'boolean', {
+    message: "You must select an option for laptop.",
+  }),
 });
 
 
@@ -62,6 +65,7 @@ export async function registerForEvent(eventId: string, prevState: any, formData
     branch: formData.get("branch"),
     yearOfStudy: formData.get("yearOfStudy"),
     mobileNumber: formData.get("mobileNumber"),
+    laptop: formData.get("laptop"),
   });
 
   if (!validatedFields.success) {

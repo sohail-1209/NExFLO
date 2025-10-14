@@ -132,6 +132,20 @@ export default function RegisterPage({ params: paramsPromise }: { params: Promis
               <Input id="mobileNumber" name="mobileNumber" type="tel" placeholder="123-456-7890" required />
               {state?.errors?.mobileNumber && <p className="text-sm text-destructive">{state.errors.mobileNumber[0]}</p>}
             </div>
+             <div className="space-y-2">
+              <Label>Will you bring a laptop?</Label>
+              <RadioGroup name="laptop" className="flex gap-4">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="true" id="laptop-yes" />
+                  <Label htmlFor="laptop-yes">Yes</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="false" id="laptop-no" />
+                  <Label htmlFor="laptop-no">No</Label>
+                </div>
+              </RadioGroup>
+              {state?.errors?.laptop && <p className="text-sm text-destructive">{state.errors.laptop[0]}</p>}
+            </div>
             <SubmitButton />
           </form>
         </CardContent>
