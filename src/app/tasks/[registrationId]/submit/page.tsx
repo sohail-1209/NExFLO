@@ -118,7 +118,7 @@ export default function TaskSubmissionPage({ params }: { params: { registrationI
               <form action={formAction} className="space-y-4 text-left">
                 <div className="space-y-2">
                   <Label htmlFor="taskSubmission">Submission URL</Label>
-                  <Input id="taskSubmission" name="taskSubmission" type="url" placeholder="https://github.com/your-repo-link" required />
+                  <Input id="taskSubmission" name="taskSubmission" type="url" placeholder="https://your-project-link.com" required />
                   {state?.errors?.taskSubmission && <p className="text-sm text-destructive">{state.errors.taskSubmission[0]}</p>}
                 </div>
                 <SubmitButton />
