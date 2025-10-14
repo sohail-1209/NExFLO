@@ -284,5 +284,3 @@ export async function resendRegistrationEmail(registrationId: string) {
         return { success: false, message: `Failed to send email. Please check server logs for details: ${error.message}` };
     }
 }
-
-    
