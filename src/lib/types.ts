@@ -32,7 +32,7 @@ export type Registration = {
   branch: string;
   yearOfStudy: number;
   mobileNumber: string;
-  status: 'pending' | 'booked' | 'waitlisted';
+  status: 'pending' | 'booked' | 'waitlisted' | 'denied';
   taskSubmission: string | null;
   registeredAt: Date;
   attended: boolean;

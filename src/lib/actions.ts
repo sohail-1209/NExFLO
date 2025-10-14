@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createEventInData, createRegistration, updateRegistration, getRegistrationById as getRegistrationByIdData, getEventById, updateEvent } from "./data";
 import type { Registration, Event } from "./types";
-import { sendRegistrationEmail } from "./email";
+import { sendRegistrationEmail, sendPassEmail } from "./email";
 
 
 const eventSchema = z.object({
@@ -46,9 +46,9 @@ export async function createEvent(prevState: any, formData: FormData) {
     const newEvent = await createEventInData({
       ...eventData,
       date: new Date(validatedFields.data.date),
-      taskPdfFile: taskPdfUrl,
-      passSubject: "Your Event Pass",
-      passBody: "Here is your event pass.",
+      taskPdfFile: taskPdfUrl as File,
+      passSubject: "Your Event Pass for {eventName}",
+      passBody: "Hi {studentName},\n\nHere is your event pass. Please have it ready for check-in.\n\nThank you!",
       nameX: 100, nameY: 100,
       rollNumberX: 100, rollNumberY: 120,
       branchX: 100, branchY: 140,
@@ -197,7 +197,7 @@ const taskSubmissionSchema = z.object({
         (url) => {
             try {
                 const hostname = new URL(url).hostname;
-                return hostname.includes('github.com') || hostname.includes('docs.google.com') || hostname.endsWith('.github.io');
+                return hostname.includes('github.com') || hostname.includes('docs.google.com') || hostname.endsWith('github.io');
             } catch {
                 return false;
             }
@@ -228,12 +228,15 @@ export async function submitTask(registrationId: string, prevState: any, formDat
         }
 
         if (registration.studentEmail.toLowerCase() !== validatedFields.data.email.toLowerCase()) {
-            return { message: "Error: The email provided does not match the registered email for this submission." };
+            return {
+              errors: { email: ["The email provided does not match the registered email for this submission."] },
+              message: "Error: The email provided does not match the registered email for this submission."
+            };
         }
 
         await updateRegistration(registrationId, { taskSubmission: validatedFields.data.taskSubmission });
         revalidatePath(`/admin`); // Revalidate admin pages
-        return { message: "Task submitted successfully!" };
+        return { message: "Task submitted successfully!", errors: {} };
     } catch (e: any) {
         console.error(e);
         return { message: `Error: Failed to submit task: ${e.message}` };
@@ -243,10 +246,20 @@ export async function submitTask(registrationId: string, prevState: any, formDat
 export async function updateRegistrationStatus(registrationId: string, eventId: string, status: Registration['status']) {
     try {
         await updateRegistration(registrationId, { status });
+
+        // If status is booked or waitlisted, send the pass email
+        if (status === 'booked' || status === 'waitlisted') {
+            const registration = await getRegistrationByIdData(registrationId);
+            const event = await getEventById(eventId);
+            if(registration && event) {
+                await sendPassEmail(registration, event);
+            }
+        }
         revalidatePath(`/admin/events/${eventId}`);
-    } catch (e) {
-        // Handle error
+        return { success: true, message: `Status updated to ${status}.` };
+    } catch (e: any) {
         console.error("Failed to update status", e);
+        return { success: false, message: `Failed to update status: ${e.message}` };
     }
 }
 

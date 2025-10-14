@@ -4,6 +4,7 @@
 import nodemailer from "nodemailer";
 import type { Registration, Event } from "./types";
 import 'dotenv/config';
+import { generatePass } from "./pass";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -74,5 +75,54 @@ export async function sendRegistrationEmail(registration: Registration, event: E
     console.error("Failed to send registration email:", error);
     // Re-throw the error to be caught by the calling server action
     throw new Error(`Could not send email. Reason: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
+}
+
+export async function sendPassEmail(registration: Registration, event: Event) {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.error("Email credentials are not set in environment variables.");
+    throw new Error("Email service is not configured.");
+  }
+
+  try {
+    const passImageBuffer = await generatePass(registration, event);
+    
+    let processedBody = event.passBody
+      .replace(/{studentName}/g, registration.studentName)
+      .replace(/{eventName}/g, event.name)
+      .replace(/\n/g, "<br>");
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: registration.studentEmail,
+      subject: event.passSubject.replace(/{eventName}/g, event.name),
+      html: `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+          </style>
+        </head>
+        <body>
+          ${processedBody}
+        </body>
+        </html>
+      `,
+      attachments: [
+        {
+          filename: 'event-pass.png',
+          content: passImageBuffer,
+          contentType: 'image/png'
+        }
+      ]
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Pass email sent successfully:", info.response);
+  } catch (error) {
+    console.error("Failed to send pass email:", error);
+    throw new Error(`Could not send pass email. Reason: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }

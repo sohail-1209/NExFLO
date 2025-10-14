@@ -101,7 +101,7 @@
         },
         "status": {
             "type": "string",
-            "enum": ["pending", "booked", "waitlisted"]
+            "enum": ["pending", "booked", "waitlisted", "denied"]
         },
         "taskSubmission": {
             "type": "string"
