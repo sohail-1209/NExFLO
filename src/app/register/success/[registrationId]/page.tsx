@@ -1,6 +1,7 @@
+
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, use } from "react";
 import { getRegistrationById, getEventById } from "@/lib/data";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,7 +12,8 @@ import type { Event, Registration } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 
 
-export default function RegistrationSuccessPage({ params }: { params: { registrationId: string } }) {
+export default function RegistrationSuccessPage({ params: paramsPromise }: { params: Promise<{ registrationId: string }> }) {
+  const params = use(paramsPromise);
   const [data, setData] = useState<{ registration: Registration, event: Event } | null>(null);
   const [loading, setLoading] = useState(true);
 

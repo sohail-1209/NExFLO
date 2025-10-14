@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useActionState, useEffect, useState, use } from "react";
@@ -29,7 +30,8 @@ function SubmitButton() {
   );
 }
 
-export default function TaskSubmissionPage({ params }: { params: { registrationId: string } }) {
+export default function TaskSubmissionPage({ params: paramsPromise }: { params: Promise<{ registrationId: string }> }) {
+  const params = use(paramsPromise);
   const [data, setData] = useState<{ registration: Registration, event: Event } | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitted, setSubmitted] = useState(false);
