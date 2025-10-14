@@ -15,14 +15,35 @@ const transporter = nodemailer.createTransport({
 
 function replacePlaceholders(body: string, registration: Registration, event: Event, baseUrl: string): string {
     const taskSubmissionUrl = `${baseUrl}/tasks/${registration.id}/submit`;
+
+    const buttonStyles = `
+      display: inline-block; 
+      padding: 12px 24px; 
+      font-size: 16px; 
+      font-weight: bold; 
+      color: #ffffff; 
+      background-color: #7c3aed; 
+      text-decoration: none; 
+      border-radius: 5px; 
+      margin: 10px 0;
+    `;
+    
+    const downloadButton = `<a href="${event.taskPdfUrl}" target="_blank" rel="noopener noreferrer" style="${buttonStyles}">Download Task PDF</a>`;
+    const submissionButton = `<a href="${taskSubmissionUrl}" target="_blank" rel="noopener noreferrer" style="${buttonStyles}">Submit Your Task Here</a>`;
+
     let finalBody = body
       .replace(/{studentName}/g, registration.studentName)
       .replace(/{eventName}/g, event.name)
-      .replace(/{taskPdfLink}/g, `<a href="${event.taskPdfUrl}" target="_blank" rel="noopener noreferrer">Download Task PDF</a>`)
-      .replace(/{taskSubmissionLink}/g, `<a href="${taskSubmissionUrl}" target="_blank" rel="noopener noreferrer">Submit Your Task Here</a>`);
+      .replace(/{taskPdfLink}/g, downloadButton)
+      .replace(/{taskSubmissionLink}/g, submissionButton);
 
     return `
       <html>
+        <head>
+          <style>
+            body { font-family: sans-serif; line-height: 1.6; }
+          </style>
+        </head>
         <body>
           ${finalBody.replace(/\n/g, "<br>")}
         </body>
