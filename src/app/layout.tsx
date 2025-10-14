@@ -8,7 +8,7 @@ import { FirebaseClientProvider } from "@/firebase";
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
-  title: "EventFlow",
+  title: "NExFLO",
   description: "Streamline your event management from registration to attendance.",
 };
 

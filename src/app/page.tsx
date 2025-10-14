@@ -11,7 +11,7 @@ export default function Home() {
         <div className="flex items-center gap-2">
           <Logo className="h-8 w-8 text-primary" />
           <h1 className="text-2xl font-bold tracking-tight text-foreground">
-            EventFlow
+            NExFLO
           </h1>
         </div>
       </header>
@@ -23,7 +23,7 @@ export default function Home() {
             </h2>
             <p className="max-w-2xl text-lg md:text-xl text-muted-foreground mb-8">
               From registration and task handling to automated pass generation and
-              attendance tracking, EventFlow has you covered.
+              attendance tracking, NExFLO has you covered.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
               <Button asChild size="lg" className="w-full sm:w-auto">
@@ -43,7 +43,7 @@ export default function Home() {
         </div>
       </main>
       <footer className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 text-center text-muted-foreground">
-        <p>&copy; {new Date().getFullYear()} EventFlow. All rights reserved.</p>
+        <p>&copy; {new Date().getFullYear()} NExFLO. All rights reserved.</p>
       </footer>
     </div>
   );

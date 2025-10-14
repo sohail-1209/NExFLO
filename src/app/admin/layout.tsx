@@ -92,7 +92,7 @@ export default function AdminLayout({
          <div className="flex items-center gap-2 mb-8">
             <Logo className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                EventFlow Admin
+                NExFLO Admin
             </h1>
         </div>
         <Card className="w-full max-w-md">
@@ -128,7 +128,7 @@ export default function AdminLayout({
         <SidebarHeader>
           <div className="flex items-center gap-2">
             <Logo className="w-7 h-7 text-primary" />
-            <span className="text-lg font-semibold">EventFlow</span>
+            <span className="text-lg font-semibold">NExFLO</span>
             <SidebarTrigger className="ml-auto" />
           </div>
         </SidebarHeader>
@@ -205,7 +205,7 @@ export default function AdminLayout({
             <SidebarTrigger />
             <div className="flex items-center gap-2">
                 <Logo className="w-6 h-6 text-primary" />
-                <span className="font-semibold">EventFlow</span>
+                <span className="font-semibold">NExFLO</span>
             </div>
         </header>
         <main className="min-h-screen p-4 sm:p-6 lg:p-8">{children}</main>
