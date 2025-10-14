@@ -109,7 +109,7 @@ export async function sendPassEmail(registration: Registration, event: Event) {
           <meta charset="UTF-8">
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .details { margin: 20px 0; padding: 20px; border-left: 4px solid #7c3aed; background-color: #f8f9fa; border-radius: 8px; }
+            .details { margin: 20px 0; padding: 20px; border-left: 4px solid #7c3aed; background-image: linear-gradient(to right, #f8f9fa, #e9ecef); border-radius: 8px; }
             .details p { margin: 5px 0; }
             .qr-container { text-align: center; margin-top: 15px; }
             .status { text-transform: capitalize; font-weight: bold; }
