@@ -16,7 +16,7 @@ const transporter = nodemailer.createTransport({
 function createEmailHtml(body: string, registration: Registration, event: Event, baseUrl: string): string {
     const taskSubmissionUrl = `${baseUrl}/tasks/${registration.id}/submit`;
 
-    // Simple placeholder replacement for name and event
+    // Replace basic placeholders in the user's custom body
     let processedBody = body
       .replace(/{studentName}/g, registration.studentName)
       .replace(/{eventName}/g, event.name);
