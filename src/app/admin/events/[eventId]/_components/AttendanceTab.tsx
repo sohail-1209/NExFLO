@@ -294,7 +294,7 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
                 </Button>
             </CardHeader>
             <CardContent>
-            <ScrollArea className="w-full whitespace-nowrap">
+            <ScrollArea className="w-full">
               <Table>
                   <TableHeader>
                       <TableRow>

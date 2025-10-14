@@ -150,7 +150,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
 
         </CardHeader>
         <CardContent>
-          <ScrollArea className="w-full whitespace-nowrap">
+          <ScrollArea className="w-full">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -166,7 +166,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                   <TableRow key={reg.id}>
                     <TableCell>
                       <div className="font-medium">{reg.studentName}</div>
-                      <div className="text-sm text-muted-foreground">{reg.studentEmail}</div>
+                      <div className="text-sm text-muted-foreground break-all">{reg.studentEmail}</div>
                        <div className="text-sm text-muted-foreground md:hidden mt-1">
                         {reg.rollNumber}
                       </div>

@@ -48,14 +48,14 @@ export default async function AdminDashboard() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ScrollArea className="w-full whitespace-nowrap">
+          <ScrollArea className="w-full">
             <Table>
               <TableHeader>
                 <TableRow>
                   <TableHead>Event</TableHead>
-                  <TableHead>Date</TableHead>
+                  <TableHead className="hidden sm:table-cell">Date</TableHead>
                   <TableHead className="text-center">Registrations</TableHead>
-                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead className="hidden sm:table-cell text-center">Status</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -70,8 +70,13 @@ export default async function AdminDashboard() {
                         <div className="text-sm text-muted-foreground hidden md:inline">
                           {event.description.substring(0, 50)}...
                         </div>
+                         <div className="text-sm text-muted-foreground mt-1 sm:hidden">
+                           <Badge variant={isUpcoming ? "default" : "secondary"}>
+                            {isUpcoming ? "Upcoming" : "Finished"}
+                          </Badge>
+                        </div>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="hidden sm:table-cell">
                         {event.date.toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "long",
@@ -84,7 +89,7 @@ export default async function AdminDashboard() {
                           <span>{registrations.length}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="hidden sm:table-cell text-center">
                         <Badge variant={isUpcoming ? "default" : "secondary"}>
                           {isUpcoming ? "Upcoming" : "Finished"}
                         </Badge>
