@@ -155,12 +155,12 @@ export default function RegistrationsTab({ registrations, event }: Registrations
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="pl-1">Student</TableHead>
+                  <TableHead>Student</TableHead>
                   <TableHead className="hidden md:table-cell px-1">Details</TableHead>
                   <TableHead className="px-1 text-center">
                     <Eye className="h-4 w-4 mx-auto" />
                   </TableHead>
-                  <TableHead className="text-center px-1">Status</TableHead>
+                  <TableHead className="text-center px-0">Status</TableHead>
                   <TableHead className="pr-0"></TableHead>
                 </TableRow>
               </TableHeader>
@@ -308,4 +308,5 @@ export default function RegistrationsTab({ registrations, event }: Registrations
 
 
     
+
 
