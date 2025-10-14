@@ -3,7 +3,7 @@
 
 import { useUser } from "@/firebase/auth/use-user";
 import Link from "next/link";
-import { Home, PlusCircle, Calendar, LogOut, LogIn, Send } from "lucide-react";
+import { Home, PlusCircle, Calendar, LogOut, LogIn, Send, ScanLine } from "lucide-react";
 import {
   SidebarProvider,
   Sidebar,
@@ -154,6 +154,14 @@ export default function AdminLayout({
                     <Link href="/admin/manual-pass">
                         <Send />
                         Manual Pass
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton href="/admin/manual-pass-scan" asChild>
+                    <Link href="/admin/manual-pass-scan">
+                        <ScanLine />
+                        Scan Pass
                     </Link>
                 </SidebarMenuButton>
             </SidebarMenuItem>
