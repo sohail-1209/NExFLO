@@ -23,12 +23,18 @@ export async function generatePassImageFromComponent(registrationId: string) {
       return new Response('Event not found', { status: 404 });
     }
 
-    const { readable, writable } = new TransformStream();
-    const imageResponse = generatePassImage(registration, event);
-    imageResponse.then(res => res.body?.pipeTo(writable));
-    return new Response(readable, {
+    const imageResponse = await generatePassImage(registration, event);
+    
+    const readableStream = imageResponse.body;
+    if (!readableStream) {
+        return new Response('Failed to generate image', { status: 500 });
+    }
+
+    // Create a new response from the readable stream
+    return new Response(readableStream, {
         headers: {
             'Content-Type': 'image/png',
+            'Cache-Control': 'public, max-age=31536000, immutable',
         },
     });
 }
@@ -36,16 +42,9 @@ export async function generatePassImageFromComponent(registrationId: string) {
 
 // This function contains the logic to render the component to an image.
 export async function generatePassImage(registration: Registration, event: Event): Promise<ImageResponse> {
-  const qrData = JSON.stringify({
-    registrationId: registration.id,
-    studentName: registration.studentName,
-    studentEmail: registration.studentEmail,
-    rollNumber: registration.rollNumber,
-    eventId: event.id
-  });
 
-  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}&bgcolor=111827&color=ffffff`;
-
+  // Note: We are using inline styles here because @vercel/og has limitations
+  // with external stylesheets and complex Tailwind CSS classes.
   return new ImageResponse(
         (
             <div
