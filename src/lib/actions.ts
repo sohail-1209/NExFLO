@@ -2,6 +2,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createEventInData, createRegistration, updateRegistration, getRegistrationById as getRegistrationByIdData, getEventById } from "./data";
@@ -78,6 +79,11 @@ const registrationSchema = z.object({
 
 
 export async function registerForEvent(eventId: string, prevState: any, formData: FormData) {
+  const headersList = headers();
+  const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
+  const protocol = headersList.get('x-forwarded-proto') || 'http';
+  const baseUrl = `${protocol}://${host}`;
+
   const event = await getEventById(eventId);
   if (!event || new Date() > event.date) {
     return {
@@ -111,7 +117,7 @@ export async function registerForEvent(eventId: string, prevState: any, formData
     });
 
     // Send the confirmation email
-    await sendRegistrationEmail(newRegistration, event);
+    await sendRegistrationEmail(newRegistration, event, baseUrl);
 
     revalidatePath(`/admin/events/${eventId}`);
     redirect(`/register/success/${newRegistration.id}`);
