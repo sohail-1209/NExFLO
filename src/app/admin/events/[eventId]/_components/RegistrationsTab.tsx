@@ -185,7 +185,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                         <Dialog>
                           <DialogTrigger asChild>
                              <Button variant="outline" size="sm">
-                              View Task <ExternalLink className="ml-2 h-3 w-3" />
+                              View
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
