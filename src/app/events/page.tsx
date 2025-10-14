@@ -12,8 +12,8 @@ export default async function EventsPage() {
     <div className="bg-background min-h-screen">
       <header className="py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-4xl font-extrabold tracking-tight text-center">Upcoming Events</h1>
-          <p className="mt-2 text-lg text-muted-foreground text-center">Find your next learning opportunity.</p>
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center">Upcoming Events</h1>
+          <p className="mt-2 text-md md:text-lg text-muted-foreground text-center">Find your next learning opportunity.</p>
         </div>
       </header>
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pb-16">

@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { Registration } from "@/lib/types";
@@ -13,6 +12,7 @@ import { CheckCircle, UserCheck, VideoOff, XCircle, Clock, List, QrCode, Downloa
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import jsQR from "jsqr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface AttendanceTabProps {
   registrations: Registration[];
@@ -234,7 +234,7 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
                         </Avatar>
                         <div>
                             <h3 className="text-lg font-bold">{scannedRegistration.studentName}</h3>
-                            <p className="text-muted-foreground">{scannedRegistration.studentEmail}</p>
+                            <p className="text-muted-foreground text-sm break-all">{scannedRegistration.studentEmail}</p>
                             <p className="text-sm text-muted-foreground">{scannedRegistration.rollNumber} &bull; {scannedRegistration.branch}</p>
                         </div>
                     </div>
@@ -257,7 +257,7 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
                     </div>
                 </div>
             ) : (
-                 <div className="flex flex-col items-center justify-center text-center h-48 bg-muted/50 rounded-lg">
+                 <div className="flex flex-col items-center justify-center text-center h-48 bg-muted/50 rounded-lg p-4">
                     <QrCode className="h-10 w-10 text-muted-foreground" />
                     <p className="mt-2 text-muted-foreground">
                         {error ? error : "Point the camera at a QR code to begin."}
@@ -283,65 +283,72 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
 
        <div className="md:col-span-2">
         <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
                 <div>
                     <CardTitle>Attendance Sheet</CardTitle>
                     <CardDescription>List of all booked, waitlisted, and checked-in attendees.</CardDescription>
                 </div>
-                <Button variant="outline" onClick={downloadCSV}>
+                <Button variant="outline" onClick={downloadCSV} className="w-full md:w-auto">
                     <Download className="mr-2 h-4 w-4" />
                     Download CSV
                 </Button>
             </CardHeader>
             <CardContent>
-            <Table>
-                <TableHeader>
-                    <TableRow>
-                        <TableHead>Student</TableHead>
-                        <TableHead>Status</TableHead>
-                        <TableHead className="text-right">Attendance</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {relevantRegistrations.map(reg => (
-                        <TableRow key={reg.id}>
-                            <TableCell>
-                                <div className="font-medium">{reg.studentName}</div>
-                                <div className="text-sm text-muted-foreground">{reg.studentEmail}</div>
-                                <div className="text-xs text-muted-foreground">{reg.rollNumber} &bull; {reg.branch}</div>
-                            </TableCell>
-                             <TableCell>
-                                <Badge className="flex items-center gap-1.5 w-fit" style={{ backgroundColor: statusConfig[reg.status].color }}>
-                                    {statusConfig[reg.status].icon}
-                                    {statusConfig[reg.status].label}
-                                </Badge>
-                            </TableCell>
-                            <TableCell className="text-right">
-                                {reg.attended && reg.attendedAt ? (
-                                    <Badge variant="default" className="bg-green-500">
-                                        <div className="flex items-center gap-2">
-                                            <CheckCircle className="h-4 w-4" />
-                                            <div>
-                                                <div>Checked In</div>
-                                                <div className="text-xs font-normal">{new Date(reg.attendedAt).toLocaleTimeString()}</div>
-                                            </div>
-                                        </div>
-                                    </Badge>
-                                ) : (
-                                    <Badge variant="secondary">Not present</Badge>
-                                )}
-                            </TableCell>
-                        </TableRow>
-                    ))}
-                    {relevantRegistrations.length === 0 && (
-                        <TableRow>
-                            <TableCell colSpan={3} className="text-center h-24">
-                                No booked or waitlisted registrations for this event.
-                            </TableCell>
-                        </TableRow>
-                    )}
-                </TableBody>
-            </Table>
+            <ScrollArea className="w-full whitespace-nowrap">
+              <Table>
+                  <TableHeader>
+                      <TableRow>
+                          <TableHead>Student</TableHead>
+                          <TableHead className="hidden sm:table-cell">Status</TableHead>
+                          <TableHead className="text-right">Attendance</TableHead>
+                      </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                      {relevantRegistrations.map(reg => (
+                          <TableRow key={reg.id}>
+                              <TableCell>
+                                  <div className="font-medium">{reg.studentName}</div>
+                                  <div className="text-sm text-muted-foreground break-all">{reg.studentEmail}</div>
+                                  <div className="text-xs text-muted-foreground mt-1 sm:hidden">
+                                      <Badge className="flex items-center gap-1.5 w-fit" style={{ backgroundColor: statusConfig[reg.status].color }}>
+                                          {statusConfig[reg.status].icon}
+                                          {statusConfig[reg.status].label}
+                                      </Badge>
+                                  </div>
+                              </TableCell>
+                               <TableCell className="hidden sm:table-cell">
+                                  <Badge className="flex items-center gap-1.5 w-fit" style={{ backgroundColor: statusConfig[reg.status].color }}>
+                                      {statusConfig[reg.status].icon}
+                                      {statusConfig[reg.status].label}
+                                  </Badge>
+                              </TableCell>
+                              <TableCell className="text-right">
+                                  {reg.attended && reg.attendedAt ? (
+                                      <Badge variant="default" className="bg-green-500">
+                                          <div className="flex items-center gap-2">
+                                              <CheckCircle className="h-4 w-4" />
+                                              <div>
+                                                  <div>Checked In</div>
+                                                  <div className="text-xs font-normal">{new Date(reg.attendedAt).toLocaleTimeString()}</div>
+                                              </div>
+                                          </div>
+                                      </Badge>
+                                  ) : (
+                                      <Badge variant="secondary">Not present</Badge>
+                                  )}
+                              </TableCell>
+                          </TableRow>
+                      ))}
+                      {relevantRegistrations.length === 0 && (
+                          <TableRow>
+                              <TableCell colSpan={3} className="text-center h-24">
+                                  No booked or waitlisted registrations for this event.
+                              </TableCell>
+                          </TableRow>
+                      )}
+                  </TableBody>
+              </Table>
+            </ScrollArea>
             </CardContent>
         </Card>
        </div>

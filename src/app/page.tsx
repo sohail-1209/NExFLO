@@ -25,14 +25,14 @@ export default function Home() {
               From registration and task handling to automated pass generation and
               attendance tracking, EventFlow has you covered.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button asChild size="lg">
+            <div className="flex flex-col sm:flex-row gap-4 w-full sm:w-auto">
+              <Button asChild size="lg" className="w-full sm:w-auto">
                 <Link href="/events">
                   Browse Events
                   <ArrowRight />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="secondary">
+              <Button asChild size="lg" variant="secondary" className="w-full sm:w-auto">
                 <Link href="/admin">
                   Admin Dashboard
                   <UserCog />

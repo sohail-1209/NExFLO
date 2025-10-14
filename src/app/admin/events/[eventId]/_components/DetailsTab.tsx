@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { Event } from "@/lib/types";
@@ -7,6 +6,7 @@ import { Calendar, MessageSquare, FileText, Mail, Link as LinkIcon } from "lucid
 import QRCodeDisplay from "@/components/common/QRCodeDisplay";
 import Link from "next/link";
 import { toast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
 
 interface DetailsTabProps {
   event: Event;
@@ -58,7 +58,7 @@ export default function DetailsTab({ event, baseUrl }: DetailsTabProps) {
               <FileText className="h-5 w-5 mt-1 text-muted-foreground" />
               <div>
                 <h3 className="font-semibold">Task PDF</h3>
-                <a href={event.taskPdfUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">{event.taskPdfUrl}</a>
+                <a href={event.taskPdfUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline break-all">{event.taskPdfUrl}</a>
               </div>
             </div>
           </CardContent>
@@ -73,12 +73,14 @@ export default function DetailsTab({ event, baseUrl }: DetailsTabProps) {
           <CardContent className="flex flex-col justify-center items-center gap-4">
             <QRCodeDisplay url={registrationUrl} />
             <div 
-              className="p-2 bg-muted rounded-md text-sm text-center break-all cursor-pointer hover:bg-muted/80"
-              onClick={copyToClipboard}
-              title="Copy to clipboard"
+              className="p-2 bg-muted rounded-md text-sm text-center break-all"
             >
               <p className="text-muted-foreground">{registrationUrl}</p>
             </div>
+             <Button onClick={copyToClipboard} variant="outline" size="sm">
+                <LinkIcon className="mr-2 h-4 w-4"/>
+                Copy Link
+             </Button>
           </CardContent>
         </Card>
       </div>

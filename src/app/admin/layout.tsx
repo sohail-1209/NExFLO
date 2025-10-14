@@ -26,6 +26,7 @@ import { useAuth } from "@/firebase";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 
 export default function AdminLayout({
   children,
@@ -84,31 +85,35 @@ export default function AdminLayout({
 
   if (!user) {
     return (
-      <div className="flex h-screen w-full flex-col items-center justify-center bg-background">
+      <div className="flex h-screen w-full flex-col items-center justify-center bg-background p-4">
          <div className="flex items-center gap-2 mb-8">
             <Logo className="h-8 w-8 text-primary" />
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
                 EventFlow Admin
             </h1>
         </div>
-        <div className="w-full max-w-md p-6">
-            <h2 className="text-2xl font-bold tracking-tight text-center">Admin Sign In</h2>
-            <p className="text-muted-foreground mb-4 text-center">Enter your credentials to access the dashboard.</p>
-            <form onSubmit={handleSignIn} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input id="email" name="email" type="email" placeholder="admin@example.com" required />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input id="password" name="password" type="password" required />
-              </div>
-              <Button type="submit" className="w-full">
-                <LogIn className="mr-2" />
-                Sign In
-              </Button>
-            </form>
-        </div>
+        <Card className="w-full max-w-md">
+            <CardHeader className="text-center">
+                <CardTitle className="text-2xl">Admin Sign In</CardTitle>
+                <CardDescription>Enter your credentials to access the dashboard.</CardDescription>
+            </CardHeader>
+            <CardContent>
+                <form onSubmit={handleSignIn} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input id="email" name="email" type="email" placeholder="admin@example.com" required />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="password">Password</Label>
+                    <Input id="password" name="password" type="password" required />
+                  </div>
+                  <Button type="submit" className="w-full">
+                    <LogIn className="mr-2" />
+                    Sign In
+                  </Button>
+                </form>
+            </CardContent>
+        </Card>
       </div>
     );
   }

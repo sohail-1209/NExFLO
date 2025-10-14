@@ -1,4 +1,3 @@
-
 "use client";
 
 import type { Registration, Event } from "@/lib/types";
@@ -33,6 +32,7 @@ import {
 } from "@/components/ui/dialog";
 import Link from "next/link";
 import { Separator } from "@/components/ui/separator";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface RegistrationsTabProps {
   registrations: Registration[];
@@ -106,14 +106,14 @@ export default function RegistrationsTab({ registrations, event }: Registrations
   return (
     <>
       <Card>
-        <CardHeader className="flex flex-row items-center justify-between">
+        <CardHeader className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div>
             <CardTitle>Manage Registrations</CardTitle>
             <CardDescription>Review submissions and manage attendee status. Sorted by most recent submission.</CardDescription>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
-                  <Button variant="outline"><Settings className="mr-2 h-4 w-4" /> Configure Pass</Button>
+                  <Button variant="outline" className="w-full md:w-auto"><Settings className="mr-2 h-4 w-4" /> Configure Pass</Button>
               </DialogTrigger>
               <DialogContent className="max-w-xl">
                 <form action={passFormAction}>
@@ -150,110 +150,115 @@ export default function RegistrationsTab({ registrations, event }: Registrations
 
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Student</TableHead>
-                <TableHead>Details</TableHead>
-                <TableHead>Submission</TableHead>
-                <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {sortedRegistrations.map((reg) => (
-                <TableRow key={reg.id}>
-                  <TableCell>
-                    <div className="font-medium">{reg.studentName}</div>
-                    <div className="text-sm text-muted-foreground">{reg.studentEmail}</div>
-                  </TableCell>
-                  <TableCell>
-                    <div className="text-sm text-muted-foreground">
-                      {reg.rollNumber} &bull; {reg.branch} &bull; Year {reg.yearOfStudy}
-                    </div>
-                     <div className="text-sm text-muted-foreground">
-                      {reg.mobileNumber} &bull; {reg.gender} &bull; Laptop: {reg.laptop ? "Yes" : "No"}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {reg.taskSubmission ? (
-                      <Dialog>
-                        <DialogTrigger asChild>
-                           <Button variant="outline" size="sm">
-                            View Task <ExternalLink className="ml-2 h-3 w-3" />
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Task Submission for {reg.studentName}</DialogTitle>
-                            <DialogDescription>
-                              Submitted on: {reg.taskSubmittedAt?.toLocaleString()}
-                            </DialogDescription>
-                          </DialogHeader>
-                           <div className="p-4 bg-muted rounded-md text-sm break-all">
-                              <Link href={reg.taskSubmission} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                                  {reg.taskSubmission}
-                              </Link>
-                          </div>
-                          <DialogFooter>
-                            <DialogClose asChild>
-                              <Button type="button">Close</Button>
-                            </DialogClose>
-                          </DialogFooter>
-                        </DialogContent>
-                      </Dialog>
-                    ) : (
-                      <span className="text-muted-foreground text-sm">Not submitted</span>
-                    )}
-                  </TableCell>
-                  <TableCell className="text-center">
-                      <Badge className="flex items-center gap-1.5 w-fit mx-auto" style={{ backgroundColor: statusConfig[reg.status].color }}>
-                          {statusConfig[reg.status].icon}
-                          {statusConfig[reg.status].label}
-                      </Badge>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" disabled={isPending}>
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          disabled={!reg.taskSubmission || reg.status === "booked"}
-                          onClick={() => handleStatusChange(reg.id, "booked")}
-                        >
-                          <Check className="mr-2 h-4 w-4" /> Approve (Book)
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          disabled={!reg.taskSubmission || reg.status === "waitlisted"}
-                          onClick={() => handleStatusChange(reg.id, "waitlisted")}
-                        >
-                          <List className="mr-2 h-4 w-4" /> Waitlist
-                        </DropdownMenuItem>
-                         <DropdownMenuSeparator />
-                         <DropdownMenuItem
-                            className="text-red-500 focus:text-red-500"
-                            disabled={reg.status === "denied"}
-                            onClick={() => openDenyDialog(reg)}
-                          >
-                           <Ban className="mr-2 h-4 w-4" /> Deny
-                         </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+          <ScrollArea className="w-full whitespace-nowrap">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Student</TableHead>
+                  <TableHead className="hidden md:table-cell">Details</TableHead>
+                  <TableHead>Submission</TableHead>
+                  <TableHead className="text-center">Status</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
-              ))}
-               {registrations.length === 0 && (
-                  <TableRow>
-                      <TableCell colSpan={5} className="text-center h-24">
-                          No registrations yet.
-                      </TableCell>
+              </TableHeader>
+              <TableBody>
+                {sortedRegistrations.map((reg) => (
+                  <TableRow key={reg.id}>
+                    <TableCell>
+                      <div className="font-medium">{reg.studentName}</div>
+                      <div className="text-sm text-muted-foreground">{reg.studentEmail}</div>
+                       <div className="text-sm text-muted-foreground md:hidden mt-1">
+                        {reg.rollNumber}
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      <div className="text-sm text-muted-foreground">
+                        {reg.rollNumber} &bull; {reg.branch} &bull; Year {reg.yearOfStudy}
+                      </div>
+                       <div className="text-sm text-muted-foreground">
+                        {reg.mobileNumber} &bull; {reg.gender} &bull; Laptop: {reg.laptop ? "Yes" : "No"}
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {reg.taskSubmission ? (
+                        <Dialog>
+                          <DialogTrigger asChild>
+                             <Button variant="outline" size="sm">
+                              View Task <ExternalLink className="ml-2 h-3 w-3" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent>
+                            <DialogHeader>
+                              <DialogTitle>Task Submission for {reg.studentName}</DialogTitle>
+                              <DialogDescription>
+                                Submitted on: {reg.taskSubmittedAt ? reg.taskSubmittedAt.toLocaleString() : 'N/A'}
+                              </DialogDescription>
+                            </DialogHeader>
+                             <div className="p-4 bg-muted rounded-md text-sm break-all">
+                                <Link href={reg.taskSubmission} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                    {reg.taskSubmission}
+                                </Link>
+                            </div>
+                            <DialogFooter>
+                              <DialogClose asChild>
+                                <Button type="button">Close</Button>
+                              </DialogClose>
+                            </DialogFooter>
+                          </DialogContent>
+                        </Dialog>
+                      ) : (
+                        <span className="text-muted-foreground text-sm">Not submitted</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center">
+                        <Badge className="flex items-center gap-1.5 w-fit mx-auto" style={{ backgroundColor: statusConfig[reg.status].color }}>
+                            {statusConfig[reg.status].icon}
+                            {statusConfig[reg.status].label}
+                        </Badge>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" disabled={isPending}>
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent>
+                          <DropdownMenuItem
+                            disabled={!reg.taskSubmission || reg.status === "booked"}
+                            onClick={() => handleStatusChange(reg.id, "booked")}
+                          >
+                            <Check className="mr-2 h-4 w-4" /> Approve (Book)
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            disabled={!reg.taskSubmission || reg.status === "waitlisted"}
+                            onClick={() => handleStatusChange(reg.id, "waitlisted")}
+                          >
+                            <List className="mr-2 h-4 w-4" /> Waitlist
+                          </DropdownMenuItem>
+                           <DropdownMenuSeparator />
+                           <DropdownMenuItem
+                              className="text-red-500 focus:text-red-500"
+                              disabled={reg.status === "denied"}
+                              onClick={() => openDenyDialog(reg)}
+                            >
+                             <Ban className="mr-2 h-4 w-4" /> Deny
+                           </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
                   </TableRow>
-              )}
-            </TableBody>
-          </Table>
+                ))}
+                 {registrations.length === 0 && (
+                    <TableRow>
+                        <TableCell colSpan={5} className="text-center h-24">
+                            No registrations yet.
+                        </TableCell>
+                    </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </ScrollArea>
         </CardContent>
       </Card>
       

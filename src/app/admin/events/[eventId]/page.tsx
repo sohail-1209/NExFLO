@@ -1,4 +1,3 @@
-
 import { getEventById, getRegistrationsByEventId } from "@/lib/data";
 import { notFound } from "next/navigation";
 import { headers } from 'next/headers';
@@ -30,7 +29,7 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
             </Link>
         </Button>
         <div>
-            <h1 className="text-3xl font-bold tracking-tight">{event.name}</h1>
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight">{event.name}</h1>
             <p className="text-muted-foreground">{event.description}</p>
         </div>
       </div>
