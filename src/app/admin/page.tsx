@@ -66,9 +66,9 @@ export default async function AdminDashboard() {
                   const isUpcoming = event.date > new Date();
                   return (
                     <TableRow key={event.id}>
-                      <TableCell>
-                        <div className="font-medium">{event.name}</div>
-                        <div className="text-sm text-muted-foreground hidden md:inline">
+                      <TableCell className="py-2 px-4">
+                        <div className="font-medium break-all">{event.name}</div>
+                        <div className="text-sm text-muted-foreground hidden md:inline break-all">
                           {event.description.substring(0, 50)}...
                         </div>
                          <div className="text-sm text-muted-foreground mt-1 sm:hidden">
@@ -77,28 +77,29 @@ export default async function AdminDashboard() {
                           </Badge>
                         </div>
                       </TableCell>
-                      <TableCell className="hidden sm:table-cell">
+                      <TableCell className="hidden sm:table-cell py-2 px-4">
                         {event.date.toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
                         })}
                       </TableCell>
-                      <TableCell className="text-center">
+                      <TableCell className="text-center py-2 px-4">
                         <div className="flex items-center justify-center gap-2">
                           <Users className="h-4 w-4 text-muted-foreground" />
                           <span>{registrations.length}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="hidden sm:table-cell text-center">
+                      <TableCell className="hidden sm:table-cell text-center py-2 px-4">
                         <Badge variant={isUpcoming ? "default" : "secondary"}>
                           {isUpcoming ? "Upcoming" : "Finished"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right">
-                        <Button asChild variant="ghost" size="sm">
+                      <TableCell className="text-right py-2 px-4">
+                        <Button asChild variant="ghost" size="icon">
                           <Link href={`/admin/events/${event.id}`}>
-                            Manage <ArrowRight className="ml-2 h-4 w-4" />
+                            <ArrowRight className="h-4 w-4" />
+                            <span className="sr-only">Manage</span>
                           </Link>
                         </Button>
                       </TableCell>
