@@ -53,11 +53,11 @@ export default async function AdminDashboard() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="pl-4">Event</TableHead>
+                  <TableHead className="pl-1">Event</TableHead>
                   <TableHead className="hidden sm:table-cell">Date</TableHead>
                   <TableHead className="text-center">Registrations</TableHead>
                   <TableHead className="hidden sm:table-cell text-center">Status</TableHead>
-                  <TableHead className="text-right pr-4">Actions</TableHead>
+                  <TableHead className="text-right pr-1">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -66,7 +66,7 @@ export default async function AdminDashboard() {
                   const isUpcoming = event.date > new Date();
                   return (
                     <TableRow key={event.id}>
-                      <TableCell className="py-2 pl-4">
+                      <TableCell className="py-2 pl-1 break-all">
                         <div className="font-medium break-all">{event.name}</div>
                         <div className="text-sm text-muted-foreground hidden md:inline break-all">
                           {event.description.substring(0, 50)}...
@@ -95,7 +95,7 @@ export default async function AdminDashboard() {
                           {isUpcoming ? "Upcoming" : "Finished"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right py-2 pr-4">
+                      <TableCell className="text-right py-2 pr-1">
                         <Button asChild variant="ghost" size="icon">
                           <Link href={`/admin/events/${event.id}`}>
                             <ArrowRight className="h-4 w-4" />
