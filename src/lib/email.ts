@@ -13,31 +13,23 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-function replacePlaceholders(body: string, registration: Registration, event: Event, baseUrl: string): string {
+function createEmailHtml(body: string, registration: Registration, event: Event, baseUrl: string): string {
     const taskSubmissionUrl = `${baseUrl}/tasks/${registration.id}/submit`;
 
-    const buttonStyles = `
-      background-color:#7c3aed;
-      color:#ffffff;
-      padding:12px 24px;
-      text-decoration:none;
-      border-radius:5px;
-      font-weight:bold;
-      display:inline-block;
-      margin: 10px 0;
-    `;
-    
-    const downloadButton = `<a href="${event.taskPdfUrl}" target="_blank" rel="noopener noreferrer" style="${buttonStyles}">Download Task PDF</a>`;
-    const submissionButton = `<a href="${taskSubmissionUrl}" target="_blank" rel="noopener noreferrer" style="${buttonStyles}">Submit Your Task Here</a>`;
-
-    let finalBody = body
+    // Simple placeholder replacement for name and event
+    let processedBody = body
       .replace(/{studentName}/g, registration.studentName)
-      .replace(/{eventName}/g, event.name)
-      .replace(/{taskPdfLink}/g, downloadButton)
-      .replace(/{taskSubmissionLink}/g, submissionButton);
+      .replace(/{eventName}/g, event.name);
 
-    // Wrap in a full, compliant HTML structure as you suggested.
-    return `
+    // Convert newlines to <br> tags for HTML formatting
+    processedBody = processedBody.replace(/\n/g, "<br>");
+
+    // Generate the HTML for the buttons
+    const downloadButton = `<a href="${event.taskPdfUrl}" target="_blank" rel="noopener noreferrer" style="background-color:#7c3aed;color:#ffffff;padding:12px 24px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;margin-top:10px;">Download Task PDF</a>`;
+    const submissionButton = `<a href="${taskSubmissionUrl}" target="_blank" rel="noopener noreferrer" style="background-color:#7c3aed;color:#ffffff;padding:12px 24px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;margin-top:10px;">Submit Your Task Here</a>`;
+    
+    // Construct the final HTML, explicitly adding the buttons after the main body
+    const finalHtml = `
       <!DOCTYPE html>
       <html>
         <head>
@@ -47,10 +39,16 @@ function replacePlaceholders(body: string, registration: Registration, event: Ev
           </style>
         </head>
         <body>
-          ${finalBody.replace(/\n/g, "<br>")}
+          ${processedBody}
+          <br><br>
+          ${downloadButton}
+          <br>
+          ${submissionButton}
         </body>
       </html>
     `;
+
+    return finalHtml;
 }
 
 
@@ -60,7 +58,7 @@ export async function sendRegistrationEmail(registration: Registration, event: E
     throw new Error("Email service is not configured.");
   }
   
-  const emailHtml = replacePlaceholders(event.mailBody, registration, event, baseUrl);
+  const emailHtml = createEmailHtml(event.mailBody, registration, event, baseUrl);
   
   const mailOptions = {
     from: process.env.EMAIL_USER,
