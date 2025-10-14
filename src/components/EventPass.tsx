@@ -1,3 +1,4 @@
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import type { Event, Registration } from "@/lib/types";
@@ -57,8 +58,10 @@ export default function EventPass({ registration, event }: EventPassProps) {
             </div>
         </>
         ) : (
-             <div className="border-t border-dashed my-4"></div>
-             <p className="text-center text-muted-foreground">Your pass will be available here once your registration is approved.</p>
+             <>
+                <div className="border-t border-dashed my-4"></div>
+                <p className="text-center text-muted-foreground">Your pass will be available here once your registration is approved.</p>
+             </>
         )}
       </CardContent>
     </Card>
