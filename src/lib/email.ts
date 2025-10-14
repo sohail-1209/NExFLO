@@ -14,13 +14,15 @@ const transporter = nodemailer.createTransport({
 });
 
 function replacePlaceholders(body: string, registration: Registration, event: Event, baseUrl: string): string {
-    // Basic placeholder replacement
     let finalBody = body.replace(/{studentName}/g, registration.studentName);
     finalBody = finalBody.replace(/{eventName}/g, event.name);
 
-    // Create the submission link
+    // Create and replace task PDF link
+    finalBody = finalBody.replace(/{taskPdfLink}/g, `<a href="${event.taskPdfUrl}" target="_blank" rel="noopener noreferrer">Download Task PDF</a>`);
+
+    // Create and replace task submission link
     const taskSubmissionUrl = `${baseUrl}/tasks/${registration.id}/submit`;
-    finalBody = finalBody.replace(/{taskSubmissionLink}/g, `<a href="${taskSubmissionUrl}">${taskSubmissionUrl}</a>`);
+    finalBody = finalBody.replace(/{taskSubmissionLink}/g, `<a href="${taskSubmissionUrl}" target="_blank" rel="noopener noreferrer">Submit Your Task Here</a>`);
     
     return finalBody;
 }
