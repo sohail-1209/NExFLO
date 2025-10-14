@@ -77,8 +77,21 @@ export default function CreateEventPage() {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="taskPdfUrl">Task PDF URL</Label>
-            <Input id="taskPdfUrl" name="taskPdfUrl" placeholder="https://example.com/task.pdf" defaultValue="/mock-task.pdf" />
+            <Label htmlFor="mailSubject">Registration Email Subject</Label>
+            <Input id="mailSubject" name="mailSubject" placeholder="e.g., Your Registration for [Event Name]" />
+             {state?.errors?.mailSubject && <p className="text-destructive text-sm">{state.errors.mailSubject[0]}</p>}
+          </div>
+
+           <div className="space-y-2">
+            <Label htmlFor="mailBody">Registration Email Body</Label>
+            <Textarea id="mailBody" name="mailBody" placeholder="e.g., Hi {studentName}, thanks for registering!"/>
+             {state?.errors?.mailBody && <p className="text-destructive text-sm">{state.errors.mailBody[0]}</p>}
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="taskPdfUrl">Task PDF</Label>
+            <Input id="taskPdfUrl" name="taskPdfUrl" type="file" />
+            <p className="text-xs text-muted-foreground">Note: File upload is for demonstration. A mock PDF will be used.</p>
              {state?.errors?.taskPdfUrl && <p className="text-destructive text-sm">{state.errors.taskPdfUrl[0]}</p>}
           </div>
         </CardContent>

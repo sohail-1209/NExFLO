@@ -1,6 +1,6 @@
 import type { Event } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, MessageSquare, FileText } from "lucide-react";
+import { Calendar, MessageSquare, FileText, Mail } from "lucide-react";
 import QRCodeDisplay from "@/components/common/QRCodeDisplay";
 
 interface DetailsTabProps {
@@ -30,6 +30,14 @@ export default function DetailsTab({ event }: DetailsTabProps) {
               <div>
                 <h3 className="font-semibold">Confirmation Message</h3>
                 <p className="text-muted-foreground">{event.confirmationMessage}</p>
+              </div>
+            </div>
+             <div className="flex items-start gap-4">
+              <Mail className="h-5 w-5 mt-1 text-muted-foreground" />
+              <div>
+                <h3 className="font-semibold">Registration Email</h3>
+                <p className="text-sm font-medium">{event.mailSubject}</p>
+                <p className="text-muted-foreground whitespace-pre-wrap">{event.mailBody}</p>
               </div>
             </div>
             <div className="flex items-start gap-4">

@@ -11,7 +11,9 @@ const eventSchema = z.object({
   description: z.string().min(10, "Description must be at least 10 characters long"),
   date: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid date" }),
   confirmationMessage: z.string().min(10, "Confirmation message must be at least 10 characters long"),
-  taskPdfUrl: z.string().url("Must be a valid URL (use /mock-task.pdf for now)"),
+  mailSubject: z.string().min(5, "Mail subject must be at least 5 characters long"),
+  mailBody: z.string().min(20, "Mail body must be at least 20 characters long"),
+  taskPdfUrl: z.string().min(1, "A task PDF is required."),
 });
 
 export async function createEvent(prevState: any, formData: FormData) {
@@ -20,6 +22,8 @@ export async function createEvent(prevState: any, formData: FormData) {
     description: formData.get("description"),
     date: formData.get("date"),
     confirmationMessage: formData.get("confirmationMessage"),
+    mailSubject: formData.get("mailSubject"),
+    mailBody: formData.get("mailBody"),
     taskPdfUrl: formData.get("taskPdfUrl"),
   });
 
@@ -30,10 +34,16 @@ export async function createEvent(prevState: any, formData: FormData) {
     };
   }
 
+  // NOTE: In a real app, you would handle the file upload here,
+  // save it to a storage service, and get a URL.
+  // For now, we'll just use the mock path from the form.
+  const taskPdfUrl = "/mock-task.pdf";
+
   try {
     const newEvent = await dbCreateEvent({
       ...validatedFields.data,
       date: new Date(validatedFields.data.date),
+      taskPdfUrl: taskPdfUrl, // Use the "uploaded" path
     });
     revalidatePath("/admin");
     return { message: "success", eventId: newEvent.id };

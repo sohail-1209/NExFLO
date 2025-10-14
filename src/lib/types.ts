@@ -5,6 +5,8 @@ export type Event = {
   date: Date;
   confirmationMessage: string;
   taskPdfUrl: string;
+  mailSubject: string;
+  mailBody: string;
 };
 
 export type Registration = {
