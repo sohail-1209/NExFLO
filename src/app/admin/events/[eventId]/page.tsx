@@ -1,3 +1,4 @@
+
 import { getEventById, getRegistrationsByEventId } from "@/lib/data";
 import { notFound } from "next/navigation";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,6 +15,7 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
     notFound();
   }
   const registrations = await getRegistrationsByEventId(params.eventId);
+  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
 
   return (
     <div className="space-y-6">
@@ -45,7 +47,7 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
           </TabsTrigger>
         </TabsList>
         <TabsContent value="details">
-          <DetailsTab event={event} />
+          <DetailsTab event={event} baseUrl={baseUrl} />
         </TabsContent>
         <TabsContent value="registrations">
           <RegistrationsTab registrations={registrations} eventId={event.id} />
