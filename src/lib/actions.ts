@@ -50,9 +50,13 @@ export async function createEvent(prevState: any, formData: FormData) {
         redirect(`/admin/events/${newEvent.id}`);
     }
 
+    // This part is unlikely to be reached due to the redirect, but it's good practice.
     return { message: "success", eventId: newEvent.id };
 
   } catch (e: any) {
+    if (e.message.includes('NEXT_REDIRECT')) {
+      throw e;
+    }
     console.error(e);
     return { message: `Error: Failed to create event: ${e.message}` };
   }
@@ -107,6 +111,9 @@ export async function registerForEvent(eventId: string, prevState: any, formData
     revalidatePath(`/admin/events/${eventId}`);
     redirect(`/register/success/${newRegistration.id}`);
   } catch (e: any) {
+    if (e.message.includes('NEXT_REDIRECT')) {
+      throw e;
+    }
     console.error(e);
     return { message: `Error: Failed to register: ${e.message}` };
   }
