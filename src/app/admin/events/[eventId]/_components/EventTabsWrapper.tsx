@@ -28,8 +28,7 @@ export default function EventTabsWrapper({ event, registrations, baseUrl }: Even
     <Tabs defaultValue="details">
       <TabsList className="grid w-full grid-cols-3">
         <TabsTrigger value="details">
-          <Calendar className="w-4 h-4 mr-2"/>
-          Details
+          <Calendar className="w-4 h-4"/>
         </TabsTrigger>
         <TabsTrigger value="registrations">
           <Users className="w-4 h-4 mr-2"/>
