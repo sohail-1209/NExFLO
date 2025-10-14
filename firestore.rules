@@ -2,27 +2,31 @@
  * @fileoverview Firestore Security Rules for Prototyping.
  *
  * Core Philosophy:
- * This ruleset prioritizes rapid prototyping by granting broad access while requiring user authentication.
- * It does not enforce strict data validation but focuses on securing data based on user identity.
+ * This ruleset is in prototyping mode. As such, it grants open access to all authenticated users while ensuring that unauthenticated users cannot access the database.
  *
  * Data Structure:
  * The database contains two top-level collections: `events` and `registrations`.
  *
  * Key Security Decisions:
- * - Authenticated users can read and write all data.
- * - Data validation is minimal, focusing only on authentication and basic ownership.
+ * - Authenticated users can create, read, update, and delete any document in any collection.
+ * - Unauthenticated users are denied all access.
+ *
+ * Access Control Patterns:
+ * - `/events/{eventId}`: Public Read with Owner-Only Writes (but with open access for prototyping)
+ * - `/registrations/{registrationId}`: Public Read with Owner-Only Writes (but with open access for prototyping)
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Allows any authenticated user to read and write events.
+     * @description Rules for the 'events' collection. Allows any authenticated user to perform any operation.
      * @path /events/{eventId}
-     * @allow (get, list) - Any authenticated user can read events.
-     * @allow (create, update, delete) - Any authenticated user can create, update, or delete events.
-     * @deny (none) - No requests are explicitly denied due to authentication requirement.
-     * @principle Allows authenticated users to manage events freely for prototyping.
+     * @allow (create) User logged in can create event.
+     * @deny (create) User not logged in cannot create event.
+     * @allow (get) Any logged in user can read any event.
+     * @deny (get) User not logged in cannot read any event.
+     * @principle Allows read and write access to the 'events' collection for any authenticated user in prototyping mode.
      */
     match /events/{eventId} {
       allow get, list: if isSignedIn();
@@ -30,12 +34,13 @@ service cloud.firestore {
     }
 
     /**
-     * @description Allows any authenticated user to read and write registrations.
+     * @description Rules for the 'registrations' collection. Allows any authenticated user to perform any operation.
      * @path /registrations/{registrationId}
-     * @allow (get, list) - Any authenticated user can read registrations.
-     * @allow (create, update, delete) - Any authenticated user can create, update, or delete registrations.
-     * @deny (none) - No requests are explicitly denied due to authentication requirement.
-     * @principle Allows authenticated users to manage registrations freely for prototyping.
+     * @allow (create) User logged in can create registration.
+     * @deny (create) User not logged in cannot create registration.
+     * @allow (get) Any logged in user can read any registration.
+     * @deny (get) User not logged in cannot read any registration.
+     * @principle Allows read and write access to the 'registrations' collection for any authenticated user in prototyping mode.
      */
     match /registrations/{registrationId} {
       allow get, list: if isSignedIn();
