@@ -1,3 +1,4 @@
+
 import {
   collection,
   doc,
@@ -12,8 +13,12 @@ import {
   serverTimestamp,
 } from "firebase/firestore";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
-import { db } from "@/firebase/firestore";
+import { initializeFirebase } from "@/firebase";
 import type { Event, Registration } from './types';
+
+// Initialize Firebase services
+const { firestore, firebaseApp } = initializeFirebase();
+const db = firestore;
 
 // Type converters for Firestore
 const eventConverter = {
@@ -97,7 +102,7 @@ export const getRegistrationById = async (id:string): Promise<Registration | und
 
 export const createEvent = async (eventData: Omit<Event, 'id' | 'taskPdfUrl'> & { taskPdfFile: File }): Promise<Event> => {
   const { taskPdfFile, ...restData } = eventData;
-  const storage = getStorage();
+  const storage = getStorage(firebaseApp);
 
   // Upload file to Firebase Storage
   const storageRef = ref(storage, `tasks/${Date.now()}-${taskPdfFile.name}`);
