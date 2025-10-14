@@ -138,7 +138,7 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
         description: result.message,
       });
       // Update local state to reflect check-in
-       setScannedRegistration(prev => prev ? {...prev, attended: true} : null);
+       setScannedRegistration(prev => prev ? {...prev, attended: true, status: 'booked'} : null);
     } else {
       toast({
         title: "Check-in Failed",
@@ -228,7 +228,7 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
         {scannedRegistration && (
             <CardFooter className="flex justify-between">
                 <Button variant="ghost" onClick={clearScan}>Clear</Button>
-                {scannedRegistration.status === 'booked' ? (
+                {(scannedRegistration.status === 'booked' || scannedRegistration.status === 'waitlisted') ? (
                      <Button onClick={handleCheckIn} disabled={scannedRegistration.attended}>
                         <UserCheck className="mr-2 h-4 w-4"/>
                         {scannedRegistration.attended ? 'Already Checked In' : 'Confirm Check-in'}

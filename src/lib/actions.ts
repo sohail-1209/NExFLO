@@ -247,7 +247,13 @@ export async function markAttendance(registrationId: string, eventId: string): P
              return { success: false, message: 'Registration not found.' };
         }
         
-        await updateRegistration(registrationId, { attended: true });
+        // Update both attended and status if they were waitlisted
+        const updates: Partial<Registration> = { attended: true };
+        if (registration.status === 'waitlisted') {
+            updates.status = 'booked';
+        }
+        
+        await updateRegistration(registrationId, updates);
 
         revalidatePath(`/admin/events/${eventId}`);
         revalidatePath(`/admin/events/${eventId}/attendance`);
