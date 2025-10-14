@@ -1,21 +1,49 @@
 
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useActionState } from "react";
 import { getRegistrationById, getEventById } from "@/lib/data";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle, Mail } from "lucide-react";
+import { ArrowLeft, CheckCircle, Mail, Send } from "lucide-react";
 import type { Event, Registration } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
+import { resendRegistrationEmail } from "@/lib/actions";
+import { useToast } from "@/hooks/use-toast";
+
+const initialState = {
+    message: "",
+    success: false,
+};
 
 
 export default function RegistrationSuccessPage({ params: paramsPromise }: { params: { registrationId: string } }) {
   const params = use(paramsPromise);
   const [data, setData] = useState<{ registration: Registration, event: Event } | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+  
+  const handleResendEmail = async () => {
+    if (!params.registrationId) return;
+
+    const result = await resendRegistrationEmail(params.registrationId);
+
+    if (result.success) {
+      toast({
+        title: "Email Sent!",
+        description: result.message,
+      });
+    } else {
+      toast({
+        title: "Error",
+        description: result.message,
+        variant: "destructive",
+      });
+    }
+  };
+
 
   useEffect(() => {
     async function fetchData() {
@@ -74,6 +102,13 @@ export default function RegistrationSuccessPage({ params: paramsPromise }: { par
                 <p className="text-sm text-muted-foreground mt-2">
                     We've sent a confirmation to <span className="font-semibold text-foreground">{registration.studentEmail}</span>. Please check your inbox for the event task and a link to submit your work. Your spot will be confirmed upon approval of your submission.
                 </p>
+            </div>
+             <div className="text-sm text-muted-foreground">
+                <p>Didn't receive the email?</p>
+                <Button variant="link" onClick={handleResendEmail} className="text-primary">
+                    <Send className="mr-2 h-4 w-4" />
+                    Resend Confirmation Email
+                </Button>
             </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">

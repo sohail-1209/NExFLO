@@ -184,3 +184,30 @@ export async function markAttendance(registrationId: string, eventId: string): P
         return { success: false, message: `Error: Failed to mark attendance: ${e.message}` };
     }
 }
+
+export async function resendRegistrationEmail(registrationId: string) {
+    try {
+        const registration = await getRegistrationByIdData(registrationId);
+        if (!registration) {
+            return { success: false, message: "Registration not found." };
+        }
+
+        const event = await getEventById(registration.eventId);
+        if (!event) {
+            return { success: false, message: "Event not found." };
+        }
+
+        const headersList = headers();
+        const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
+        const protocol = headersList.get('x-forwarded-proto') || 'http';
+        const baseUrl = `${protocol}://${host}`;
+
+        await sendRegistrationEmail(registration, event, baseUrl);
+
+        return { success: true, message: `Email resent to ${registration.studentEmail}` };
+
+    } catch (error: any) {
+        console.error("Failed to resend email:", error);
+        return { success: false, message: "Failed to resend email." };
+    }
+}
