@@ -29,7 +29,7 @@ function SubmitButton({ isPastEvent }: { isPastEvent: boolean }) {
   </Button>;
 }
 
-export default function RegisterPage({ params: paramsPromise }: { params: Promise<{ eventId: string }> }) {
+export default function RegisterPage({ params: paramsPromise }: { params: { eventId: string } }) {
   const params = use(paramsPromise);
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);

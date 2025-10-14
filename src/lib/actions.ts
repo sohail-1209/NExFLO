@@ -1,11 +1,13 @@
+
 "use server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { createEventInData, createRegistration, updateRegistration, getRegistrationById as getRegistrationByIdData } from "./data";
-import type { Registration } from "./types";
-import { getEventById } from "./data";
+import { createEventInData, createRegistration, updateRegistration, getRegistrationById as getRegistrationByIdData, getEventById } from "./data";
+import type { Registration, Event } from "./types";
+import { sendRegistrationEmail } from "./email";
+
 
 const eventSchema = z.object({
   name: z.string().min(3, "Event name must be at least 3 characters long"),
@@ -50,7 +52,6 @@ export async function createEvent(prevState: any, formData: FormData) {
         redirect(`/admin/events/${newEvent.id}`);
     }
 
-    // This part is unlikely to be reached due to the redirect, but it's good practice.
     return { message: "success", eventId: newEvent.id };
 
   } catch (e: any) {
@@ -108,6 +109,10 @@ export async function registerForEvent(eventId: string, prevState: any, formData
       eventId,
       ...validatedFields.data,
     });
+
+    // Send the confirmation email
+    await sendRegistrationEmail(newRegistration, event);
+
     revalidatePath(`/admin/events/${eventId}`);
     redirect(`/register/success/${newRegistration.id}`);
   } catch (e: any) {

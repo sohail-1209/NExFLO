@@ -12,13 +12,14 @@ import type { Event, Registration } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 
 
-export default function RegistrationSuccessPage({ params: paramsPromise }: { params: Promise<{ registrationId: string }> }) {
+export default function RegistrationSuccessPage({ params: paramsPromise }: { params: { registrationId: string } }) {
   const params = use(paramsPromise);
   const [data, setData] = useState<{ registration: Registration, event: Event } | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchData() {
+      if(!params.registrationId) return;
       const registration = await getRegistrationById(params.registrationId);
       if (!registration) notFound();
       const event = await getEventById(registration.eventId);
