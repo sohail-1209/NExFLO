@@ -1,13 +1,14 @@
 
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath } from "next/revalidate";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createEventInData, createRegistration, updateRegistration, getRegistrationById as getRegistrationByIdData, getEventById, updateEvent } from "./data";
 import type { Registration, Event } from "./types";
 import { sendRegistrationEmail, sendPassEmail } from "./email";
+import { suggestEmailCorrection as suggestEmailCorrectionFlow, type EmailInput } from '@/ai/flows/suggest-email-flow';
 
 
 const eventSchema = z.object({
@@ -297,4 +298,17 @@ export async function resendRegistrationEmail(registrationId: string) {
     }
 }
 
+
+export async function suggestEmailCorrection(
+  input: EmailInput
+): Promise<{ suggestion: string | null }> {
+  try {
+    const result = await suggestEmailCorrectionFlow(input);
+    return { suggestion: result.suggestion };
+  } catch (error) {
+    console.error('Error in AI suggestion flow:', error);
+    // Return no suggestion in case of an error
+    return { suggestion: null };
+  }
+}
     

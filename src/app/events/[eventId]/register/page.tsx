@@ -1,8 +1,8 @@
 
 "use client";
 
-import { useActionState, useEffect, useState, use } from "react";
-import { registerForEvent } from "@/lib/actions";
+import { useActionState, useEffect, useState, use, useTransition } from "react";
+import { registerForEvent, suggestEmailCorrection } from "@/lib/actions";
 import { getEventById } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { notFound } from "next/navigation";
 import type { Event } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft, Calendar, Sparkles } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
@@ -33,6 +33,10 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
   const params = use(paramsPromise);
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState('');
+  const [emailSuggestion, setEmailSuggestion] = useState<string | null>(null);
+  const [isCheckingEmail, startEmailCheck] = useTransition();
+
   const { toast } = useToast();
   
   const registerForEventWithId = registerForEvent.bind(null, params.eventId);
@@ -61,8 +65,26 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
         variant: "destructive"
       })
     }
-  }, [state, toast])
+  }, [state, toast]);
 
+  const handleEmailBlur = () => {
+    if (email && email.includes('@')) {
+      startEmailCheck(async () => {
+        setEmailSuggestion(null);
+        const { suggestion } = await suggestEmailCorrection({ email });
+        if (suggestion) {
+          setEmailSuggestion(suggestion);
+        }
+      });
+    }
+  };
+
+  const handleSuggestionClick = () => {
+    if (emailSuggestion) {
+      setEmail(emailSuggestion);
+      setEmailSuggestion(null);
+    }
+  };
 
   if (loading) {
     return (
@@ -150,8 +172,30 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
             </div>
             <div className="space-y-2">
               <Label htmlFor="studentEmail">Email Address</Label>
-              <Input id="studentEmail" name="studentEmail" type="email" placeholder="jane.doe@example.com" required disabled={isPastEvent} />
-              {state?.errors?.studentEmail && <p className="text-sm text-destructive">{state.errors.studentEmail[0]}</p>}
+              <Input 
+                id="studentEmail" 
+                name="studentEmail" 
+                type="email" 
+                placeholder="jane.doe@example.com" 
+                required 
+                disabled={isPastEvent} 
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={handleEmailBlur}
+              />
+               {state?.errors?.studentEmail && <p className="text-sm text-destructive">{state.errors.studentEmail[0]}</p>}
+               {isCheckingEmail && <p className="text-xs text-muted-foreground flex items-center gap-1.5 pt-1"><Sparkles className="h-3 w-3 animate-pulse" />Checking for typos...</p>}
+               {emailSuggestion && !isCheckingEmail && (
+                 <Button
+                    type="button"
+                    variant="link"
+                    size="sm"
+                    className="text-primary h-auto p-0 text-xs"
+                    onClick={handleSuggestionClick}
+                  >
+                    Did you mean: <span className="font-semibold">{emailSuggestion}</span>?
+                  </Button>
+               )}
             </div>
              <div className="space-y-2">
               <Label htmlFor="mobileNumber">Mobile Number</Label>
@@ -184,3 +228,4 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
     </div>
   );
 }
+
