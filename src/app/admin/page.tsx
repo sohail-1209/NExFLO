@@ -77,20 +77,20 @@ export default async function AdminDashboard() {
                           </Badge>
                         </div>
                       </TableCell>
-                      <TableCell className="hidden sm:table-cell py-2 px-2">
+                      <TableCell className="hidden sm:table-cell py-2 px-1">
                         {event.date.toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
                         })}
                       </TableCell>
-                      <TableCell className="text-center py-2 px-2">
+                      <TableCell className="text-center py-2 px-1">
                         <div className="flex items-center justify-center gap-2">
                           <Users className="h-4 w-4 text-muted-foreground" />
                           <span>{registrations.length}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="hidden sm:table-cell text-center py-2 px-2">
+                      <TableCell className="hidden sm:table-cell text-center py-2 px-1">
                         <Badge variant={isUpcoming ? "default" : "secondary"}>
                           {isUpcoming ? "Upcoming" : "Finished"}
                         </Badge>
