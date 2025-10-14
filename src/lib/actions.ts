@@ -342,7 +342,7 @@ export async function sendManualPass(prevState: any, formData: FormData) {
     const protocol = headersList.get('x-forwarded-proto') || 'http';
     const baseUrl = `${protocol}://${host}`;
     
-    await sendManualPassEmail({ ...validatedFields.data, date: new Date(validatedFields.data.eventDate) }, baseUrl);
+    await sendManualPassEmail({ ...validatedFields.data, eventDate: new Date(validatedFields.data.eventDate) }, baseUrl);
 
     return { message: `Email sent successfully to ${validatedFields.data.studentEmail}!` };
   } catch (e: any) {
@@ -388,7 +388,7 @@ export async function sendBulkPasses(prevState: any, formData: FormData) {
     // Call a new email function designed for bulk sending
     await sendBulkPassesEmail(
       attendees,
-      { ...emailDetails, date: new Date(emailDetails.eventDate) },
+      { ...emailDetails, eventDate: new Date(emailDetails.eventDate) },
       baseUrl
     );
 
@@ -398,3 +398,4 @@ export async function sendBulkPasses(prevState: any, formData: FormData) {
     return { message: `Error: Failed to send emails: ${e.message}` };
   }
 }
+
