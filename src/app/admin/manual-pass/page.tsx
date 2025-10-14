@@ -15,6 +15,7 @@ import { Separator } from "@/components/ui/separator";
 import Papa from "papaparse";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const singleInitialState = { message: "", errors: {} };
 const bulkInitialState = { message: "", errors: {} };
@@ -145,22 +146,29 @@ export default function ManualPassPage() {
             </div>
 
             <Separator/>
-            <div className="space-y-4">
-                 <h3 className="text-lg font-medium flex items-center gap-2"><Shield className="w-5 h-5" /> Custom Email Sender (Optional)</h3>
+            <Collapsible>
+                <CollapsibleTrigger asChild>
+                    <Button variant="link" className="p-0 flex items-center gap-2">
+                        <Shield className="w-5 h-5" />
+                        Custom Email Sender (Optional)
+                    </Button>
+                </CollapsibleTrigger>
                  <p className="text-sm text-muted-foreground">Provide credentials to send this email from a specific account.</p>
-                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                        <Label htmlFor="appMail">Custom App Email</Label>
-                        <Input id="appMail" name="appMail" type="email" placeholder="your-email@gmail.com" />
-                        {singleState?.errors?.appMail && <p className="text-destructive text-sm">{singleState.errors.appMail[0]}</p>}
-                    </div>
-                    <div className="space-y-2">
-                        <Label htmlFor="appPass">Custom App Password</Label>
-                        <Input id="appPass" name="appPass" type="password" placeholder="16-digit app password" />
-                        {singleState?.errors?.appPass && <p className="text-destructive text-sm">{singleState.errors.appPass[0]}</p>}
-                    </div>
-                 </div>
-            </div>
+                <CollapsibleContent className="pt-4 space-y-4">
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="appMail">Custom App Email</Label>
+                            <Input id="appMail" name="appMail" type="email" placeholder="your-email@gmail.com" />
+                            {singleState?.errors?.appMail && <p className="text-destructive text-sm">{singleState.errors.appMail[0]}</p>}
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="appPass">Custom App Password</Label>
+                            <Input id="appPass" name="appPass" type="password" placeholder="16-digit app password" />
+                            {singleState?.errors?.appPass && <p className="text-destructive text-sm">{singleState.errors.appPass[0]}</p>}
+                        </div>
+                     </div>
+                </CollapsibleContent>
+            </Collapsible>
 
             </CardContent>
             <CardFooter>
@@ -221,6 +229,29 @@ export default function ManualPassPage() {
                     <Label htmlFor="bulk_sendWithoutPass">Send normal email (without pass attachment)</Label>
                 </div>
                 
+                <Separator />
+                <Collapsible>
+                    <CollapsibleTrigger asChild>
+                         <Button variant="link" className="p-0 flex items-center gap-2">
+                            <Shield className="w-5 h-5" />
+                            Custom Email Sender (Optional)
+                        </Button>
+                    </CollapsibleTrigger>
+                     <p className="text-sm text-muted-foreground">Provide credentials to send these bulk emails from a specific account.</p>
+                    <CollapsibleContent className="pt-4 space-y-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="bulk_appMail">Custom App Email</Label>
+                                <Input id="bulk_appMail" name="appMail" type="email" placeholder="your-email@gmail.com" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="bulk_appPass">Custom App Password</Label>
+                                <Input id="bulk_appPass" name="appPass" type="password" placeholder="16-digit app password" />
+                            </div>
+                        </div>
+                    </CollapsibleContent>
+                </Collapsible>
+
                 <Separator />
                 <h3 className="text-lg font-medium">Upload Attendees</h3>
                  <div className="space-y-2">

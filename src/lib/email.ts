@@ -13,7 +13,7 @@ interface TransporterOptions {
     };
 }
 
-function getTransporter(customMail?: string, customPass?: string) {
+function getTransporter(customMail?: string | null, customPass?: string | null) {
     const useDefault = !customMail || !customPass;
 
     const user = useDefault ? process.env.EMAIL_USER : customMail;
@@ -281,8 +281,8 @@ export interface ManualPassDetails {
     emailSubject: string;
     emailBody: string;
     sendWithoutPass: boolean;
-    appMail?: string;
-    appPass?: string;
+    appMail?: string | null;
+    appPass?: string | null;
 }
 
 export async function sendManualPassEmail(details: ManualPassDetails, baseUrl: string) {
@@ -418,8 +418,8 @@ export interface BulkEmailDetails {
     emailSubject: string;
     emailBody: string;
     sendWithoutPass: boolean;
-    appMail?: string;
-    appPass?: string;
+    appMail?: string | null;
+    appPass?: string | null;
 }
 
 function replacePlaceholders(template: string, attendee: AttendeeData, eventDetails: Omit<BulkEmailDetails, 'eventDate' | 'sendWithoutPass' | 'emailSubject' | 'emailBody' | 'appMail' | 'appPass'> & {date: Date}): string {
@@ -430,7 +430,7 @@ function replacePlaceholders(template: string, attendee: AttendeeData, eventDeta
     for (const key in allPlaceholders) {
         // Normalize key to be safe for regex: remove spaces and handle special characters
         const placeholder = `{${key}}`;
-        result = result.replace(new RegExp(placeholder, "g"), (allPlaceholders as any)[key]);
+        result = result.replace(new RegExp(placeholder.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1"), "g"), (allPlaceholders as any)[key]);
     }
 
     return result;

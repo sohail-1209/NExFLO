@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Mail, Shield } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 const initialState = {
   message: "",
@@ -105,22 +106,29 @@ export default function CreateEventPage() {
           
            <Separator />
 
-          <div className="space-y-4">
-             <h3 className="text-lg font-medium flex items-center gap-2"><Shield className="w-5 h-5" /> Custom Email Sender (Optional)</h3>
-             <p className="text-sm text-muted-foreground">If you want to send emails from a specific Gmail account for this event, provide the credentials below. Otherwise, the default system email will be used.</p>
-             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                    <Label htmlFor="appMail">Custom App Email</Label>
-                    <Input id="appMail" name="appMail" type="email" placeholder="your-email@gmail.com" />
-                    {state?.errors?.appMail && <p className="text-destructive text-sm">{state.errors.appMail[0]}</p>}
-                </div>
-                <div className="space-y-2">
-                    <Label htmlFor="appPass">Custom App Password</Label>
-                    <Input id="appPass" name="appPass" type="password" placeholder="16-digit app password" />
-                    {state?.errors?.appPass && <p className="text-destructive text-sm">{state.errors.appPass[0]}</p>}
-                </div>
-             </div>
-          </div>
+          <Collapsible>
+            <CollapsibleTrigger asChild>
+                <Button variant="link" className="p-0 flex items-center gap-2">
+                    <Shield className="w-5 h-5" /> 
+                    Custom Email Sender (Optional)
+                </Button>
+            </CollapsibleTrigger>
+             <p className="text-sm text-muted-foreground">Click to provide credentials if you want to send emails from a specific Gmail account. Otherwise, the default system email will be used.</p>
+            <CollapsibleContent className="pt-4 space-y-4">
+                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                        <Label htmlFor="appMail">Custom App Email</Label>
+                        <Input id="appMail" name="appMail" type="email" placeholder="your-email@gmail.com" />
+                        {state?.errors?.appMail && <p className="text-destructive text-sm">{state.errors.appMail[0]}</p>}
+                    </div>
+                    <div className="space-y-2">
+                        <Label htmlFor="appPass">Custom App Password</Label>
+                        <Input id="appPass" name="appPass" type="password" placeholder="16-digit app password" />
+                        {state?.errors?.appPass && <p className="text-destructive text-sm">{state.errors.appPass[0]}</p>}
+                    </div>
+                 </div>
+            </CollapsibleContent>
+          </Collapsible>
         </CardContent>
         <CardFooter className="flex justify-between">
             <Button asChild variant="outline">
