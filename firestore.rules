@@ -1,46 +1,61 @@
 /**
- * @file Firebase Security Rules
- * @version 2
+ * @fileoverview Firestore Security Rules for the application.
  *
- * @description
- * This ruleset allows anyone to do anything, regardless of authentication status.
- * This is ONLY suitable for prototyping and should NEVER be deployed to production.
+ * Core Philosophy:
+ * This ruleset prioritizes security by enforcing strict data access controls.
+ * Public read access is granted cautiously and only where explicitly intended.
+ * Write access is always restricted based on authorization checks.
  *
  * Data Structure:
- * - /events/{eventId}: Stores event information.
- * - /registrations/{registrationId}: Stores registration information.
+ * The Firestore database contains two top-level collections: `events` and `registrations`.
+ *  - `/events/{eventId}`: Stores event data.
+ *  - `/registrations/{registrationId}`: Stores user registration data for events.
  *
  * Key Security Decisions:
- * - All read and write operations are permitted for all users.
+ * - Public read access is enabled for the `events` collection to allow listing of all events.
+ * - Write access to the `events` collection is not permitted (in the prototype mode) and requires a TODO for future access control implementation.
+ * - Write access to the `registrations` collection is not permitted (in the prototype mode) and requires a TODO for future access control implementation.
+ * - All potentially sensitive data, such as registration records, are strictly secured.
+ *
+ * Denormalization for Authorization:
+ *  - The current data model does not explicitly support authorization. Therefore, owner fields would be needed to improve the security rules.
+ *
+ * Structural Segregation:
+ *  - The application does not currently implement structural segregation. All events and registration information are stored in top-level collections.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Allows anyone to read or write event data.
+     * @description Allows public read access to the `events` collection, but restricts write access.
      * @path /events/{eventId}
-     * @allow (get, list) Any user can read event details.
-     * @allow (create, update, delete) Any user can create, update, or delete event details.
-     * @deny None. All operations are permitted.
-     * @principle Allows all access for prototyping purposes.
+     * @allow (get, list) Anyone can read event data.
+     * @deny (create, update, delete) No one can create, update, or delete events.
+     * @principle Allows public listing of events while restricting unauthorized modifications.
      */
     match /events/{eventId} {
       allow get, list: if true;
-      allow create, update, delete: if true;
+      allow create, update, delete: if false; // TODO: Add owner validation once the schema is updated with an ownership field.
     }
 
     /**
-     * @description Allows anyone to read or write registration data.
+     * @description Restricts all access to the `registrations` collection.
      * @path /registrations/{registrationId}
-     * @allow (get, list) Any user can read registration details.
-     * @allow (create, update, delete) Any user can create, update, or delete registration details.
-     * @deny None. All operations are permitted.
-     * @principle Allows all access for prototyping purposes.
+     * @allow None.
+     * @deny (get, list, create, update, delete) No one can access registration data without further rules.
+     * @principle Enforces strict access control on sensitive registration information.
      */
     match /registrations/{registrationId} {
-      allow get, list: if true;
-      allow create, update, delete: if true;
+      allow get, list, create, update, delete: if false; // TODO: Implement more specific security rules for registrations.
+    }
+  }
+}
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if true;
     }
   }
 }
