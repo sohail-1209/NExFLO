@@ -3,7 +3,7 @@
 
 import { useUser } from "@/firebase/auth/use-user";
 import Link from "next/link";
-import { Home, PlusCircle, Calendar, LogOut, LogIn } from "lucide-react";
+import { Home, PlusCircle, Calendar, LogOut, LogIn, Send } from "lucide-react";
 import {
   SidebarProvider,
   Sidebar,
@@ -28,6 +28,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 export default function AdminLayout({
   children,
@@ -148,7 +149,16 @@ export default function AdminLayout({
                 </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarMenuButton href="/admin/manual-pass" asChild>
+                    <Link href="/admin/manual-pass">
+                        <Send />
+                        Manual Pass
+                    </Link>
+                </SidebarMenuButton>
+            </SidebarMenuItem>
           </SidebarMenu>
+          <Separator className="my-2" />
           <div className="px-4 py-2 text-sm font-medium text-muted-foreground">
             Events
           </div>

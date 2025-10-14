@@ -1,8 +1,10 @@
+
 export type Event = {
   id: string;
   name: string;
   description: string;
   date: Date;
+  venue: string;
   confirmationMessage: string;
   taskPdfUrl: string;
   mailSubject: string;

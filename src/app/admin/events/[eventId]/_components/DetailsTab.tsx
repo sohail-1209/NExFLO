@@ -1,8 +1,9 @@
+
 "use client";
 
 import type { Event } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Calendar, MessageSquare, FileText, Mail, Link as LinkIcon } from "lucide-react";
+import { Calendar, MessageSquare, FileText, Mail, Link as LinkIcon, MapPin } from "lucide-react";
 import QRCodeDisplay from "@/components/common/QRCodeDisplay";
 import Link from "next/link";
 import { toast } from "@/hooks/use-toast";
@@ -39,6 +40,15 @@ export default function DetailsTab({ event, baseUrl }: DetailsTabProps) {
                 <p className="text-muted-foreground">{event.date.toLocaleString('en-US', { dateStyle: 'full', timeStyle: 'short' })}</p>
               </div>
             </div>
+            {event.venue && (
+                 <div className="flex items-start gap-4">
+                    <MapPin className="h-5 w-5 mt-1 text-muted-foreground" />
+                    <div>
+                        <h3 className="font-semibold">Venue</h3>
+                        <p className="text-muted-foreground">{event.venue}</p>
+                    </div>
+                </div>
+            )}
             <div className="flex items-start gap-4">
               <MessageSquare className="h-5 w-5 mt-1 text-muted-foreground" />
               <div>

@@ -36,6 +36,7 @@ const eventConverter = {
       name: data.name,
       description: data.description,
       date: data.date.toDate(),
+      venue: data.venue,
       confirmationMessage: data.confirmationMessage,
       taskPdfUrl: data.taskPdfUrl,
       mailSubject: data.mailSubject,

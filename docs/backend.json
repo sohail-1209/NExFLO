@@ -23,6 +23,10 @@
           "format": "date-time",
           "description": "The date and time of the event."
         },
+        "venue": {
+            "type": "string",
+            "description": "The location where the event will take place."
+        },
         "confirmationMessage": {
             "type": "string",
             "description": "Message shown to users after they register."
@@ -48,7 +52,7 @@
             "description": "Body of the event pass email."
         }
       },
-      "required": ["name", "description", "date", "confirmationMessage", "taskPdfUrl", "mailSubject", "mailBody", "passSubject", "passBody"]
+      "required": ["name", "description", "date", "venue", "confirmationMessage", "taskPdfUrl", "mailSubject", "mailBody", "passSubject", "passBody"]
     },
     "Registration": {
       "title": "Registration",

@@ -59,11 +59,19 @@ export default function CreateEventPage() {
             <Textarea id="description" name="description" placeholder="A brief summary of your event." />
              {state?.errors?.description && <p className="text-destructive text-sm">{state.errors.description[0]}</p>}
           </div>
+        
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+                <Label htmlFor="date">Event Date and Time</Label>
+                <Input id="date" name="date" type="datetime-local" />
+                {state?.errors?.date && <p className="text-destructive text-sm">{state.errors.date[0]}</p>}
+            </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="date">Event Date and Time</Label>
-            <Input id="date" name="date" type="datetime-local" />
-             {state?.errors?.date && <p className="text-destructive text-sm">{state.errors.date[0]}</p>}
+            <div className="space-y-2">
+                <Label htmlFor="venue">Venue</Label>
+                <Input id="venue" name="venue" placeholder="e.g., Online or Conference Hall A" />
+                {state?.errors?.venue && <p className="text-destructive text-sm">{state.errors.venue[0]}</p>}
+            </div>
           </div>
           
           <Separator />

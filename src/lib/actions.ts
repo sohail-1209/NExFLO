@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createEventInData, createRegistration, updateRegistration, getRegistrationById as getRegistrationByIdData, getEventById, updateEvent } from "./data";
 import type { Registration, Event } from "./types";
-import { sendRegistrationEmail, sendPassEmail } from "./email";
+import { sendRegistrationEmail, sendPassEmail, sendManualPassEmail } from "./email";
 import { suggestEmailCorrection as suggestEmailCorrectionFlow } from '@/ai/flows/suggest-email-flow';
 import type { EmailInput } from '@/ai/schemas/email-suggestion-schema';
 
@@ -16,6 +16,7 @@ const eventSchema = z.object({
   name: z.string().min(3, "Event name must be at least 3 characters long"),
   description: z.string().min(10, "Description must be at least 10 characters long"),
   date: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid date" }),
+  venue: z.string().min(3, "Venue must be at least 3 characters long"),
   confirmationMessage: z.string().min(10, "Confirmation message must be at least 10 characters long"),
   mailSubject: z.string().min(5, "Mail subject must be at least 5 characters long"),
   mailBody: z.string().min(20, "Mail body must be at least 20 characters long"),
@@ -27,6 +28,7 @@ export async function createEvent(prevState: any, formData: FormData) {
     name: formData.get("name"),
     description: formData.get("description"),
     date: formData.get("date"),
+    venue: formData.get("venue"),
     confirmationMessage: formData.get("confirmationMessage"),
     mailSubject: formData.get("mailSubject"),
     mailBody: formData.get("mailBody"),
@@ -312,6 +314,39 @@ export async function suggestEmailCorrection(
     return { suggestion: null };
   }
 }
-    
 
+const manualPassSchema = z.object({
+  studentName: z.string().min(2, "Attendee name is required"),
+  studentEmail: z.string().email("Invalid email address"),
+  eventName: z.string().min(3, "Event name is required"),
+  eventDate: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Invalid date" }),
+  eventVenue: z.string().min(3, "Event venue is required"),
+  emailSubject: z.string().min(5, "Email subject is required"),
+  emailBody: z.string().min(10, "Email body is required"),
+  sendWithoutPass: z.preprocess((val) => val === 'on', z.boolean()),
+});
+
+export async function sendManualPass(prevState: any, formData: FormData) {
+  const validatedFields = manualPassSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Error: Please check your input.",
+    };
+  }
+
+  try {
+    const headersList = headers();
+    const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
+    const protocol = headersList.get('x-forwarded-proto') || 'http';
+    const baseUrl = `${protocol}://${host}`;
     
+    await sendManualPassEmail({ ...validatedFields.data, date: new Date(validatedFields.data.eventDate) }, baseUrl);
+
+    return { message: `Email sent successfully to ${validatedFields.data.studentEmail}!` };
+  } catch (e: any) {
+    console.error("Failed to send manual pass:", e);
+    return { message: `Error: Failed to send email: ${e.message}` };
+  }
+}

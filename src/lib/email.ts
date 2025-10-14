@@ -134,7 +134,6 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
   }
 
   try {
-    const publicHostingUrl = process.env.FIREBASE_HOSTING_URL || baseUrl;
     let processedBody = event.passBody
       .replace(/{studentName}/g, registration.studentName)
       .replace(/{eventName}/g, event.name)
@@ -228,6 +227,7 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
               </div>
               <div class="card-body">
                 <p><strong>Attendee</strong>${registration.studentName}</p>
+                ${event.venue ? `<p><strong>Venue</strong>${event.venue}</p>` : ''}
                 <p><strong>Email</strong>${registration.studentEmail}</p>
                 <p><strong>Roll Number</strong>${registration.rollNumber}</p>
                 <p><strong>Branch & Year</strong>${registration.branch} &bull; Year ${registration.yearOfStudy}</p>
@@ -261,4 +261,135 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
   }
 }
 
+interface ManualPassDetails {
+    studentName: string;
+    studentEmail: string;
+    eventName: string;
+    eventDate: Date;
+    eventVenue: string;
+    emailSubject: string;
+    emailBody: string;
+    sendWithoutPass: boolean;
+}
+
+export async function sendManualPassEmail(details: ManualPassDetails, baseUrl: string) {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.error("Email credentials are not set in environment variables.");
+        throw new Error("Email service is not configured.");
+    }
     
+    let processedBody = details.emailBody
+      .replace(/{studentName}/g, details.studentName)
+      .replace(/{eventName}/g, details.eventName)
+      .replace(/\n/g, "<br>");
+      
+    const subject = details.emailSubject
+      .replace(/{studentName}/g, details.studentName)
+      .replace(/{eventName}/g, details.eventName);
+
+    const attachments = [];
+    let html = processedBody;
+
+    if (!details.sendWithoutPass) {
+        const qrData = JSON.stringify({
+            studentName: details.studentName,
+            studentEmail: details.studentEmail,
+            eventName: details.eventName,
+            eventDate: details.eventDate.toISOString(),
+            eventVenue: details.eventVenue,
+        });
+        const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`;
+
+        attachments.push({
+            filename: 'qr-code.png',
+            path: qrCodeUrl,
+            cid: 'qrcodepass'
+        });
+
+        html = `
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <meta charset="UTF-8">
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f4f4f4;}
+            .email-container { text-align: center; padding: 20px; }
+            .card {
+              background-color: #ffffff;
+              border-radius: 16px;
+              box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+              max-width: 400px;
+              margin: 20px auto;
+              overflow: hidden;
+              text-align: left;
+            }
+            .card-header {
+              background-color: #BB86FC; /* Primary color */
+              padding: 20px 20px 10px 20px;
+              position: relative;
+              color: #121212;
+            }
+            .card-header h2 {
+                margin: 0;
+                font-size: 24px;
+            }
+            .wave {
+                position: absolute;
+                bottom: -1px;
+                left: 0;
+                width: 100%;
+                height: 20px;
+                background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="1" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,133.3C672,117,768,139,864,165.3C960,192,1056,224,1152,218.7C1248,213,1344,171,1392,149.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+                background-size: cover;
+            }
+            .card-body {
+              padding: 20px;
+              padding-top: 10px;
+            }
+            .card-body p { margin: 10px 0; font-size: 14px; color: #555; }
+            .card-body strong { color: #121212; font-weight: 600; display: block; margin-bottom: 2px; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px;}
+            .qr-section { text-align: center; padding: 20px; border-top: 1px dashed #ddd; }
+            .qr-section p { font-size: 12px; color: #666; margin-bottom: 10px; }
+          </style>
+        </head>
+        <body>
+          <div class="email-container">
+            ${processedBody}
+            <div class="card">
+              <div class="card-header">
+                <h2>${details.eventName}</h2>
+                <p style="margin: 4px 0 0; opacity: 0.8;">EVENT PASS</p>
+                <div class="wave"></div>
+              </div>
+              <div class="card-body">
+                <p><strong>Attendee</strong>${details.studentName}</p>
+                <p><strong>Date</strong>${details.eventDate.toLocaleString()}</p>
+                <p><strong>Venue</strong>${details.eventVenue}</p>
+              </div>
+              <div class="qr-section">
+                <p>Scan this code for event check-in</p>
+                <img src="cid:qrcodepass" alt="Event Pass QR Code" style="max-width:150px; border-radius: 8px;"/>
+              </div>
+            </div>
+          </div>
+        </body>
+        </html>
+      `;
+    }
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: details.studentEmail,
+      subject: subject,
+      html: html,
+      attachments: attachments
+    };
+
+    try {
+        const info = await transporter.sendMail(mailOptions);
+        console.log("Manual pass email sent successfully:", info.response);
+    } catch (error) {
+        console.error("Failed to send manual pass email:", error);
+        throw new Error(`Could not send email. Reason: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
