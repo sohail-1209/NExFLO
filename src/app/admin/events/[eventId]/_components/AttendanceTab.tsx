@@ -1,3 +1,4 @@
+
 "use client";
 
 import type { Registration } from "@/lib/types";
@@ -174,11 +175,11 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
       reg.mobileNumber,
       reg.laptop ? "Yes" : "No",
       reg.status,
-      reg.registeredAt ? new Date(reg.registeredAt).toISOString() : "N/A",
+      reg.registeredAt ? new Date(reg.registeredAt).toLocaleString() : "N/A",
       reg.taskSubmission || "N/A",
-      reg.taskSubmittedAt ? new Date(reg.taskSubmittedAt).toISOString() : "N/A",
+      reg.taskSubmittedAt ? new Date(reg.taskSubmittedAt).toLocaleString() : "N/A",
       reg.attended ? "Yes" : "No",
-      reg.attendedAt ? new Date(reg.attendedAt).toISOString() : "N/A"
+      reg.attendedAt ? new Date(reg.attendedAt).toLocaleString() : "N/A"
     ].join(","));
 
     const csvContent = "data:text/csv;charset=utf-8," 
