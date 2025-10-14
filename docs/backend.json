@@ -57,10 +57,12 @@
         "rollNumberY": { "type": "number" },
         "branchX": { "type": "number" },
         "branchY": { "type": "number" },
+        "emailX": { "type": "number" },
+        "emailY": { "type": "number" },
         "statusX": { "type": "number" },
         "statusY": { "type": "number" }
       },
-      "required": ["name", "description", "date", "confirmationMessage", "taskPdfUrl", "mailSubject", "mailBody", "passSubject", "passBody", "passLayoutUrl", "nameX", "nameY", "rollNumberX", "rollNumberY", "branchX", "branchY", "statusX", "statusY"]
+      "required": ["name", "description", "date", "confirmationMessage", "taskPdfUrl", "mailSubject", "mailBody", "passSubject", "passBody", "passLayoutUrl", "nameX", "nameY", "rollNumberX", "rollNumberY", "branchX", "branchY", "emailX", "emailY", "statusX", "statusY"]
     },
     "Registration": {
       "title": "Registration",

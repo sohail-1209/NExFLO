@@ -52,7 +52,8 @@ export async function createEvent(prevState: any, formData: FormData) {
       nameX: 100, nameY: 100,
       rollNumberX: 100, rollNumberY: 120,
       branchX: 100, branchY: 140,
-      statusX: 100, statusY: 160,
+      emailX: 100, emailY: 160,
+      statusX: 100, statusY: 180,
     });
     revalidatePath("/admin");
     
@@ -81,6 +82,8 @@ const passDetailsSchema = z.object({
   rollNumberY: z.coerce.number(),
   branchX: z.coerce.number(),
   branchY: z.coerce.number(),
+  emailX: z.coerce.number(),
+  emailY: z.coerce.number(),
   statusX: z.coerce.number(),
   statusY: z.coerce.number(),
 });
@@ -96,6 +99,8 @@ export async function updateEventPassDetails(eventId: string, prevState: any, fo
     rollNumberY: formData.get("rollNumberY"),
     branchX: formData.get("branchX"),
     branchY: formData.get("branchY"),
+    emailX: formData.get("emailX"),
+    emailY: formData.get("emailY"),
     statusX: formData.get("statusX"),
     statusY: formData.get("statusY"),
   });

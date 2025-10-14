@@ -16,6 +16,8 @@ export type Event = {
   rollNumberY: number;
   branchX: number;
   branchY: number;
+  emailX: number;
+  emailY: number;
   statusX: number;
   statusY: number;
 };

@@ -143,12 +143,20 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                                     <Input id="branchY" name="branchY" type="number" placeholder="140" defaultValue={event.branchY}/>
                                 </div>
                                 <div className="space-y-2">
+                                    <Label htmlFor="emailX">Email X</Label>
+                                    <Input id="emailX" name="emailX" type="number" placeholder="100" defaultValue={event.emailX}/>
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="emailY">Email Y</Label>
+                                    <Input id="emailY" name="emailY" type="number" placeholder="160" defaultValue={event.emailY}/>
+                                </div>
+                                <div className="space-y-2">
                                     <Label htmlFor="statusX">Status X</Label>
                                     <Input id="statusX" name="statusX" type="number" placeholder="100" defaultValue={event.statusX}/>
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="statusY">Status Y</Label>
-                                    <Input id="statusY" name="statusY" type="number" placeholder="160" defaultValue={event.statusY}/>
+                                    <Input id="statusY" name="statusY" type="number" placeholder="180" defaultValue={event.statusY}/>
                                 </div>
                             </div>
                             {(passState?.errors as any)?.nameX && <p className="text-destructive text-sm mt-2">All coordinates must be provided.</p>}

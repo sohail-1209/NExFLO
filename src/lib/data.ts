@@ -49,6 +49,8 @@ const eventConverter = {
       rollNumberY: data.rollNumberY,
       branchX: data.branchX,
       branchY: data.branchY,
+      emailX: data.emailX,
+      emailY: data.emailY,
       statusX: data.statusX,
       statusY: data.statusY,
     };
@@ -139,7 +141,7 @@ export const createEventInData = async (eventData: CreateEventData): Promise<Eve
 export const updateEvent = async (id: string, updates: Partial<Omit<Event, 'id'>>) => {
     const eventDocRef = doc(db, 'events', id);
 
-    const eventUpdates = { ...updates };
+    const eventUpdates: { [key: string]: any } = { ...updates };
 
     if (eventUpdates.passLayoutUrl instanceof File) {
         const passLayoutFile = eventUpdates.passLayoutUrl;
@@ -147,8 +149,6 @@ export const updateEvent = async (id: string, updates: Partial<Omit<Event, 'id'>
         const passUploadResult = await uploadBytes(passLayoutStorageRef, passLayoutFile);
         eventUpdates.passLayoutUrl = await getDownloadURL(passUploadResult.ref);
     } else if (!eventUpdates.passLayoutUrl) {
-        // If the URL is empty/null/undefined but not a file, don't try to update it.
-        // This prevents overwriting an existing URL with an empty one if no new file is uploaded.
         delete eventUpdates.passLayoutUrl;
     }
   
