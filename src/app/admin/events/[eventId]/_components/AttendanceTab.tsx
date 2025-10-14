@@ -2,14 +2,16 @@
 
 import type { Registration } from "@/lib/types";
 import { markAttendance } from "@/lib/actions";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, UserCheck } from "lucide-react";
+import { CheckCircle, UserCheck, Video, VideoOff } from "lucide-react";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
+import jsQR from "jsqr";
 
 interface AttendanceTabProps {
   registrations: Registration[];
@@ -19,8 +21,74 @@ interface AttendanceTabProps {
 export default function AttendanceTab({ registrations, eventId }: AttendanceTabProps) {
   const [scannedId, setScannedId] = useState("");
   const { toast } = useToast();
+  const [hasCameraPermission, setHasCameraPermission] = useState<boolean | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const bookedRegistrations = registrations.filter(r => r.status === 'booked');
+
+  useEffect(() => {
+    const getCameraPermission = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream;
+        }
+        setHasCameraPermission(true);
+      } catch (error) {
+        console.error('Error accessing camera:', error);
+        setHasCameraPermission(false);
+        toast({
+          variant: 'destructive',
+          title: 'Camera Access Denied',
+          description: 'Please enable camera permissions in your browser to use the scanner.',
+        });
+      }
+    };
+    getCameraPermission();
+
+    // Cleanup function to stop the video stream
+    return () => {
+      if (videoRef.current && videoRef.current.srcObject) {
+        const stream = videoRef.current.srcObject as MediaStream;
+        stream.getTracks().forEach(track => track.stop());
+      }
+    };
+  }, [toast]);
+
+  useEffect(() => {
+    let animationFrameId: number;
+    const scan = () => {
+      if (videoRef.current && videoRef.current.readyState === videoRef.current.HAVE_ENOUGH_DATA && canvasRef.current) {
+        const video = videoRef.current;
+        const canvas = canvasRef.current;
+        const context = canvas.getContext('2d');
+        
+        if(context) {
+          canvas.height = video.videoHeight;
+          canvas.width = video.videoWidth;
+          context.drawImage(video, 0, 0, canvas.width, canvas.height);
+          const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+          const code = jsQR(imageData.data, imageData.width, imageData.height, {
+            inversionAttempts: "dontInvert",
+          });
+
+          if (code) {
+            setScannedId(code.data);
+          }
+        }
+      }
+      animationFrameId = requestAnimationFrame(scan);
+    };
+
+    if (hasCameraPermission) {
+      animationFrameId = requestAnimationFrame(scan);
+    }
+
+    return () => {
+      cancelAnimationFrame(animationFrameId);
+    };
+  }, [hasCameraPermission]);
   
   const handleCheckIn = async () => {
     if (!scannedId) return;
@@ -54,19 +122,34 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
 
   return (
     <div className="space-y-6">
-      <Card>
+       <Card>
         <CardHeader>
           <CardTitle>QR Code Scanner</CardTitle>
-          <CardDescription>Enter the scanned QR data to check in an attendee.</CardDescription>
+          <CardDescription>Scan a pass to check in an attendee, or enter the ID manually.</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-4">
+          <div className="bg-muted rounded-md aspect-video w-full max-w-md mx-auto flex items-center justify-center overflow-hidden">
+             <video ref={videoRef} className="w-full h-full object-cover" autoPlay playsInline muted />
+             <canvas ref={canvasRef} style={{ display: 'none' }} />
+          </div>
+
+          {hasCameraPermission === false && (
+            <Alert variant="destructive">
+              <VideoOff className="h-4 w-4" />
+              <AlertTitle>Camera Access Required</AlertTitle>
+              <AlertDescription>
+                Please allow camera access to use the QR scanner. You can still check in attendees manually.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="flex gap-2">
             <Input
-              placeholder="Paste QR code data here..."
+              placeholder="QR code data will appear here..."
               value={scannedId}
               onChange={(e) => setScannedId(e.target.value)}
             />
-            <Button onClick={handleCheckIn}>Check In</Button>
+            <Button onClick={handleCheckIn} disabled={!scannedId}>Check In</Button>
           </div>
         </CardContent>
       </Card>
