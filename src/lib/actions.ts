@@ -143,8 +143,13 @@ export async function registerForEvent(eventId: string, prevState: any, formData
       ...validatedFields.data,
     });
 
+    const headersList = headers();
+    const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
+    const protocol = headersList.get('x-forwarded-proto') || 'http';
+    const baseUrl = `${protocol}://${host}`;
+
     // Send the confirmation email
-    await sendRegistrationEmail(newRegistration, event);
+    await sendRegistrationEmail(newRegistration, event, baseUrl);
 
     revalidatePath(`/admin/events/${eventId}`);
     redirect(`/register/success/${newRegistration.id}`);
@@ -222,7 +227,11 @@ export async function updateRegistrationStatus(registrationId: string, eventId: 
             const registration = await getRegistrationByIdData(registrationId);
             const event = await getEventById(eventId);
             if(registration && event) {
-                await sendPassEmail(registration, event);
+                const headersList = headers();
+                const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
+                const protocol = headersList.get('x-forwarded-proto') || 'http';
+                const baseUrl = `${protocol}://${host}`;
+                await sendPassEmail(registration, event, baseUrl);
             }
         }
         revalidatePath(`/admin/events/${eventId}`);
@@ -273,7 +282,12 @@ export async function resendRegistrationEmail(registrationId: string) {
             return { success: false, message: "Event not found." };
         }
         
-        await sendRegistrationEmail(registration, event);
+        const headersList = headers();
+        const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
+        const protocol = headersList.get('x-forwarded-proto') || 'http';
+        const baseUrl = `${protocol}://${host}`;
+
+        await sendRegistrationEmail(registration, event, baseUrl);
 
         return { success: true, message: `Email sent successfully to ${registration.studentEmail}. Please check your inbox (and spam folder).` };
 
@@ -282,3 +296,5 @@ export async function resendRegistrationEmail(registrationId: string) {
         return { success: false, message: `Failed to send email. Please check server logs for details: ${error.message}` };
     }
 }
+
+    
