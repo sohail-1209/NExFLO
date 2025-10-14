@@ -36,7 +36,6 @@ function createRegistrationEmailHtml(body: string, registration: Registration, e
         </head>
         <body>
           <div class="container">
-            <img src="cid:nexuslogo" alt="Nexus Logo" style="max-width: 100px; margin-bottom: 20px;" />
             ${processedBody}
             <br><br>
             ${downloadButton}
@@ -64,11 +63,6 @@ export async function sendRegistrationEmail(registration: Registration, event: E
     to: registration.studentEmail,
     subject: event.mailSubject.replace(/{eventName}/g, event.name),
     html: emailHtml,
-    attachments: [{
-        filename: 'nexus.png',
-        path: 'https://api.dicebear.com/8.x/initials/svg?seed=N&backgroundColor=7c3aed&radius=0',
-        cid: 'nexuslogo' 
-    }]
   };
 
   try {
@@ -121,7 +115,6 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
         </head>
         <body>
           <div class="container">
-            <img src="cid:nexuslogo" alt="Nexus Logo" style="max-width: 100px; margin-bottom: 20px;" />
             ${processedBody}
             
             <div class="details">
@@ -140,11 +133,6 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
         </html>
       `,
       attachments: [
-        {
-            filename: 'nexus.png',
-            path: 'https://api.dicebear.com/8.x/initials/svg?seed=N&backgroundColor=7c3aed&radius=0',
-            cid: 'nexuslogo'
-        },
         {
             filename: 'qr-code.png',
             path: qrCodeUrl,
