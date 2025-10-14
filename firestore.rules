@@ -1,61 +1,53 @@
 /**
- * @fileoverview Firestore Security Rules for the event registration application.
+ * @fileoverview Firestore Security Rules for the application.
  *
  * Core Philosophy:
- * This ruleset prioritizes secure data access by enforcing strict ownership for event registrations.
- * All registrations are publicly readable, but only authenticated users can create registrations.
- * Modification and deletion of registrations are disallowed to maintain data integrity.
+ * This ruleset allows all logged-in users to read and write any data.
  *
  * Data Structure:
- * - /events/{eventId}: Stores event information.
- * - /registrations/{registrationId}: Stores user registrations for events.
+ * The Firestore database contains two top-level collections: 'events' and 'registrations'.
+ *  - /events/{eventId}: Stores event details.
+ *  - /registrations/{registrationId}: Stores registration information.
  *
  * Key Security Decisions:
- * - Public Read Access for Events: Events are publicly readable to facilitate discovery and registration.
- * - Registrations are publicly readable, but only authenticated users can create registrations.
- * - No User Listing: Listing all users is explicitly denied for privacy.
- *
- * Denormalization for Authorization:
- *  N/A - There is no denormalized data in this rule set.
- *
- * Structural Segregation:
- * N/A - There is no structural segregation in this rule set.
+ * - All read and write permissions are granted to authenticated users.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Grants public read access to events and restricts write access.
+     * @description Grants all read and write permissions to authenticated users for events.
      * @path /events/{eventId}
-     * @allow (get, list): Any user can read event details.
-     * @allow (create): No one can create an event through the client.
-     * @deny (create, update, delete): No one can create, update, or delete an event.
-     * @principle Allows public read access while restricting write access.
+     * @allow (get, list) User is logged in.
+     * @allow (create, update, delete) User is logged in.
+     * @deny (create, update, delete) User is not logged in.
+     * @principle Allows any logged-in user to read and write event data.
      */
     match /events/{eventId} {
-      allow get, list: if true;
-      allow create, update, delete: if false;
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
+      allow create: if isSignedIn();
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn();
     }
 
     /**
-     * @description Grants public read access to registrations and restricts write access. Only authenticated users can create a registration.
+     * @description Grants all read and write permissions to authenticated users for registrations.
      * @path /registrations/{registrationId}
-     * @allow (get, list): Any user can read registration details.
-     * @allow (create): Only authenticated users can create a registration.
-     * @deny (update, delete): No one can update or delete a registration.
-     * @principle Restricts modification and deletion of registrations.
+     * @allow (get, list) User is logged in.
+     * @allow (create, update, delete) User is logged in.
+     * @deny (create, update, delete) User is not logged in.
+     * @principle Allows any logged-in user to read and write registration data.
      */
     match /registrations/{registrationId} {
-      allow get, list: if true;
+      allow get: if isSignedIn();
+      allow list: if isSignedIn();
       allow create: if isSignedIn();
-      allow update, delete: if false;
+      allow update: if isSignedIn();
+      allow delete: if isSignedIn();
     }
 
-    /**
-     * @description Checks if the user is signed in.
-     * @return {boolean} True if the user is signed in, false otherwise.
-     */
     function isSignedIn() {
       return request.auth != null;
     }
