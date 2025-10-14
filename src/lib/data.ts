@@ -7,20 +7,20 @@ let events: Event[] = [
     name: 'Next.js Global Summit',
     description: 'Join us for a deep dive into the latest features of Next.js, with workshops from the core team and community experts. A full day of learning, networking, and fun!',
     date: new Date('2024-10-26T09:00:00'),
-    confirmationMessage: 'Thanks for registering! Your spot is pending task submission. Please complete the attached challenge to confirm your booking.',
+    confirmationMessage: 'Thanks for registering! Your spot is pending task submission. Please check your email for the task details and submission link.',
     taskPdfUrl: '/mock-task.pdf',
     mailSubject: 'Your Next.js Summit Registration',
-    mailBody: 'Hello! Thank you for registering for the Next.js Global Summit. Please complete the task to secure your spot.'
+    mailBody: 'Hello {studentName}!\n\nThank you for registering for the Next.js Global Summit. Please complete the task to secure your spot.\n\nTask PDF: {taskPdfUrl}\nSubmit your work here: {taskSubmissionLink}\n\nWe look forward to seeing you!'
   },
   {
     id: 'cl-event-2',
     name: 'AI in Web Development',
     description: 'Explore how to integrate generative AI into modern web applications. This is a hands-on workshop for developers looking to build the next generation of intelligent apps.',
     date: new Date('2024-11-15T10:00:00'),
-    confirmationMessage: 'You are on the list! To secure your place, please complete the task provided in the link below. We can\'t wait to see what you build.',
+    confirmationMessage: 'You are on the list! To secure your place, please check your email for the task and submission link. We can\'t wait to see what you build.',
     taskPdfUrl: '/mock-task.pdf',
     mailSubject: 'Your AI in Web Dev Workshop Registration',
-    mailBody: 'Hi there! We have received your registration for the AI in Web Development workshop. The next step is to complete the pre-event task.'
+    mailBody: 'Hi {studentName}!\n\nWe have received your registration for the AI in Web Development workshop. The next step is to complete the pre-event task.\n\nTask PDF: {taskPdfUrl}\nSubmit your work here: {taskSubmissionLink}\n\nThanks!'
   }
 ];
 
