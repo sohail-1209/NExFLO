@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DetailsTab from "./_components/DetailsTab";
 import RegistrationsTab from "./_components/RegistrationsTab";
 import AttendanceTab from "./_components/AttendanceTab";
-import { Calendar, Users, QrCode, ArrowLeft } from "lucide-react";
+import { Calendar, Users, QrCode, ArrowLeft, UserCheck } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
@@ -40,7 +40,7 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
             Registrations
           </TabsTrigger>
           <TabsTrigger value="attendance">
-            <QrCode className="w-4 h-4 mr-2"/>
+            <UserCheck className="w-4 h-4 mr-2"/>
             Attendance
           </TabsTrigger>
         </TabsList>
