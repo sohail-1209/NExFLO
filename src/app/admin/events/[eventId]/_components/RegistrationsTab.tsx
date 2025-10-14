@@ -157,8 +157,8 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                 <TableRow>
                   <TableHead className="pl-1">Student</TableHead>
                   <TableHead className="hidden md:table-cell px-2">Details</TableHead>
-                  <TableHead className="px-2">Submission</TableHead>
-                  <TableHead className="text-center px-2">Status</TableHead>
+                  <TableHead className="px-1">Submission</TableHead>
+                  <TableHead className="text-center px-1">Status</TableHead>
                   <TableHead className="text-right pr-1">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -180,7 +180,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                         {reg.mobileNumber} &bull; {reg.gender} &bull; Laptop: {reg.laptop ? "Yes" : "No"}
                       </div>
                     </TableCell>
-                    <TableCell className="p-2">
+                    <TableCell className="p-1">
                       {reg.taskSubmission ? (
                         <Dialog>
                           <DialogTrigger asChild>
@@ -211,7 +211,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                         <span className="text-muted-foreground text-sm">Not submitted</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-center p-2">
+                    <TableCell className="text-center p-1">
                         <Badge className="flex items-center gap-1.5 w-fit mx-auto" style={{ backgroundColor: statusConfig[reg.status].color }}>
                             {statusConfig[reg.status].icon}
                             {statusConfig[reg.status].label}
