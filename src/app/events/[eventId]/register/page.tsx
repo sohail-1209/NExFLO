@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useState, use } from "react";
 import { registerForEvent } from "@/lib/actions";
 import { getEventById } from "@/lib/data";
 import { Button } from "@/components/ui/button";
@@ -21,7 +21,8 @@ function SubmitButton() {
   return <Button type="submit" className="w-full">Register</Button>;
 }
 
-export default function RegisterPage({ params }: { params: { eventId: string } }) {
+export default function RegisterPage({ params: paramsPromise }: { params: Promise<{ eventId: string }> }) {
+  const params = use(paramsPromise);
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   

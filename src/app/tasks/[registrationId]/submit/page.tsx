@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useState, use } from "react";
 import { submitTask } from "@/lib/actions";
 import { getRegistrationById, getEventById } from "@/lib/data";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,7 @@ import type { Event, Registration } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
 import { CheckCircle } from "lucide-react";
 import Link from "next/link";
+import { CardFooter } from "@/components/ui/card";
 
 const initialState = {
   message: "",
@@ -22,7 +23,8 @@ function SubmitButton() {
   return <Button type="submit" className="w-full">Submit Task</Button>;
 }
 
-export default function SubmitTaskPage({ params }: { params: { registrationId: string } }) {
+export default function SubmitTaskPage({ params: paramsPromise }: { params: Promise<{ registrationId: string }> }) {
+  const params = use(paramsPromise);
   const [data, setData] = useState<{ registration: Registration, event: Event } | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitted, setSubmitted] = useState(false);
