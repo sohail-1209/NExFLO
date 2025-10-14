@@ -17,14 +17,13 @@ function replacePlaceholders(body: string, registration: Registration, event: Ev
     const taskSubmissionUrl = `${baseUrl}/tasks/${registration.id}/submit`;
 
     const buttonStyles = `
-      display: inline-block; 
-      padding: 12px 24px; 
-      font-size: 16px; 
-      font-weight: bold; 
-      color: #ffffff; 
-      background-color: #7c3aed; 
-      text-decoration: none; 
-      border-radius: 5px; 
+      background-color:#7c3aed;
+      color:#ffffff;
+      padding:12px 24px;
+      text-decoration:none;
+      border-radius:5px;
+      font-weight:bold;
+      display:inline-block;
       margin: 10px 0;
     `;
     
@@ -37,11 +36,14 @@ function replacePlaceholders(body: string, registration: Registration, event: Ev
       .replace(/{taskPdfLink}/g, downloadButton)
       .replace(/{taskSubmissionLink}/g, submissionButton);
 
+    // Wrap in a full, compliant HTML structure as you suggested.
     return `
+      <!DOCTYPE html>
       <html>
         <head>
+          <meta charset="UTF-8">
           <style>
-            body { font-family: sans-serif; line-height: 1.6; }
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
           </style>
         </head>
         <body>
