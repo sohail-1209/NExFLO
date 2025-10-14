@@ -100,7 +100,9 @@ export default function TaskSubmissionPage({ params: paramsPromise }: { params: 
                 </div>
                 <h3 className="text-xl font-semibold">Task Already Submitted!</h3>
                 <p className="text-muted-foreground">We've already received your submission. Our team will review it and you'll be notified via email about your status.</p>
-                <p className="text-sm text-muted-foreground pt-2">You can view your submission at: <br/><Link href={registration.taskSubmission!} className="text-primary hover:underline" target="_blank">{registration.taskSubmission}</Link></p>
+                {registration.taskSubmission && (
+                    <p className="text-sm text-muted-foreground pt-2">You can view your submission at: <br/><Link href={registration.taskSubmission} className="text-primary hover:underline" target="_blank">{registration.taskSubmission}</Link></p>
+                )}
              </div>
           ) : (
             <>
@@ -119,6 +121,11 @@ export default function TaskSubmissionPage({ params: paramsPromise }: { params: 
               </Alert>
 
               <form action={formAction} className="space-y-4 text-left">
+                <div className="space-y-2">
+                  <Label htmlFor="email">Your Email Address</Label>
+                  <Input id="email" name="email" type="email" placeholder="Enter the email you registered with" required />
+                  {state?.errors?.email && <p className="text-sm text-destructive">{state.errors.email[0]}</p>}
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="taskSubmission">Submission URL</Label>
                   <Input id="taskSubmission" name="taskSubmission" type="url" placeholder="https://your-project-link.com" required />

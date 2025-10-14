@@ -132,23 +132,25 @@ export async function registerForEvent(eventId: string, prevState: any, formData
 }
 
 const taskSubmissionSchema = z.object({
+    email: z.string().email("Please provide a valid email address."),
     taskSubmission: z.string().url("Please provide a valid URL.").refine(
         (url) => {
             try {
                 const hostname = new URL(url).hostname;
-                return hostname.includes('github.com') || hostname.includes('docs.google.com');
+                return hostname.includes('github.com') || hostname.includes('docs.google.com') || hostname.endsWith('.github.io');
             } catch {
                 return false;
             }
         },
         {
-            message: "Submission must be a valid URL from either GitHub or Google Docs."
+            message: "Submission must be a valid URL from GitHub (including github.io) or Google Docs."
         }
     ),
 });
 
 export async function submitTask(registrationId: string, prevState: any, formData: FormData) {
     const validatedFields = taskSubmissionSchema.safeParse({
+        email: formData.get("email"),
         taskSubmission: formData.get("taskSubmission"),
     });
 
@@ -160,6 +162,15 @@ export async function submitTask(registrationId: string, prevState: any, formDat
     }
 
     try {
+        const registration = await getRegistrationByIdData(registrationId);
+        if (!registration) {
+             return { message: "Error: Registration not found." };
+        }
+
+        if (registration.studentEmail.toLowerCase() !== validatedFields.data.email.toLowerCase()) {
+            return { message: "Error: The email provided does not match the registered email for this submission." };
+        }
+
         await updateRegistration(registrationId, { taskSubmission: validatedFields.data.taskSubmission });
         revalidatePath(`/admin`); // Revalidate admin pages
         return { message: "Task submitted successfully!" };
