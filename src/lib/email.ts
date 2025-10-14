@@ -15,7 +15,9 @@ const transporter = nodemailer.createTransport({
 
 function createEmailHtml(body: string, registration: Registration, event: Event, baseUrl: string): string {
     const taskSubmissionUrl = `${baseUrl}/tasks/${registration.id}/submit`;
-    const logoUrl = `${baseUrl}/nexus.png`;
+    
+    // Use a publicly accessible placeholder URL for the logo
+    const logoUrl = 'https://api.dicebear.com/8.x/initials/svg?seed=Nexus&backgroundColor=7c3aed';
 
     // Replace basic placeholders in the user's custom body
     let processedBody = body
@@ -42,7 +44,7 @@ function createEmailHtml(body: string, registration: Registration, event: Event,
         </head>
         <body>
           <div class="container">
-            <img src="${logoUrl}" alt="Nexus Logo" style="max-width: 150px; margin-bottom: 20px;" />
+            <img src="${logoUrl}" alt="Nexus Logo" style="max-width: 100px; margin-bottom: 20px;" />
             ${processedBody}
             <br><br>
             ${downloadButton}
@@ -102,7 +104,7 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
       eventId: event.id
     });
     const imageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`;
-    const logoUrl = `${baseUrl}/nexus.png`;
+    const logoUrl = 'https://api.dicebear.com/8.x/initials/svg?seed=Nexus&backgroundColor=7c3aed';
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -124,7 +126,7 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
         </head>
         <body>
           <div class="container">
-            <img src="${logoUrl}" alt="Nexus Logo" style="max-width: 150px; margin-bottom: 20px;" />
+            <img src="${logoUrl}" alt="Nexus Logo" style="max-width: 100px; margin-bottom: 20px;" />
             ${processedBody}
             
             <div class="details">
