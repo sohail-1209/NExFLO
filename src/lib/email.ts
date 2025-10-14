@@ -4,7 +4,7 @@
 import nodemailer from "nodemailer";
 import type { Registration, Event } from "./types";
 import 'dotenv/config';
-import { generatePass } from "./pass";
+import { generatePassImage } from "./pass";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -85,7 +85,7 @@ export async function sendPassEmail(registration: Registration, event: Event) {
   }
 
   try {
-    const passImageBuffer = await generatePass(registration, event);
+    const passImageBuffer = await generatePassImage(registration, event);
     
     let processedBody = event.passBody
       .replace(/{studentName}/g, registration.studentName)
@@ -107,6 +107,8 @@ export async function sendPassEmail(registration: Registration, event: Event) {
         </head>
         <body>
           ${processedBody}
+          <br><br>
+          <img src="cid:eventpass" alt="Event Pass" style="max-width:400px;"/>
         </body>
         </html>
       `,
@@ -114,7 +116,8 @@ export async function sendPassEmail(registration: Registration, event: Event) {
         {
           filename: 'event-pass.png',
           content: passImageBuffer,
-          contentType: 'image/png'
+          contentType: 'image/png',
+          cid: 'eventpass'
         }
       ]
     };

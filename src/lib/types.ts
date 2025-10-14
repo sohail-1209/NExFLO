@@ -9,17 +9,6 @@ export type Event = {
   mailBody: string;
   passSubject: string;
   passBody: string;
-  passLayoutUrl: string;
-  nameX: number;
-  nameY: number;
-  rollNumberX: number;
-  rollNumberY: number;
-  branchX: number;
-  branchY: number;
-  emailX: number;
-  emailY: number;
-  statusX: number;
-  statusY: number;
 };
 
 export type Registration = {

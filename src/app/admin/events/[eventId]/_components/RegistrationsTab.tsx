@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Check, Clock, ExternalLink, List, MoreVertical, BookImage, Pin, Settings, Ban } from "lucide-react";
+import { Check, Clock, ExternalLink, List, MoreVertical, BookImage, Settings, Ban } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -107,15 +107,15 @@ export default function RegistrationsTab({ registrations, event }: Registrations
               <DialogTrigger asChild>
                   <Button variant="outline"><Settings className="mr-2 h-4 w-4" /> Configure Pass</Button>
               </DialogTrigger>
-              <DialogContent className="max-w-2xl">
+              <DialogContent className="max-w-xl">
                 <form action={passFormAction}>
                   <DialogHeader>
-                      <DialogTitle>Configure Event Pass</DialogTitle>
-                      <DialogDescription>Set up the details for the automated event pass generation.</DialogDescription>
+                      <DialogTitle>Configure Event Pass Email</DialogTitle>
+                      <DialogDescription>Set up the email that delivers the event pass to approved attendees.</DialogDescription>
                   </DialogHeader>
                   <div className="py-4 space-y-4 max-h-[70vh] overflow-y-auto pr-4">
                        <div className="space-y-4">
-                          <h3 className="text-lg font-medium flex items-center gap-2"><BookImage className="w-5 h-5" /> Event Pass Details</h3>
+                          <h3 className="text-lg font-medium flex items-center gap-2"><BookImage className="w-5 h-5" /> Event Pass Email Details</h3>
                           <div className="space-y-2">
                               <Label htmlFor="passSubject">Pass Email Subject</Label>
                               <Input id="passSubject" name="passSubject" placeholder="e.g., Your Pass for {eventName} is Here!" defaultValue={event.passSubject} />
@@ -124,62 +124,9 @@ export default function RegistrationsTab({ registrations, event }: Registrations
 
                           <div className="space-y-2">
                               <Label htmlFor="passBody">Pass Email Body</Label>
-                              <Textarea id="passBody" name="passBody" placeholder="e.g., Hi {studentName}, here is your pass!" defaultValue={event.passBody} />
+                              <Textarea id="passBody" name="passBody" placeholder="e.g., Hi {studentName}, here is your pass!" defaultValue={event.passBody} rows={5} />
+                               <p className="text-xs text-muted-foreground">The generated pass image will be automatically attached below this content.</p>
                               {passState?.errors?.passBody && <p className="text-destructive text-sm">{passState.errors.passBody[0]}</p>}
-                          </div>
-
-                          <div className="space-y-2">
-                              <Label htmlFor="passLayoutUrl">Pass Layout Image URL</Label>
-                              <Input id="passLayoutUrl" name="passLayoutUrl" placeholder="https://..." defaultValue={event.passLayoutUrl} />
-                              {event.passLayoutUrl && <p className="text-xs text-muted-foreground mt-1">Current: <Link href={event.passLayoutUrl} target="_blank" className="text-primary hover:underline">View Image</Link>. Paste a new URL to replace.</p>}
-                              {passState?.errors?.passLayoutUrl && <p className="text-destructive text-sm">{passState.errors.passLayoutUrl[0]}</p>}
-                          </div>
-
-                          <div>
-                              <Label className="flex items-center gap-2 mb-2"><Pin className="w-4 h-4"/> Text Coordinates</Label>
-                              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                  <div className="space-y-2">
-                                      <Label htmlFor="nameX">Name X</Label>
-                                      <Input id="nameX" name="nameX" type="number" placeholder="100" defaultValue={event.nameX}/>
-                                  </div>
-                                  <div className="space-y-2">
-                                      <Label htmlFor="nameY">Name Y</Label>
-                                      <Input id="nameY" name="nameY" type="number" placeholder="100" defaultValue={event.nameY}/>
-                                  </div>
-                                  <div className="space-y-2">
-                                      <Label htmlFor="rollNumberX">Roll No. X</Label>
-                                      <Input id="rollNumberX" name="rollNumberX" type="number" placeholder="100" defaultValue={event.rollNumberX}/>
-                                  </div>
-                                  <div className="space-y-2">
-                                      <Label htmlFor="rollNumberY">Roll No. Y</Label>
-                                      <Input id="rollNumberY" name="rollNumberY" type="number" placeholder="120" defaultValue={event.rollNumberY}/>
-                                  </div>
-                                  <div className="space-y-2">
-                                      <Label htmlFor="branchX">Branch X</Label>
-                                      <Input id="branchX" name="branchX" type="number" placeholder="100" defaultValue={event.branchX}/>
-                                  </div>
-                                  <div className="space-y-2">
-                                      <Label htmlFor="branchY">Branch Y</Label>
-                                      <Input id="branchY" name="branchY" type="number" placeholder="140" defaultValue={event.branchY}/>
-                                  </div>
-                                  <div className="space-y-2">
-                                      <Label htmlFor="emailX">Email X</Label>
-                                      <Input id="emailX" name="emailX" type="number" placeholder="100" defaultValue={event.emailX}/>
-                                  </div>
-                                  <div className="space-y-2">
-                                      <Label htmlFor="emailY">Email Y</Label>
-                                      <Input id="emailY" name="emailY" type="number" placeholder="160" defaultValue={event.emailY}/>
-                                  </div>
-                                  <div className="space-y-2">
-                                      <Label htmlFor="statusX">Status X</Label>
-                                      <Input id="statusX" name="statusX" type="number" placeholder="100" defaultValue={event.statusX}/>
-                                  </div>
-                                  <div className="space-y-2">
-                                      <Label htmlFor="statusY">Status Y</Label>
-                                      <Input id="statusY" name="statusY" type="number" placeholder="180" defaultValue={event.statusY}/>
-                                  </div>
-                              </div>
-                              {(passState?.errors as any)?.nameX && <p className="text-destructive text-sm mt-2">All coordinates must be provided.</p>}
                           </div>
                       </div>
                   </div>

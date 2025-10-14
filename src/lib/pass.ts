@@ -1,66 +1,69 @@
 
 "use server";
 
+import { ImageResponse } from '@vercel/og';
 import type { Event, Registration } from './types';
+import EventPass from '@/components/EventPass';
+import { getEventById, getRegistrationById } from './data';
 
-// This function generates a pass image by using a third-party service (via a URL)
-// to overlay text onto a base image. This is a common approach in serverless environments
-// where local image manipulation libraries like 'canvas' may not be available or practical.
-export async function generatePass(registration: Registration, event: Event): Promise<Buffer> {
-  // Define the text overlays. Each object in the array represents one piece of text
-  // to be drawn on the image. The `text` is encoded to be URL-safe.
-  const overlays = [
-    { text: encodeURIComponent(registration.studentName), x: event.nameX, y: event.nameY },
-    { text: encodeURIComponent(registration.rollNumber), x: event.rollNumberX, y: event.rollNumberY },
-    { text: encodeURIComponent(registration.branch), x: event.branchX, y: event.branchY },
-    { text: encodeURIComponent(registration.studentEmail), x: event.emailX, y: event.emailY },
-    { 
-      text: encodeURIComponent(registration.status.charAt(0).toUpperCase() + registration.status.slice(1)), 
-      x: event.statusX, 
-      y: event.statusY 
-    },
-  ];
+export const config = {
+  runtime: 'edge',
+};
 
-  // Construct the URL for the image generation service.
-  // This example uses 'imgix.com', a popular image processing service.
-  // The base URL is the pass layout image stored in Firebase Storage.
-  // We append parameters to the URL to tell the service what to do.
-  let imageUrl = `${event.passLayoutUrl}?`;
+// This function generates the pass by rendering the EventPass component.
+// It is intended to be called from an API route.
+export async function generatePassImageFromComponent(registrationId: string) {
+    const registration = await getRegistrationById(registrationId);
+    if (!registration) {
+      return new Response('Registration not found', { status: 404 });
+    }
+  
+    const event = await getEventById(registration.eventId);
+    if (!event) {
+      return new Response('Event not found', { status: 404 });
+    }
 
-  // Define common text styling parameters.
-  // These are specific to the 'imgix' service and control the font, size, color, etc.
-  const textParams = `txt-color=000000&txt-font=Arial-Bold&txt-align=left&txt-size=24`;
+    const { readable, writable } = new TransformStream();
+    const imageResponse = generatePassImage(registration, event);
+    imageResponse.then(res => res.body?.pipeTo(writable));
+    return new Response(readable, {
+        headers: {
+            'Content-Type': 'image/png',
+        },
+    });
+}
 
-  // Add each text overlay to the URL.
-  // The 'blend' parameter tells imgix to overlay text, 'blend-x' and 'blend-y' set the position.
-  overlays.forEach(overlay => {
-    imageUrl += `&blend=${overlay.text}&blend-mode=normal&blend-x=${overlay.x}&blend-y=${overlay.y}&${textParams}`;
+
+// This function contains the logic to render the component to an image.
+export async function generatePassImage(registration: Registration, event: Event): Promise<ImageResponse> {
+  const qrData = JSON.stringify({
+    registrationId: registration.id,
+    studentName: registration.studentName,
+    studentEmail: registration.studentEmail,
+    rollNumber: registration.rollNumber,
+    eventId: event.id
   });
 
-  // The imgix service requires the base image URL to be Base64 encoded if it has its own parameters.
-  // To simplify, we remove the token from our Firebase Storage URL. This may require storage rules
-  // to be public for read access, which is a trade-off for using this method.
-  const baseUrl = event.passLayoutUrl.split('?')[0];
-  const encodedBaseUrl = Buffer.from(baseUrl).toString('base64url');
-  
-  // This is a hypothetical final URL structure for a different service that takes a base64 encoded base URL.
-  // The actual implementation depends heavily on the chosen image manipulation service.
-  // For this example, we will directly fetch the constructed URL which assumes the service
-  // can handle chained parameters correctly.
+  const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}&bgcolor=111827&color=ffffff`;
 
-  try {
-    const response = await fetch(imageUrl);
-    if (!response.ok) {
-      // Log the URL for debugging purposes if the image fetch fails.
-      console.error("Failed to fetch image from URL:", imageUrl);
-      throw new Error(`Failed to generate pass image. Status: ${response.status}`);
-    }
-    // The response body is an ArrayBuffer, which we convert to a Buffer to be used in the email attachment.
-    const imageBuffer = Buffer.from(await response.arrayBuffer());
-    return imageBuffer;
-  } catch (error) {
-    console.error("Error generating pass:", error);
-    // If image generation fails, we re-throw the error to be handled by the calling action.
-    throw new Error("Could not generate pass image.");
-  }
+  return new ImageResponse(
+        (
+            <div
+                style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    background: '#111827', // A dark background similar to the app's dark theme
+                    width: '100%',
+                    height: '100%',
+                }}
+            >
+                <EventPass registration={registration} event={event} />
+            </div>
+        ),
+        {
+            width: 500,
+            height: 700,
+        }
+    );
 }

@@ -42,18 +42,12 @@ export async function createEvent(prevState: any, formData: FormData) {
   try {
     const { taskPdfUrl, ...eventData } = validatedFields.data;
     
-    // Provide default/empty values for the new pass-related fields
     const newEvent = await createEventInData({
       ...eventData,
       date: new Date(validatedFields.data.date),
       taskPdfFile: taskPdfUrl as File,
       passSubject: "Your Event Pass for {eventName}",
       passBody: "Hi {studentName},\n\nHere is your event pass. Please have it ready for check-in.\n\nThank you!",
-      nameX: 100, nameY: 100,
-      rollNumberX: 100, rollNumberY: 120,
-      branchX: 100, branchY: 140,
-      emailX: 100, emailY: 160,
-      statusX: 100, statusY: 180,
     });
     revalidatePath("/admin");
     
@@ -75,34 +69,12 @@ export async function createEvent(prevState: any, formData: FormData) {
 const passDetailsSchema = z.object({
   passSubject: z.string().min(5, "Pass subject must be at least 5 characters long"),
   passBody: z.string().min(20, "Pass body must be at least 20 characters long"),
-  passLayoutUrl: z.instanceof(File).or(z.string().url()).optional().nullable(),
-  nameX: z.coerce.number(),
-  nameY: z.coerce.number(),
-  rollNumberX: z.coerce.number(),
-  rollNumberY: z.coerce.number(),
-  branchX: z.coerce.number(),
-  branchY: z.coerce.number(),
-  emailX: z.coerce.number(),
-  emailY: z.coerce.number(),
-  statusX: z.coerce.number(),
-  statusY: z.coerce.number(),
 });
 
 export async function updateEventPassDetails(eventId: string, prevState: any, formData: FormData) {
   const validatedFields = passDetailsSchema.safeParse({
     passSubject: formData.get("passSubject"),
     passBody: formData.get("passBody"),
-    passLayoutUrl: formData.get("passLayoutUrl"),
-    nameX: formData.get("nameX"),
-    nameY: formData.get("nameY"),
-    rollNumberX: formData.get("rollNumberX"),
-    rollNumberY: formData.get("rollNumberY"),
-    branchX: formData.get("branchX"),
-    branchY: formData.get("branchY"),
-    emailX: formData.get("emailX"),
-    emailY: formData.get("emailY"),
-    statusX: formData.get("statusX"),
-    statusY: formData.get("statusY"),
   });
 
   if (!validatedFields.success) {

@@ -42,17 +42,6 @@ const eventConverter = {
       mailBody: data.mailBody,
       passSubject: data.passSubject,
       passBody: data.passBody,
-      passLayoutUrl: data.passLayoutUrl,
-      nameX: data.nameX,
-      nameY: data.nameY,
-      rollNumberX: data.rollNumberX,
-      rollNumberY: data.rollNumberY,
-      branchX: data.branchX,
-      branchY: data.branchY,
-      emailX: data.emailX,
-      emailY: data.emailY,
-      statusX: data.statusX,
-      statusY: data.statusY,
     };
   },
 };
@@ -114,12 +103,12 @@ export const getRegistrationById = async (id:string): Promise<Registration | und
     return docSnap.exists() ? docSnap.data() : undefined;
 }
 
-type CreateEventData = Omit<Event, 'id' | 'taskPdfUrl' | 'passLayoutUrl'> & { 
+type CreateEventData = Omit<Event, 'id' | 'taskPdfUrl'> & { 
   taskPdfFile: File;
 };
 
 export const createEventInData = async (eventData: CreateEventData): Promise<Event> => {
-  const { taskPdfFile, passLayoutFile, ...restData } = eventData as any;
+  const { taskPdfFile, ...restData } = eventData as any;
 
   // Upload task PDF to Firebase Storage
   const taskPdfStorageRef = ref(storage, `tasks/${Date.now()}-${taskPdfFile.name}`);
@@ -129,7 +118,6 @@ export const createEventInData = async (eventData: CreateEventData): Promise<Eve
   const newEventData = {
     ...restData,
     taskPdfUrl,
-    passLayoutUrl: "", // Start with an empty pass layout URL
   };
 
   const eventsCol = collection(db, 'events').withConverter(eventConverter);
@@ -140,19 +128,7 @@ export const createEventInData = async (eventData: CreateEventData): Promise<Eve
 
 export const updateEvent = async (id: string, updates: Partial<Omit<Event, 'id'>>) => {
     const eventDocRef = doc(db, 'events', id);
-
-    const eventUpdates: { [key: string]: any } = { ...updates };
-
-    if (eventUpdates.passLayoutUrl instanceof File) {
-        const passLayoutFile = eventUpdates.passLayoutUrl;
-        const passLayoutStorageRef = ref(storage, `passes/${Date.now()}-${passLayoutFile.name}`);
-        const passUploadResult = await uploadBytes(passLayoutStorageRef, passLayoutFile);
-        eventUpdates.passLayoutUrl = await getDownloadURL(passUploadResult.ref);
-    } else if (!eventUpdates.passLayoutUrl) {
-        delete eventUpdates.passLayoutUrl;
-    }
-  
-  await updateDoc(eventDocRef, eventUpdates);
+    await updateDoc(eventDocRef, updates);
 };
 
 
