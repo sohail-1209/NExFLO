@@ -13,23 +13,31 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Calendar } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Link from "next/link";
+import { useToast } from "@/hooks/use-toast";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+
 
 const initialState = {
   message: "",
   errors: {},
 };
 
-function SubmitButton() {
-  return <Button type="submit" className="w-full">Register</Button>;
+function SubmitButton({ isPastEvent }: { isPastEvent: boolean }) {
+  return <Button type="submit" className="w-full" disabled={isPastEvent}>
+      {isPastEvent ? "Registration Closed" : "Register"}
+  </Button>;
 }
 
 export default function RegisterPage({ params: paramsPromise }: { params: Promise<{ eventId: string }> }) {
   const params = use(paramsPromise);
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
   
   const registerForEventWithId = registerForEvent.bind(null, params.eventId);
   const [state, formAction] = useActionState(registerForEventWithId, initialState);
+  
+  const isPastEvent = event ? new Date() > event.date : false;
 
   useEffect(() => {
     async function fetchEvent() {
@@ -43,6 +51,17 @@ export default function RegisterPage({ params: paramsPromise }: { params: Promis
     }
     fetchEvent();
   }, [params.eventId]);
+  
+  useEffect(() => {
+    if (state.message && state.message.startsWith("Error")) {
+      toast({
+        title: "Registration Error",
+        description: state.message,
+        variant: "destructive"
+      })
+    }
+  }, [state, toast])
+
 
   if (loading) {
     return (
@@ -81,20 +100,26 @@ export default function RegisterPage({ params: paramsPromise }: { params: Promis
           </div>
         </CardHeader>
         <CardContent>
+            {isPastEvent && (
+                <Alert variant="destructive" className="mb-4">
+                    <AlertTitle>Registration Closed</AlertTitle>
+                    <AlertDescription>The date for this event has already passed.</AlertDescription>
+                </Alert>
+            )}
           <form action={formAction} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="studentName">Full Name</Label>
-              <Input id="studentName" name="studentName" placeholder="Jane Doe" required />
+              <Input id="studentName" name="studentName" placeholder="Jane Doe" required disabled={isPastEvent} />
               {state?.errors?.studentName && <p className="text-sm text-destructive">{state.errors.studentName[0]}</p>}
             </div>
              <div className="space-y-2">
               <Label htmlFor="rollNumber">Roll Number</Label>
-              <Input id="rollNumber" name="rollNumber" placeholder="e.g. 21CS001" required />
+              <Input id="rollNumber" name="rollNumber" placeholder="e.g. 21CS001" required disabled={isPastEvent} />
               {state?.errors?.rollNumber && <p className="text-sm text-destructive">{state.errors.rollNumber[0]}</p>}
             </div>
              <div className="space-y-2">
               <Label>Gender</Label>
-              <RadioGroup name="gender" className="flex gap-4">
+              <RadioGroup name="gender" className="flex gap-4" disabled={isPastEvent}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="male" id="male" />
                   <Label htmlFor="male">Male</Label>
@@ -113,28 +138,28 @@ export default function RegisterPage({ params: paramsPromise }: { params: Promis
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="branch">Branch</Label>
-                     <Input id="branch" name="branch" placeholder="e.g. Computer Science" required />
+                     <Input id="branch" name="branch" placeholder="e.g. Computer Science" required disabled={isPastEvent} />
                     {state?.errors?.branch && <p className="text-sm text-destructive">{state.errors.branch[0]}</p>}
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="yearOfStudy">Year of Study</Label>
-                    <Input id="yearOfStudy" name="yearOfStudy" type="number" placeholder="e.g. 3" required />
+                    <Input id="yearOfStudy" name="yearOfStudy" type="number" placeholder="e.g. 3" required disabled={isPastEvent} />
                     {state?.errors?.yearOfStudy && <p className="text-sm text-destructive">{state.errors.yearOfStudy[0]}</p>}
                 </div>
             </div>
             <div className="space-y-2">
               <Label htmlFor="studentEmail">Email Address</Label>
-              <Input id="studentEmail" name="studentEmail" type="email" placeholder="jane.doe@example.com" required />
+              <Input id="studentEmail" name="studentEmail" type="email" placeholder="jane.doe@example.com" required disabled={isPastEvent} />
               {state?.errors?.studentEmail && <p className="text-sm text-destructive">{state.errors.studentEmail[0]}</p>}
             </div>
              <div className="space-y-2">
               <Label htmlFor="mobileNumber">Mobile Number</Label>
-              <Input id="mobileNumber" name="mobileNumber" type="tel" placeholder="123-456-7890" required />
+              <Input id="mobileNumber" name="mobileNumber" type="tel" placeholder="123-456-7890" required disabled={isPastEvent} />
               {state?.errors?.mobileNumber && <p className="text-sm text-destructive">{state.errors.mobileNumber[0]}</p>}
             </div>
              <div className="space-y-2">
               <Label>Will you bring a laptop?</Label>
-              <RadioGroup name="laptop" className="flex gap-4">
+              <RadioGroup name="laptop" className="flex gap-4" disabled={isPastEvent}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="true" id="laptop-yes" />
                   <Label htmlFor="laptop-yes">Yes</Label>
@@ -146,7 +171,7 @@ export default function RegisterPage({ params: paramsPromise }: { params: Promis
               </RadioGroup>
               {state?.errors?.laptop && <p className="text-sm text-destructive">{state.errors.laptop[0]}</p>}
             </div>
-            <SubmitButton />
+            <SubmitButton isPastEvent={isPastEvent} />
           </form>
         </CardContent>
         <CardFooter>

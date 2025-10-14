@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createEvent as dbCreateEvent, createRegistration, updateRegistration } from "./data";
 import type { Registration } from "./types";
+import { getEventById } from "./data";
 
 const eventSchema = z.object({
   name: z.string().min(3, "Event name must be at least 3 characters long"),
@@ -13,7 +14,7 @@ const eventSchema = z.object({
   confirmationMessage: z.string().min(10, "Confirmation message must be at least 10 characters long"),
   mailSubject: z.string().min(5, "Mail subject must be at least 5 characters long"),
   mailBody: z.string().min(20, "Mail body must be at least 20 characters long"),
-  taskPdfUrl: z.string().min(1, "A task PDF is required."),
+  taskPdfUrl: z.instanceof(File).refine(file => file.size > 0, "A task PDF is required."),
 });
 
 export async function createEvent(prevState: any, formData: FormData) {
@@ -34,21 +35,19 @@ export async function createEvent(prevState: any, formData: FormData) {
     };
   }
 
-  // NOTE: In a real app, you would handle the file upload here,
-  // save it to a storage service, and get a URL.
-  // For now, we'll just use the mock path from the form.
-  const taskPdfUrl = "/mock-task.pdf";
-
   try {
+    const { taskPdfUrl, ...eventData } = validatedFields.data;
+    
     const newEvent = await dbCreateEvent({
-      ...validatedFields.data,
+      ...eventData,
       date: new Date(validatedFields.data.date),
-      taskPdfUrl: taskPdfUrl, // Use the "uploaded" path
+      taskPdfFile: taskPdfUrl,
     });
     revalidatePath("/admin");
     return { message: "success", eventId: newEvent.id };
-  } catch (e) {
-    return { message: "Failed to create event." };
+  } catch (e: any) {
+    console.error(e);
+    return { message: `Failed to create event: ${e.message}` };
   }
 }
 
@@ -67,6 +66,14 @@ const registrationSchema = z.object({
 
 
 export async function registerForEvent(eventId: string, prevState: any, formData: FormData) {
+  const event = await getEventById(eventId);
+  if (new Date() > event!.date) {
+    return {
+      errors: {},
+      message: "Error: Registration for this event has closed.",
+    };
+  }
+  
   const validatedFields = registrationSchema.safeParse({
     studentName: formData.get("studentName"),
     studentEmail: formData.get("studentEmail"),
@@ -92,8 +99,9 @@ export async function registerForEvent(eventId: string, prevState: any, formData
     });
     revalidatePath(`/admin/events/${eventId}`);
     redirect(`/register/success/${newRegistration.id}`);
-  } catch (e) {
-    return { message: "Failed to register." };
+  } catch (e: any) {
+    console.error(e);
+    return { message: `Failed to register: ${e.message}` };
   }
 }
 
@@ -117,8 +125,9 @@ export async function submitTask(registrationId: string, prevState: any, formDat
         await updateRegistration(registrationId, { taskSubmission: validatedFields.data.taskSubmission });
         revalidatePath(`/admin`); // Revalidate admin pages
         return { message: "Task submitted successfully!" };
-    } catch (e) {
-        return { message: "Failed to submit task." };
+    } catch (e: any) {
+        console.error(e);
+        return { message: `Failed to submit task: ${e.message}` };
     }
 }
 
@@ -128,7 +137,7 @@ export async function updateRegistrationStatus(registrationId: string, eventId: 
         revalidatePath(`/admin/events/${eventId}`);
     } catch (e) {
         // Handle error
-        console.error("Failed to update status");
+        console.error("Failed to update status", e);
     }
 }
 
@@ -137,11 +146,12 @@ export async function markAttendance(registrationId: string, eventId: string) {
     try {
         const registration = await updateRegistration(registrationId, { attended: true });
         if (registration) {
-            revalidatePath(`/admin/events/${eventId}`);
+            revalidatePath(`/admin/events/${eventId}/attendance`);
             return { success: true, message: `${registration.studentName} checked in.` };
         }
         return { success: false, message: 'Registration not found.' };
-    } catch (e) {
-        return { success: false, message: 'Failed to mark attendance.' };
+    } catch (e: any) {
+        console.error(e);
+        return { success: false, message: `Failed to mark attendance: ${e.message}` };
     }
 }

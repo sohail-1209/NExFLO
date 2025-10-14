@@ -4,12 +4,11 @@ import type { Registration } from "@/lib/types";
 import { markAttendance } from "@/lib/actions";
 import { useState, useRef, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, UserCheck, Video, VideoOff, XCircle, Clock, List, User } from "lucide-react";
+import { CheckCircle, UserCheck, VideoOff, XCircle, Clock, List, QrCode } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import jsQR from "jsqr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -138,9 +137,8 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
         title: "Check-in Successful",
         description: result.message,
       });
-      // Clear the scanned data to allow for the next scan
-      setScannedId(""); 
-      setScannedRegistration(null);
+      // Update local state to reflect check-in
+       setScannedRegistration(prev => prev ? {...prev, attended: true} : null);
     } else {
       toast({
         title: "Check-in Failed",

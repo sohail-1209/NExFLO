@@ -90,8 +90,7 @@ export default function CreateEventPage() {
 
           <div className="space-y-2">
             <Label htmlFor="taskPdfUrl">Task PDF</Label>
-            <Input id="taskPdfUrl" name="taskPdfUrl" type="file" />
-            <p className="text-xs text-muted-foreground">Note: File upload is for demonstration. A mock PDF will be used.</p>
+            <Input id="taskPdfUrl" name="taskPdfUrl" type="file" accept=".pdf" />
              {state?.errors?.taskPdfUrl && <p className="text-destructive text-sm">{state.errors.taskPdfUrl[0]}</p>}
           </div>
         </CardContent>

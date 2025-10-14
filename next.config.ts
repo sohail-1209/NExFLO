@@ -39,8 +39,16 @@ const nextConfig: NextConfig = {
         hostname: 'api.dicebear.com',
         port: '',
         pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'firebasestorage.googleapis.com',
+        port: '',
       }
     ],
+  },
+  env: {
+    NEXT_PUBLIC_EMULATORS_ENABLED: process.env.NEXT_PUBLIC_EMULATORS_ENABLED,
   },
 };
 
