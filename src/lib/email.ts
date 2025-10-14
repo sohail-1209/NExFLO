@@ -13,7 +13,8 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-function createRegistrationEmailHtml(body: string, registration: Registration, event: Event, baseUrl: string): string {
+function createRegistrationEmailHtml(body: string, registration: Registration, event: Event): string {
+    const baseUrl = process.env.FIREBASE_HOSTING_URL || `http://localhost:3000`;
     const taskSubmissionUrl = `${baseUrl}/tasks/${registration.id}/submit`;
     
     let processedBody = body
@@ -50,13 +51,13 @@ function createRegistrationEmailHtml(body: string, registration: Registration, e
 }
 
 
-export async function sendRegistrationEmail(registration: Registration, event: Event, baseUrl: string) {
+export async function sendRegistrationEmail(registration: Registration, event: Event) {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     console.error("Email credentials are not set in environment variables.");
     throw new Error("Email service is not configured.");
   }
   
-  const emailHtml = createRegistrationEmailHtml(event.mailBody, registration, event, baseUrl);
+  const emailHtml = createRegistrationEmailHtml(event.mailBody, registration, event);
   
   const mailOptions = {
     from: process.env.EMAIL_USER,
@@ -74,7 +75,7 @@ export async function sendRegistrationEmail(registration: Registration, event: E
   }
 }
 
-export async function sendPassEmail(registration: Registration, event: Event, baseUrl: string) {
+export async function sendPassEmail(registration: Registration, event: Event) {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     console.error("Email credentials are not set in environment variables.");
     throw new Error("Email service is not configured.");

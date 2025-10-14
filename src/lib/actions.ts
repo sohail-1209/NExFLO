@@ -111,11 +111,6 @@ const registrationSchema = z.object({
 
 
 export async function registerForEvent(eventId: string, prevState: any, formData: FormData) {
-  const headersList = headers();
-  const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
-  const protocol = headersList.get('x-forwarded-proto') || 'http';
-  const baseUrl = `${protocol}://${host}`;
-
   const event = await getEventById(eventId);
   if (!event || new Date() > event.date) {
     return {
@@ -149,7 +144,7 @@ export async function registerForEvent(eventId: string, prevState: any, formData
     });
 
     // Send the confirmation email
-    await sendRegistrationEmail(newRegistration, event, baseUrl);
+    await sendRegistrationEmail(newRegistration, event);
 
     revalidatePath(`/admin/events/${eventId}`);
     redirect(`/register/success/${newRegistration.id}`);
@@ -227,11 +222,7 @@ export async function updateRegistrationStatus(registrationId: string, eventId: 
             const registration = await getRegistrationByIdData(registrationId);
             const event = await getEventById(eventId);
             if(registration && event) {
-                const headersList = headers();
-                const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
-                const protocol = headersList.get('x-forwarded-proto') || 'http';
-                const baseUrl = `${protocol}://${host}`;
-                await sendPassEmail(registration, event, baseUrl);
+                await sendPassEmail(registration, event);
             }
         }
         revalidatePath(`/admin/events/${eventId}`);
@@ -281,13 +272,8 @@ export async function resendRegistrationEmail(registrationId: string) {
         if (!event) {
             return { success: false, message: "Event not found." };
         }
-
-        const headersList = headers();
-        const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
-        const protocol = headersList.get('x-forwarded-proto') || 'http';
-        const baseUrl = `${protocol}://${host}`;
-
-        await sendRegistrationEmail(registration, event, baseUrl);
+        
+        await sendRegistrationEmail(registration, event);
 
         return { success: true, message: `Email sent successfully to ${registration.studentEmail}. Please check your inbox (and spam folder).` };
 
