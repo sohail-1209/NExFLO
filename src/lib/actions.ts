@@ -74,7 +74,7 @@ export async function createEvent(prevState: any, formData: FormData) {
 const passDetailsSchema = z.object({
   passSubject: z.string().min(5, "Pass subject must be at least 5 characters long"),
   passBody: z.string().min(20, "Pass body must be at least 20 characters long"),
-  passLayoutUrl: z.instanceof(File).refine(file => file.size > 0 && file.type.startsWith("image/"), "A pass layout image is required.").or(z.string().url()).optional(),
+  passLayoutUrl: z.instanceof(File).or(z.string().url()).optional().nullable(),
   nameX: z.coerce.number(),
   nameY: z.coerce.number(),
   rollNumberX: z.coerce.number(),

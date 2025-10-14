@@ -136,15 +136,21 @@ export const createEventInData = async (eventData: CreateEventData): Promise<Eve
   return { ...newEventData, id: docRef.id };
 };
 
-export const updateEvent = async (id: string, updates: Partial<Event & { passLayoutFile?: File }>) => {
-  const eventDocRef = doc(db, 'events', id);
-  const { passLayoutFile, ...eventUpdates } = updates;
+export const updateEvent = async (id: string, updates: Partial<Omit<Event, 'id'>>) => {
+    const eventDocRef = doc(db, 'events', id);
 
-  if (passLayoutFile instanceof File) {
-    const passLayoutStorageRef = ref(storage, `passes/${Date.now()}-${passLayoutFile.name}`);
-    const passUploadResult = await uploadBytes(passLayoutStorageRef, passLayoutFile);
-    eventUpdates.passLayoutUrl = await getDownloadURL(passUploadResult.ref);
-  }
+    const eventUpdates = { ...updates };
+
+    if (eventUpdates.passLayoutUrl instanceof File) {
+        const passLayoutFile = eventUpdates.passLayoutUrl;
+        const passLayoutStorageRef = ref(storage, `passes/${Date.now()}-${passLayoutFile.name}`);
+        const passUploadResult = await uploadBytes(passLayoutStorageRef, passLayoutFile);
+        eventUpdates.passLayoutUrl = await getDownloadURL(passUploadResult.ref);
+    } else if (!eventUpdates.passLayoutUrl) {
+        // If the URL is empty/null/undefined but not a file, don't try to update it.
+        // This prevents overwriting an existing URL with an empty one if no new file is uploaded.
+        delete eventUpdates.passLayoutUrl;
+    }
   
   await updateDoc(eventDocRef, eventUpdates);
 };
