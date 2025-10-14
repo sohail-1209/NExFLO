@@ -43,8 +43,8 @@ interface RegistrationsTabProps {
 const statusConfig = {
     booked: { label: <span className="hidden sm:inline">Booked</span>, color: 'bg-green-500', icon: <>✅</> },
     waitlisted: { label: <span className="hidden sm:inline">Waitlisted</span>, color: 'bg-yellow-500', icon: <>⚠️</> },
-    pending: { label: 'Pending', color: 'bg-gray-500', icon: <Clock className="h-3 w-3" /> },
-    denied: { label: 'Denied', color: 'bg-red-500', icon: <Ban className="h-3 w-3" /> },
+    pending: { label: <span className="hidden sm:inline">Pending</span>, color: 'bg-gray-500', icon: <Clock className="h-3 w-3" /> },
+    denied: { label: <span className="hidden sm:inline">Denied</span>, color: 'bg-red-500', icon: <Ban className="h-3 w-3" /> },
 };
 
 const passInitialState = {
@@ -297,3 +297,5 @@ export default function RegistrationsTab({ registrations, event }: Registrations
     </>
   );
 }
+
+    
