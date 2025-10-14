@@ -4,11 +4,21 @@ import { notFound } from "next/navigation";
 import { headers } from 'next/headers';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DetailsTab from "./_components/DetailsTab";
-import RegistrationsTab from "./_components/RegistrationsTab";
-import AttendanceTab from "./_components/AttendanceTab";
-import { Calendar, Users, QrCode, ArrowLeft, UserCheck } from "lucide-react";
+import { Calendar, Users, UserCheck, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import dynamic from "next/dynamic";
+
+const RegistrationsTab = dynamic(() => import("./_components/RegistrationsTab"), { 
+  ssr: false,
+  loading: () => <Skeleton className="w-full h-[300px]" />,
+});
+const AttendanceTab = dynamic(() => import("./_components/AttendanceTab"), { 
+  ssr: false,
+  loading: () => <Skeleton className="w-full h-[300px]" />,
+});
+
 
 export default async function EventDetailPage({ params }: { params: { eventId: string } }) {
   const event = await getEventById(params.eventId);
