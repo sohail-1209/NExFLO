@@ -43,8 +43,8 @@ export async function generatePassImageFromComponent(registrationId: string) {
 // This function contains the logic to render the component to an image.
 export async function generatePassImage(registration: Registration, event: Event): Promise<ImageResponse> {
 
-  // Note: We are using inline styles here because @vercel/og has limitations
-  // with external stylesheets and complex Tailwind CSS classes.
+  // The 'style' prop needs to be passed directly as an object to the options of ImageResponse,
+  // not on the div itself. This is the correct syntax for @vercel/og.
   return new ImageResponse(
     (
       <div
@@ -52,9 +52,9 @@ export async function generatePassImage(registration: Registration, event: Event
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#111827', // A dark background similar to the app's dark theme
           width: '100%',
           height: '100%',
+          background: '#1e1b4b', // Using a dark indigo color
         }}
       >
         <EventPass registration={registration} event={event} />
