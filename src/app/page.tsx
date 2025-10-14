@@ -18,7 +18,7 @@ export default function Home() {
       <main className="flex-grow flex items-center">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col items-center text-center">
-            <h2 className="text-4xl md:text-6xl font-extrabold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-primary via-accent to-primary-foreground mb-4">
+            <h2 className="text-4xl md:text-6xl font-extrabold tracking-tighter text-primary mb-4">
               Event Management, Reimagined.
             </h2>
             <p className="max-w-2xl text-lg md:text-xl text-muted-foreground mb-8">
