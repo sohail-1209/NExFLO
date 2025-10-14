@@ -1,0 +1,118 @@
+
+{
+  "entities": {
+    "Event": {
+      "title": "Event",
+      "description": "An entity representing an event.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the event."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the event."
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of the event."
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The date and time of the event."
+        },
+        "confirmationMessage": {
+            "type": "string",
+            "description": "Message shown to users after they register."
+        },
+        "taskPdfUrl": {
+            "type": "string",
+            "description": "URL to the task PDF in Firebase Storage."
+        },
+        "mailSubject": {
+            "type": "string",
+            "description": "Subject of the registration confirmation email."
+        },
+        "mailBody": {
+            "type": "string",
+            "description": "Body of the registration confirmation email."
+        }
+      },
+      "required": ["name", "description", "date", "confirmationMessage", "taskPdfUrl", "mailSubject", "mailBody"]
+    },
+    "Registration": {
+      "title": "Registration",
+      "description": "An entity representing a user's registration for an event.",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique identifier for the registration."
+        },
+        "eventId": {
+          "type": "string",
+          "description": "The ID of the event this registration is for."
+        },
+        "studentName": {
+          "type": "string"
+        },
+        "studentEmail": {
+          "type": "string",
+          "format": "email"
+        },
+        "rollNumber": {
+            "type": "string"
+        },
+        "gender": {
+            "type": "string"
+        },
+        "branch": {
+            "type": "string"
+        },
+        "yearOfStudy": {
+            "type": "number"
+        },
+        "mobileNumber": {
+            "type": "string"
+        },
+        "status": {
+            "type": "string",
+            "enum": ["pending", "booked", "waitlisted"]
+        },
+        "taskSubmission": {
+            "type": "string"
+        },
+        "registeredAt": {
+            "type": "string",
+            "format": "date-time"
+        },
+        "attended": {
+            "type": "boolean"
+        },
+        "laptop": {
+            "type": "boolean"
+        }
+      },
+      "required": ["eventId", "studentName", "studentEmail", "rollNumber", "gender", "branch", "yearOfStudy", "mobileNumber", "status", "registeredAt", "attended", "laptop"]
+    }
+  },
+  "auth": {
+    "providers": ["google.com"]
+  },
+  "firestore": {
+    "/events/{eventId}": {
+      "schema": {
+        "$ref": "#/entities/Event"
+      },
+      "description": "Collection of all events."
+    },
+    "/registrations/{registrationId}": {
+      "schema": {
+        "$ref": "#/entities/Registration"
+      },
+      "description": "Collection of all registrations for all events."
+    }
+  }
+}
