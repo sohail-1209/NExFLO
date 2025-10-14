@@ -55,7 +55,7 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
           <DetailsTab event={event} baseUrl={baseUrl} />
         </TabsContent>
         <TabsContent value="registrations">
-          <RegistrationsTab registrations={registrations} eventId={event.id} />
+          <RegistrationsTab registrations={registrations} event={event} />
         </TabsContent>
         <TabsContent value="attendance">
           <AttendanceTab registrations={registrations} eventId={event.id} />

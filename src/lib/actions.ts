@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { createEventInData, createRegistration, updateRegistration, getRegistrationById as getRegistrationByIdData, getEventById } from "./data";
+import { createEventInData, createRegistration, updateRegistration, getRegistrationById as getRegistrationByIdData, getEventById, updateEvent } from "./data";
 import type { Registration, Event } from "./types";
 import { sendRegistrationEmail } from "./email";
 
@@ -18,17 +18,6 @@ const eventSchema = z.object({
   mailSubject: z.string().min(5, "Mail subject must be at least 5 characters long"),
   mailBody: z.string().min(20, "Mail body must be at least 20 characters long"),
   taskPdfUrl: z.instanceof(File).refine(file => file.size > 0, "A task PDF is required.").or(z.string().url()),
-  passSubject: z.string().min(5, "Pass subject must be at least 5 characters long"),
-  passBody: z.string().min(20, "Pass body must be at least 20 characters long"),
-  passLayoutUrl: z.instanceof(File).refine(file => file.size > 0 && file.type.startsWith("image/"), "A pass layout image is required."),
-  nameX: z.coerce.number(),
-  nameY: z.coerce.number(),
-  rollNumberX: z.coerce.number(),
-  rollNumberY: z.coerce.number(),
-  branchX: z.coerce.number(),
-  branchY: z.coerce.number(),
-  statusX: z.coerce.number(),
-  statusY: z.coerce.number(),
 });
 
 export async function createEvent(prevState: any, formData: FormData) {
@@ -40,17 +29,6 @@ export async function createEvent(prevState: any, formData: FormData) {
     mailSubject: formData.get("mailSubject"),
     mailBody: formData.get("mailBody"),
     taskPdfUrl: formData.get("taskPdfUrl"),
-    passSubject: formData.get("passSubject"),
-    passBody: formData.get("passBody"),
-    passLayoutUrl: formData.get("passLayoutUrl"),
-    nameX: formData.get("nameX"),
-    nameY: formData.get("nameY"),
-    rollNumberX: formData.get("rollNumberX"),
-    rollNumberY: formData.get("rollNumberY"),
-    branchX: formData.get("branchX"),
-    branchY: formData.get("branchY"),
-    statusX: formData.get("statusX"),
-    statusY: formData.get("statusY"),
   });
 
   if (!validatedFields.success) {
@@ -62,13 +40,19 @@ export async function createEvent(prevState: any, formData: FormData) {
   }
 
   try {
-    const { taskPdfUrl, passLayoutUrl, ...eventData } = validatedFields.data;
+    const { taskPdfUrl, ...eventData } = validatedFields.data;
     
+    // Provide default/empty values for the new pass-related fields
     const newEvent = await createEventInData({
       ...eventData,
       date: new Date(validatedFields.data.date),
       taskPdfFile: taskPdfUrl,
-      passLayoutFile: passLayoutUrl,
+      passSubject: "Your Event Pass",
+      passBody: "Here is your event pass.",
+      nameX: 100, nameY: 100,
+      rollNumberX: 100, rollNumberY: 120,
+      branchX: 100, branchY: 140,
+      statusX: 100, statusY: 160,
     });
     revalidatePath("/admin");
     
@@ -86,6 +70,54 @@ export async function createEvent(prevState: any, formData: FormData) {
     return { message: `Error: Failed to create event: ${e.message}` };
   }
 }
+
+const passDetailsSchema = z.object({
+  passSubject: z.string().min(5, "Pass subject must be at least 5 characters long"),
+  passBody: z.string().min(20, "Pass body must be at least 20 characters long"),
+  passLayoutUrl: z.instanceof(File).refine(file => file.size > 0 && file.type.startsWith("image/"), "A pass layout image is required.").or(z.string().url()).optional(),
+  nameX: z.coerce.number(),
+  nameY: z.coerce.number(),
+  rollNumberX: z.coerce.number(),
+  rollNumberY: z.coerce.number(),
+  branchX: z.coerce.number(),
+  branchY: z.coerce.number(),
+  statusX: z.coerce.number(),
+  statusY: z.coerce.number(),
+});
+
+export async function updateEventPassDetails(eventId: string, prevState: any, formData: FormData) {
+  const validatedFields = passDetailsSchema.safeParse({
+    passSubject: formData.get("passSubject"),
+    passBody: formData.get("passBody"),
+    passLayoutUrl: formData.get("passLayoutUrl"),
+    nameX: formData.get("nameX"),
+    nameY: formData.get("nameY"),
+    rollNumberX: formData.get("rollNumberX"),
+    rollNumberY: formData.get("rollNumberY"),
+    branchX: formData.get("branchX"),
+    branchY: formData.get("branchY"),
+    statusX: formData.get("statusX"),
+    statusY: formData.get("statusY"),
+  });
+
+  if (!validatedFields.success) {
+     return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Error: Please check your input.",
+    };
+  }
+
+  try {
+    await updateEvent(eventId, validatedFields.data);
+    revalidatePath(`/admin/events/${eventId}`);
+    return { message: "Pass details updated successfully!", errors: {} };
+  } catch (e:any) {
+    console.error(e);
+    return { message: `Error: Failed to update pass details: ${e.message}`, errors: {} };
+  }
+
+}
+
 
 const registrationSchema = z.object({
   studentName: z.string().min(2, "Name is required"),

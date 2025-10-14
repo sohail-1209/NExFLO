@@ -114,26 +114,20 @@ export const getRegistrationById = async (id:string): Promise<Registration | und
 
 type CreateEventData = Omit<Event, 'id' | 'taskPdfUrl' | 'passLayoutUrl'> & { 
   taskPdfFile: File;
-  passLayoutFile: File;
 };
 
 export const createEventInData = async (eventData: CreateEventData): Promise<Event> => {
-  const { taskPdfFile, passLayoutFile, ...restData } = eventData;
+  const { taskPdfFile, passLayoutFile, ...restData } = eventData as any;
 
   // Upload task PDF to Firebase Storage
   const taskPdfStorageRef = ref(storage, `tasks/${Date.now()}-${taskPdfFile.name}`);
   const taskUploadResult = await uploadBytes(taskPdfStorageRef, taskPdfFile);
   const taskPdfUrl = await getDownloadURL(taskUploadResult.ref);
 
-  // Upload pass layout image to Firebase Storage
-  const passLayoutStorageRef = ref(storage, `passes/${Date.now()}-${passLayoutFile.name}`);
-  const passUploadResult = await uploadBytes(passLayoutStorageRef, passLayoutFile);
-  const passLayoutUrl = await getDownloadURL(passUploadResult.ref);
-
   const newEventData = {
     ...restData,
     taskPdfUrl,
-    passLayoutUrl,
+    passLayoutUrl: "", // Start with an empty pass layout URL
   };
 
   const eventsCol = collection(db, 'events').withConverter(eventConverter);
@@ -141,6 +135,20 @@ export const createEventInData = async (eventData: CreateEventData): Promise<Eve
   
   return { ...newEventData, id: docRef.id };
 };
+
+export const updateEvent = async (id: string, updates: Partial<Event & { passLayoutFile?: File }>) => {
+  const eventDocRef = doc(db, 'events', id);
+  const { passLayoutFile, ...eventUpdates } = updates;
+
+  if (passLayoutFile instanceof File) {
+    const passLayoutStorageRef = ref(storage, `passes/${Date.now()}-${passLayoutFile.name}`);
+    const passUploadResult = await uploadBytes(passLayoutStorageRef, passLayoutFile);
+    eventUpdates.passLayoutUrl = await getDownloadURL(passUploadResult.ref);
+  }
+  
+  await updateDoc(eventDocRef, eventUpdates);
+};
+
 
 export const createRegistration = async (regData: Omit<Registration, 'id' | 'registeredAt' | 'status' | 'taskSubmission' | 'attended'>): Promise<Registration> => {
   const newRegistrationData: Omit<Registration, 'id'> = {
