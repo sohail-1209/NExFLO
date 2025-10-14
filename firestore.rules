@@ -1,55 +1,46 @@
 /**
- * @fileoverview Firestore Security Rules for Prototyping.
+ * @file Firebase Security Rules
+ * @version 2
  *
- * Core Philosophy:
- * This ruleset is in prototyping mode. As such, it grants open access to all authenticated users while ensuring that unauthenticated users cannot access the database.
+ * @description
+ * This ruleset allows anyone to do anything, regardless of authentication status.
+ * This is ONLY suitable for prototyping and should NEVER be deployed to production.
  *
  * Data Structure:
- * The database contains two top-level collections: `events` and `registrations`.
+ * - /events/{eventId}: Stores event information.
+ * - /registrations/{registrationId}: Stores registration information.
  *
  * Key Security Decisions:
- * - Authenticated users can create, read, update, and delete any document in any collection.
- * - Unauthenticated users are denied all access.
- *
- * Access Control Patterns:
- * - `/events/{eventId}`: Public Read with Owner-Only Writes (but with open access for prototyping)
- * - `/registrations/{registrationId}`: Public Read with Owner-Only Writes (but with open access for prototyping)
+ * - All read and write operations are permitted for all users.
  */
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
     /**
-     * @description Rules for the 'events' collection. Allows any authenticated user to perform any operation.
+     * @description Allows anyone to read or write event data.
      * @path /events/{eventId}
-     * @allow (create) User logged in can create event.
-     * @deny (create) User not logged in cannot create event.
-     * @allow (get) Any logged in user can read any event.
-     * @deny (get) User not logged in cannot read any event.
-     * @principle Allows read and write access to the 'events' collection for any authenticated user in prototyping mode.
+     * @allow (get, list) Any user can read event details.
+     * @allow (create, update, delete) Any user can create, update, or delete event details.
+     * @deny None. All operations are permitted.
+     * @principle Allows all access for prototyping purposes.
      */
     match /events/{eventId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if isSignedIn();
+      allow get, list: if true;
+      allow create, update, delete: if true;
     }
 
     /**
-     * @description Rules for the 'registrations' collection. Allows any authenticated user to perform any operation.
+     * @description Allows anyone to read or write registration data.
      * @path /registrations/{registrationId}
-     * @allow (create) User logged in can create registration.
-     * @deny (create) User not logged in cannot create registration.
-     * @allow (get) Any logged in user can read any registration.
-     * @deny (get) User not logged in cannot read any registration.
-     * @principle Allows read and write access to the 'registrations' collection for any authenticated user in prototyping mode.
+     * @allow (get, list) Any user can read registration details.
+     * @allow (create, update, delete) Any user can create, update, or delete registration details.
+     * @deny None. All operations are permitted.
+     * @principle Allows all access for prototyping purposes.
      */
     match /registrations/{registrationId} {
-      allow get, list: if isSignedIn();
-      allow create, update, delete: if isSignedIn();
-    }
-
-    // Helper function to check if a user is signed in.
-    function isSignedIn() {
-      return request.auth != null;
+      allow get, list: if true;
+      allow create, update, delete: if true;
     }
   }
 }
