@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { createEvent as dbCreateEvent, createRegistration, updateRegistration } from "./data";
+import { createEvent as createEventInData, createRegistration, updateRegistration } from "./data";
 import type { Registration } from "./types";
 import { getEventById } from "./data";
 
@@ -38,7 +38,7 @@ export async function createEvent(prevState: any, formData: FormData) {
   try {
     const { taskPdfUrl, ...eventData } = validatedFields.data;
     
-    const newEvent = await dbCreateEvent({
+    const newEvent = await createEventInData({
       ...eventData,
       date: new Date(validatedFields.data.date),
       taskPdfFile: taskPdfUrl,
@@ -67,7 +67,7 @@ const registrationSchema = z.object({
 
 export async function registerForEvent(eventId: string, prevState: any, formData: FormData) {
   const event = await getEventById(eventId);
-  if (new Date() > event!.date) {
+  if (!event || new Date() > event.date) {
     return {
       errors: {},
       message: "Error: Registration for this event has closed.",
