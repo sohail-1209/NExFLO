@@ -31,16 +31,19 @@ function createRegistrationEmailHtml(body: string, registration: Registration, e
           <meta charset="UTF-8">
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { text-align: center; }
+            .container { text-align: left; }
+            .button-container { text-align: center; }
           </style>
         </head>
         <body>
           <div class="container">
             ${processedBody}
-            <br><br>
-            ${downloadButton}
-            <br>
-            ${submissionButton}
+            <div class="button-container">
+                <br><br>
+                ${downloadButton}
+                <br>
+                ${submissionButton}
+            </div>
           </div>
         </body>
       </html>
@@ -110,7 +113,7 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
             .details p { margin: 5px 0; }
             .qr-container { text-align: center; margin-top: 15px; }
             .status { text-transform: capitalize; font-weight: bold; }
-            .container { text-align: center; }
+            .container { text-align: left; }
           </style>
         </head>
         <body>
