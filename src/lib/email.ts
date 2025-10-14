@@ -58,4 +58,3 @@ export async function sendRegistrationEmail(registration: Registration, event: E
     throw new Error(`Could not send email. Reason: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
-
