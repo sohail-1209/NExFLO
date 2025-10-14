@@ -156,10 +156,10 @@ export default function RegistrationsTab({ registrations, event }: Registrations
               <TableHeader>
                 <TableRow>
                   <TableHead className="pl-1">Student</TableHead>
-                  <TableHead className="hidden md:table-cell px-2">Details</TableHead>
+                  <TableHead className="hidden md:table-cell px-1">Details</TableHead>
                   <TableHead className="px-1">Submission</TableHead>
                   <TableHead className="text-center px-1">Status</TableHead>
-                  <TableHead className="text-right pr-1">Actions</TableHead>
+                  <TableHead className="text-right pr-1"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -172,7 +172,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                         {reg.rollNumber}
                       </div>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell p-2">
+                    <TableCell className="hidden md:table-cell p-1">
                       <div className="text-sm text-muted-foreground">
                         {reg.rollNumber} &bull; {reg.branch} &bull; Year {reg.yearOfStudy}
                       </div>
@@ -301,3 +301,4 @@ export default function RegistrationsTab({ registrations, event }: Registrations
     
 
     
+
