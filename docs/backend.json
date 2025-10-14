@@ -38,9 +38,29 @@
         "mailBody": {
             "type": "string",
             "description": "Body of the registration confirmation email."
-        }
+        },
+        "passSubject": {
+          "type": "string",
+          "description": "Subject of the event pass email."
+        },
+        "passBody": {
+            "type": "string",
+            "description": "Body of the event pass email."
+        },
+        "passLayoutUrl": {
+            "type": "string",
+            "description": "URL to the pass layout image in Firebase Storage."
+        },
+        "nameX": { "type": "number" },
+        "nameY": { "type": "number" },
+        "rollNumberX": { "type": "number" },
+        "rollNumberY": { "type": "number" },
+        "branchX": { "type": "number" },
+        "branchY": { "type": "number" },
+        "statusX": { "type": "number" },
+        "statusY": { "type": "number" }
       },
-      "required": ["name", "description", "date", "confirmationMessage", "taskPdfUrl", "mailSubject", "mailBody"]
+      "required": ["name", "description", "date", "confirmationMessage", "taskPdfUrl", "mailSubject", "mailBody", "passSubject", "passBody", "passLayoutUrl", "nameX", "nameY", "rollNumberX", "rollNumberY", "branchX", "branchY", "statusX", "statusY"]
     },
     "Registration": {
       "title": "Registration",

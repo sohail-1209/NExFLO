@@ -40,6 +40,17 @@ const eventConverter = {
       taskPdfUrl: data.taskPdfUrl,
       mailSubject: data.mailSubject,
       mailBody: data.mailBody,
+      passSubject: data.passSubject,
+      passBody: data.passBody,
+      passLayoutUrl: data.passLayoutUrl,
+      nameX: data.nameX,
+      nameY: data.nameY,
+      rollNumberX: data.rollNumberX,
+      rollNumberY: data.rollNumberY,
+      branchX: data.branchX,
+      branchY: data.branchY,
+      statusX: data.statusX,
+      statusY: data.statusY,
     };
   },
 };
@@ -101,17 +112,28 @@ export const getRegistrationById = async (id:string): Promise<Registration | und
     return docSnap.exists() ? docSnap.data() : undefined;
 }
 
-export const createEventInData = async (eventData: Omit<Event, 'id' | 'taskPdfUrl'> & { taskPdfFile: File }): Promise<Event> => {
-  const { taskPdfFile, ...restData } = eventData;
+type CreateEventData = Omit<Event, 'id' | 'taskPdfUrl' | 'passLayoutUrl'> & { 
+  taskPdfFile: File;
+  passLayoutFile: File;
+};
 
-  // Upload file to Firebase Storage
-  const storageRef = ref(storage, `tasks/${Date.now()}-${taskPdfFile.name}`);
-  const uploadResult = await uploadBytes(storageRef, taskPdfFile);
-  const taskPdfUrl = await getDownloadURL(uploadResult.ref);
+export const createEventInData = async (eventData: CreateEventData): Promise<Event> => {
+  const { taskPdfFile, passLayoutFile, ...restData } = eventData;
+
+  // Upload task PDF to Firebase Storage
+  const taskPdfStorageRef = ref(storage, `tasks/${Date.now()}-${taskPdfFile.name}`);
+  const taskUploadResult = await uploadBytes(taskPdfStorageRef, taskPdfFile);
+  const taskPdfUrl = await getDownloadURL(taskUploadResult.ref);
+
+  // Upload pass layout image to Firebase Storage
+  const passLayoutStorageRef = ref(storage, `passes/${Date.now()}-${passLayoutFile.name}`);
+  const passUploadResult = await uploadBytes(passLayoutStorageRef, passLayoutFile);
+  const passLayoutUrl = await getDownloadURL(passUploadResult.ref);
 
   const newEventData = {
     ...restData,
-    taskPdfUrl
+    taskPdfUrl,
+    passLayoutUrl,
   };
 
   const eventsCol = collection(db, 'events').withConverter(eventConverter);

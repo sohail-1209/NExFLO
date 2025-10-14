@@ -18,6 +18,17 @@ const eventSchema = z.object({
   mailSubject: z.string().min(5, "Mail subject must be at least 5 characters long"),
   mailBody: z.string().min(20, "Mail body must be at least 20 characters long"),
   taskPdfUrl: z.instanceof(File).refine(file => file.size > 0, "A task PDF is required.").or(z.string().url()),
+  passSubject: z.string().min(5, "Pass subject must be at least 5 characters long"),
+  passBody: z.string().min(20, "Pass body must be at least 20 characters long"),
+  passLayoutUrl: z.instanceof(File).refine(file => file.size > 0 && file.type.startsWith("image/"), "A pass layout image is required."),
+  nameX: z.coerce.number(),
+  nameY: z.coerce.number(),
+  rollNumberX: z.coerce.number(),
+  rollNumberY: z.coerce.number(),
+  branchX: z.coerce.number(),
+  branchY: z.coerce.number(),
+  statusX: z.coerce.number(),
+  statusY: z.coerce.number(),
 });
 
 export async function createEvent(prevState: any, formData: FormData) {
@@ -29,6 +40,17 @@ export async function createEvent(prevState: any, formData: FormData) {
     mailSubject: formData.get("mailSubject"),
     mailBody: formData.get("mailBody"),
     taskPdfUrl: formData.get("taskPdfUrl"),
+    passSubject: formData.get("passSubject"),
+    passBody: formData.get("passBody"),
+    passLayoutUrl: formData.get("passLayoutUrl"),
+    nameX: formData.get("nameX"),
+    nameY: formData.get("nameY"),
+    rollNumberX: formData.get("rollNumberX"),
+    rollNumberY: formData.get("rollNumberY"),
+    branchX: formData.get("branchX"),
+    branchY: formData.get("branchY"),
+    statusX: formData.get("statusX"),
+    statusY: formData.get("statusY"),
   });
 
   if (!validatedFields.success) {
@@ -40,12 +62,13 @@ export async function createEvent(prevState: any, formData: FormData) {
   }
 
   try {
-    const { taskPdfUrl, ...eventData } = validatedFields.data;
+    const { taskPdfUrl, passLayoutUrl, ...eventData } = validatedFields.data;
     
     const newEvent = await createEventInData({
       ...eventData,
       date: new Date(validatedFields.data.date),
       taskPdfFile: taskPdfUrl,
+      passLayoutFile: passLayoutUrl,
     });
     revalidatePath("/admin");
     
