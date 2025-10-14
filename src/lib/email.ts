@@ -21,8 +21,8 @@ function createRegistrationEmailHtml(body: string, registration: Registration, e
       .replace(/{eventName}/g, event.name)
       .replace(/\n/g, "<br>");
 
-    const downloadButton = `<a href="${event.taskPdfUrl}" target="_blank" rel="noopener noreferrer" style="background-color:#7c3aed;color:#ffffff;padding:12px 24px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;margin-top:10px;">Download Task PDF</a>`;
-    const submissionButton = `<a href="${taskSubmissionUrl}" target="_blank" rel="noopener noreferrer" style="background-color:#7c3aed;color:#ffffff;padding:12px 24px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;margin-top:10px;">Submit Your Task Here</a>`;
+    const downloadButton = `<a href="${event.taskPdfUrl}" target="_blank" rel="noopener noreferrer" style="background-color:#BB86FC;color:#121212;padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block;margin:10px 5px;">Download Task PDF</a>`;
+    const submissionButton = `<a href="${taskSubmissionUrl}" target="_blank" rel="noopener noreferrer" style="background-color:#BB86FC;color:#121212;padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block;margin:10px 5px;">Submit Your Task</a>`;
     
     const finalHtml = `
       <!DOCTYPE html>
@@ -30,19 +30,69 @@ function createRegistrationEmailHtml(body: string, registration: Registration, e
         <head>
           <meta charset="UTF-8">
           <style>
-            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .container { text-align: left; }
-            .button-container { text-align: center; }
+            body { 
+              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; 
+              line-height: 1.6; 
+              color: #e0e0e0;
+              background-color: #121212;
+              margin: 0;
+              padding: 0;
+            }
+            .email-container { 
+              text-align: center; 
+              padding: 20px;
+            }
+            .card {
+              background-color: #1e1e1e;
+              border: 1px solid #333;
+              border-radius: 16px;
+              box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+              max-width: 600px;
+              margin: 20px auto;
+              overflow: hidden;
+              text-align: left;
+            }
+            .card-header {
+              background-color: #333;
+              padding: 24px;
+            }
+            .card-header h2 {
+                margin: 0;
+                font-size: 28px;
+                color: #BB86FC;
+            }
+             .card-header p {
+                margin: 4px 0 0;
+                font-size: 16px;
+                color: #b0b0b0;
+            }
+            .card-body {
+              padding: 24px;
+              color: #c0c0c0;
+            }
+            .button-container { 
+              text-align: center; 
+              margin-top: 24px;
+              padding-top: 24px;
+              border-top: 1px solid #333;
+            }
           </style>
         </head>
         <body>
-          <div class="container">
-            ${processedBody}
-            <div class="button-container">
-                <br><br>
-                ${downloadButton}
-                <br>
-                ${submissionButton}
+          <div class="email-container">
+            <div class="card">
+                <div class="card-header">
+                    <h2>Registration for ${event.name}</h2>
+                    <p>Thank you for your interest!</p>
+                </div>
+                <div class="card-body">
+                    ${processedBody}
+                </div>
+                <div class="button-container">
+                    <p style="margin:0 0 16px; color: #b0b0b0;">Please complete the next steps to secure your spot:</p>
+                    ${downloadButton}
+                    ${submissionButton}
+                </div>
             </div>
           </div>
         </body>
@@ -132,10 +182,10 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
             }
             .wave {
                 position: absolute;
-                bottom: -10px;
+                bottom: -1px;
                 left: 0;
                 width: 100%;
-                height: 30px;
+                height: 20px;
                 background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%23ffffff" fill-opacity="1" d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,133.3C672,117,768,139,864,165.3C960,192,1056,224,1152,218.7C1248,213,1344,171,1392,149.3L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
                 background-size: cover;
             }
@@ -210,3 +260,5 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
     throw new Error(`Could not send pass email. Reason: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
+
+    
