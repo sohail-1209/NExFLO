@@ -91,8 +91,15 @@ export async function sendPassEmail(registration: Registration, event: Event) {
     
     // We get the base URL from the environment variable if available, otherwise default to a generic localhost for dev
     const host = process.env.NEXT_PUBLIC_HOST_URL || 'http://localhost:9002';
-    const passPageUrl = `${host}/mypass/${registration.id}`;
-    const imageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=500x700&data=${encodeURIComponent(passPageUrl)}&format=png`;
+    
+    const qrData = JSON.stringify({
+      registrationId: registration.id,
+      studentName: registration.studentName,
+      studentEmail: registration.studentEmail,
+      rollNumber: registration.rollNumber,
+      eventId: event.id
+    });
+    const imageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -105,12 +112,23 @@ export async function sendPassEmail(registration: Registration, event: Event) {
           <meta charset="UTF-8">
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .details { margin: 20px 0; padding: 10px; border-left: 3px solid #7c3aed; background-color: #f8f9fa; }
+            .details p { margin: 5px 0; }
           </style>
         </head>
         <body>
           ${processedBody}
-          <br><br>
-          <img src="${imageUrl}" alt="Event Pass" style="max-width:500px;"/>
+          
+          <div class="details">
+            <p><strong>Name:</strong> ${registration.studentName}</p>
+            <p><strong>Roll Number:</strong> ${registration.rollNumber}</p>
+            <p><strong>Branch:</strong> ${registration.branch}</p>
+            <p><strong>Year of Study:</strong> ${registration.yearOfStudy}</p>
+            <p><strong>Status:</strong> <span style="text-transform: capitalize; font-weight: bold;">${registration.status}</span></p>
+          </div>
+
+          <p>Please have this QR code ready for check-in:</p>
+          <img src="${imageUrl}" alt="Event Pass QR Code" style="max-width:200px;"/>
         </body>
         </html>
       `,
