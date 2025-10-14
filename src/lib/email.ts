@@ -261,7 +261,7 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
   }
 }
 
-interface ManualPassDetails {
+export interface ManualPassDetails {
     studentName: string;
     studentEmail: string;
     eventName: string;
@@ -391,5 +391,108 @@ export async function sendManualPassEmail(details: ManualPassDetails, baseUrl: s
     } catch (error) {
         console.error("Failed to send manual pass email:", error);
         throw new Error(`Could not send email. Reason: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+}
+
+
+export type AttendeeData = {
+    "Full Name": string;
+    "E - Mail": string;
+    [key: string]: any;
+};
+
+export interface BulkEmailDetails {
+    eventName: string;
+    eventDate: Date;
+    eventVenue: string;
+    emailSubject: string;
+    emailBody: string;
+    sendWithoutPass: boolean;
+}
+
+function replacePlaceholders(template: string, attendee: AttendeeData, eventDetails: Omit<BulkEmailDetails, 'eventDate' | 'sendWithoutPass' | 'emailSubject' | 'emailBody'> & {date: Date}): string {
+    let result = template;
+    const allPlaceholders = {...attendee, ...eventDetails};
+
+    // Replace {key} with value from attendee or eventDetails
+    for (const key in allPlaceholders) {
+        // Normalize key to be safe for regex: remove spaces and handle special characters
+        const placeholder = `{${key}}`;
+        result = result.replace(new RegExp(placeholder, "g"), (allPlaceholders as any)[key]);
+    }
+
+    return result;
+}
+
+
+export async function sendBulkPassesEmail(attendees: AttendeeData[], details: BulkEmailDetails, baseUrl: string) {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        throw new Error("Email service is not configured.");
+    }
+    
+    // Process each attendee. Don't await here to send emails in parallel.
+    for (const attendee of attendees) {
+        // Await inside the loop for each email to be sent sequentially.
+        // For parallel sending, you would use Promise.all
+        try {
+            const studentName = attendee["Full Name"];
+            const studentEmail = attendee["E - Mail"];
+
+            if (!studentName || !studentEmail) {
+                console.warn("Skipping row due to missing name or email:", attendee);
+                continue;
+            }
+            
+            const eventDataForTemplate = {
+              eventName: details.eventName,
+              eventVenue: details.eventVenue,
+              date: details.eventDate
+            };
+
+            let processedBody = replacePlaceholders(details.emailBody, attendee, eventDataForTemplate);
+            const subject = replacePlaceholders(details.emailSubject, attendee, eventDataForTemplate);
+
+            const attachments: any[] = [];
+            let html = processedBody.replace(/\n/g, "<br>");
+
+            if (!details.sendWithoutPass) {
+                const qrData = JSON.stringify({
+                    studentName: studentName,
+                    studentEmail: studentEmail,
+                    eventName: details.eventName,
+                    eventDate: details.eventDate.toISOString(),
+                    eventVenue: details.eventVenue,
+                    ...attendee // include all other csv data in qr
+                });
+                const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`;
+
+                attachments.push({
+                    filename: 'qr-code.png',
+                    path: qrCodeUrl,
+                    cid: 'qrcodepass'
+                });
+                
+                html = `
+                    <!DOCTYPE html><html><head><style>body{font-family:Arial,sans-serif;background-color:#f4f4f4;color:#333;}.card{background-color:#fff;max-width:400px;margin:20px auto;border-radius:16px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.1);}.card-header{background-color:#BB86FC;color:#121212;padding:20px;font-size:24px;} .card-body{padding:20px;} .qr-section{text-align:center;padding:20px;border-top:1px dashed #ddd;}</style></head>
+                    <body><div class="email-container">${html}<div class="card"><div class="card-header">${details.eventName}</div><div class="card-body"><strong>Attendee:</strong> ${studentName}<br><strong>Date:</strong> ${details.eventDate.toLocaleString()}<br><strong>Venue:</strong> ${details.eventVenue}</div><div class="qr-section"><p>Scan this for check-in</p><img src="cid:qrcodepass" alt="QR Code"/></div></div></div></body></html>`;
+
+            }
+
+            const mailOptions = {
+                from: process.env.EMAIL_USER,
+                to: studentEmail,
+                subject: subject,
+                html: html,
+                attachments: attachments
+            };
+
+            // Send email
+            await transporter.sendMail(mailOptions);
+            console.log(`Email sent successfully to ${studentEmail}`);
+
+        } catch (error) {
+            console.error(`Failed to send email to ${attendee["E - Mail"]}:`, error);
+            // Decide if you want to throw or just log the error and continue
+        }
     }
 }

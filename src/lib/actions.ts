@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createEventInData, createRegistration, updateRegistration, getRegistrationById as getRegistrationByIdData, getEventById, updateEvent } from "./data";
 import type { Registration, Event } from "./types";
-import { sendRegistrationEmail, sendPassEmail, sendManualPassEmail } from "./email";
+import { sendRegistrationEmail, sendPassEmail, sendManualPassEmail, sendBulkPassesEmail, type AttendeeData } from "./email";
 import { suggestEmailCorrection as suggestEmailCorrectionFlow } from '@/ai/flows/suggest-email-flow';
 import type { EmailInput } from '@/ai/schemas/email-suggestion-schema';
 
@@ -348,5 +348,53 @@ export async function sendManualPass(prevState: any, formData: FormData) {
   } catch (e: any) {
     console.error("Failed to send manual pass:", e);
     return { message: `Error: Failed to send email: ${e.message}` };
+  }
+}
+
+const bulkPassSchema = manualPassSchema.omit({ studentName: true, studentEmail: true }).extend({
+  attendees: z.string().min(1, "CSV file is required and must contain attendees.")
+});
+
+
+export async function sendBulkPasses(prevState: any, formData: FormData) {
+  const validatedFields = bulkPassSchema.safeParse(Object.fromEntries(formData.entries()));
+
+  if (!validatedFields.success) {
+    return {
+      errors: validatedFields.error.flatten().fieldErrors,
+      message: "Error: Please check your input.",
+    };
+  }
+  
+  let attendees: AttendeeData[] = [];
+  try {
+    attendees = JSON.parse(validatedFields.data.attendees);
+     if (!Array.isArray(attendees) || attendees.length === 0) {
+      return { message: "Error: No valid attendees found in the CSV." };
+    }
+  } catch (e) {
+    return { message: "Error: Invalid attendee data format." };
+  }
+
+
+  try {
+    const { attendees: _, ...emailDetails } = validatedFields.data;
+    
+    const headersList = headers();
+    const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
+    const protocol = headersList.get('x-forwarded-proto') || 'http';
+    const baseUrl = `${protocol}://${host}`;
+    
+    // Call a new email function designed for bulk sending
+    await sendBulkPassesEmail(
+      attendees,
+      { ...emailDetails, date: new Date(emailDetails.eventDate) },
+      baseUrl
+    );
+
+    return { message: `Emails are being sent to ${attendees.length} attendees!` };
+  } catch (e: any) {
+    console.error("Failed to send bulk passes:", e);
+    return { message: `Error: Failed to send emails: ${e.message}` };
   }
 }
