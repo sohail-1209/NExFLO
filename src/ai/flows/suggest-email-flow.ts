@@ -1,31 +1,18 @@
+
 'use server';
 /**
  * @fileOverview An email validation AI flow.
  *
  * - suggestEmailCorrection - A function that suggests a correction for a given email address.
- * - EmailInput - The input type for the suggestEmailCorrection function.
- * - EmailSuggestionOutput - The return type for the suggestEmailCorrection function.
  */
 
 import { ai } from '@/ai/genkit';
-import { z } from 'zod';
-
-export const EmailInputSchema = z.object({
-  email: z.string().describe('The email address to validate.'),
-});
-export type EmailInput = z.infer<typeof EmailInputSchema>;
-
-export const EmailSuggestionOutputSchema = z.object({
-  suggestion: z
-    .string()
-    .nullable()
-    .describe(
-      'The suggested email correction, or null if no correction is needed.'
-    ),
-});
-export type EmailSuggestionOutput = z.infer<
-  typeof EmailSuggestionOutputSchema
->;
+import { 
+  EmailInputSchema, 
+  EmailSuggestionOutputSchema,
+  type EmailInput,
+  type EmailSuggestionOutput
+} from '@/ai/schemas/email-suggestion-schema';
 
 export async function suggestEmailCorrection(
   input: EmailInput

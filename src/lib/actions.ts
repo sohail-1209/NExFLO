@@ -8,7 +8,8 @@ import { z } from "zod";
 import { createEventInData, createRegistration, updateRegistration, getRegistrationById as getRegistrationByIdData, getEventById, updateEvent } from "./data";
 import type { Registration, Event } from "./types";
 import { sendRegistrationEmail, sendPassEmail } from "./email";
-import { suggestEmailCorrection as suggestEmailCorrectionFlow, type EmailInput } from '@/ai/flows/suggest-email-flow';
+import { suggestEmailCorrection as suggestEmailCorrectionFlow } from '@/ai/flows/suggest-email-flow';
+import type { EmailInput } from '@/ai/schemas/email-suggestion-schema';
 
 
 const eventSchema = z.object({
