@@ -18,7 +18,7 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
   const registrations = await getRegistrationsByEventId(params.eventId);
   
   const headersList = headers();
-  const host = headersList.get('host') || "";
+  const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
   const protocol = headersList.get('x-forwarded-proto') || 'http';
   const baseUrl = `${protocol}://${host}`;
 
