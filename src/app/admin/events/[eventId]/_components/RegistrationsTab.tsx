@@ -155,17 +155,17 @@ export default function RegistrationsTab({ registrations, event }: Registrations
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="pl-1 pr-2">Student</TableHead>
+                  <TableHead className="pl-1">Student</TableHead>
                   <TableHead className="hidden md:table-cell px-2">Details</TableHead>
                   <TableHead className="px-2">Submission</TableHead>
                   <TableHead className="text-center px-2">Status</TableHead>
-                  <TableHead className="text-right px-2">Actions</TableHead>
+                  <TableHead className="text-right pr-1">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sortedRegistrations.map((reg) => (
                   <TableRow key={reg.id}>
-                    <TableCell className="py-2 pl-1 pr-2">
+                    <TableCell className="py-2 pl-1">
                       <div className="font-medium break-all">{reg.studentName}</div>
                       <div className="text-sm text-muted-foreground break-all">{reg.studentEmail}</div>
                        <div className="text-sm text-muted-foreground md:hidden mt-1">
@@ -217,7 +217,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                             {statusConfig[reg.status].label}
                         </Badge>
                     </TableCell>
-                    <TableCell className="text-right p-2">
+                    <TableCell className="text-right pr-1">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" disabled={isPending}>
@@ -297,5 +297,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
     </>
   );
 }
+
+    
 
     
