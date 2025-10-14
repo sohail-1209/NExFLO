@@ -224,13 +224,6 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                         >
                           <List className="mr-2 h-4 w-4" /> Waitlist
                         </DropdownMenuItem>
-                         {reg.status === 'booked' && (
-                          <DropdownMenuItem asChild>
-                            <Link href={`/mypass/${reg.id}`} target="_blank">
-                             <ExternalLink className="mr-2 h-4 w-4" /> View Pass
-                            </Link>
-                          </DropdownMenuItem>
-                         )}
                          <DropdownMenuSeparator />
                          <DropdownMenuItem
                             className="text-red-500 focus:text-red-500"
