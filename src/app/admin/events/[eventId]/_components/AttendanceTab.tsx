@@ -174,11 +174,11 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
       reg.mobileNumber,
       reg.laptop ? "Yes" : "No",
       reg.status,
-      reg.registeredAt ? reg.registeredAt.toISOString() : "N/A",
+      reg.registeredAt ? new Date(reg.registeredAt).toISOString() : "N/A",
       reg.taskSubmission || "N/A",
-      reg.taskSubmittedAt ? reg.taskSubmittedAt.toISOString() : "N/A",
+      reg.taskSubmittedAt ? new Date(reg.taskSubmittedAt).toISOString() : "N/A",
       reg.attended ? "Yes" : "No",
-      reg.attendedAt ? reg.attendedAt.toISOString() : "N/A"
+      reg.attendedAt ? new Date(reg.attendedAt).toISOString() : "N/A"
     ].join(","));
 
     const csvContent = "data:text/csv;charset=utf-8," 
@@ -316,13 +316,13 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
                                 </Badge>
                             </TableCell>
                             <TableCell className="text-right">
-                                {reg.attended ? (
+                                {reg.attended && reg.attendedAt ? (
                                     <Badge variant="default" className="bg-green-500">
                                         <div className="flex items-center gap-2">
                                             <CheckCircle className="h-4 w-4" />
                                             <div>
                                                 <div>Checked In</div>
-                                                <div className="text-xs font-normal">{reg.attendedAt?.toLocaleTimeString()}</div>
+                                                <div className="text-xs font-normal">{new Date(reg.attendedAt).toLocaleTimeString()}</div>
                                             </div>
                                         </div>
                                     </Badge>

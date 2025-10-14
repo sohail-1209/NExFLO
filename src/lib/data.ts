@@ -47,14 +47,20 @@ const eventConverter = {
 };
 
 const registrationConverter = {
-  toFirestore: (registration: Omit<Registration, 'id'>) => {
-     const { registeredAt, taskSubmittedAt, attendedAt, ...rest } = registration;
-    return {
-      ...rest,
-      registeredAt: registeredAt ? Timestamp.fromDate(registeredAt) : serverTimestamp(),
-      taskSubmittedAt: taskSubmittedAt ? Timestamp.fromDate(taskSubmittedAt) : null,
-      attendedAt: attendedAt ? Timestamp.fromDate(attendedAt) : null,
-    };
+  toFirestore: (registration: Partial<Registration> & {id?: string}) => {
+     const { registeredAt, taskSubmittedAt, attendedAt, id, ...rest } = registration;
+    const data: any = { ...rest };
+
+    if (registeredAt) data.registeredAt = Timestamp.fromDate(new Date(registeredAt));
+    if (taskSubmittedAt) data.taskSubmittedAt = Timestamp.fromDate(new Date(taskSubmittedAt));
+    if (attendedAt) data.attendedAt = Timestamp.fromDate(new Date(attendedAt));
+    
+    // For new documents, ensure serverTimestamp is used if registeredAt is not provided
+    if (!id && !registeredAt) {
+      data.registeredAt = serverTimestamp();
+    }
+    
+    return data;
   },
   fromFirestore: (snapshot: any, options: any): Registration => {
     const data = snapshot.data(options);
@@ -154,8 +160,10 @@ export const createRegistration = async (regData: Omit<Registration, 'id' | 'reg
 };
 
 export const updateRegistration = async (id: string, updates: Partial<Registration>): Promise<Registration | undefined> => {
-  const regDocRef = doc(db, 'registrations', id).withConverter(registrationConverter);
-  await updateDoc(regDocRef, updates);
-  const updatedDoc = await getDoc(regDocRef);
+  const regDocRef = doc(db, 'registrations', id);
+  // Using the converter's toFirestore to handle date conversions
+  const convertedUpdates = registrationConverter.toFirestore(updates);
+  await updateDoc(regDocRef, convertedUpdates);
+  const updatedDoc = await getDoc(regDocRef.withConverter(registrationConverter));
   return updatedDoc.exists() ? updatedDoc.data() : undefined;
 };
