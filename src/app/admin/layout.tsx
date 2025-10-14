@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useUser } from "@/firebase/auth/use-user";
@@ -121,7 +122,7 @@ export default function AdminLayout({
 
   return (
     <SidebarProvider>
-      <Sidebar>
+      <Sidebar collapsible="icon">
         <SidebarHeader>
           <div className="flex items-center gap-2">
             <Logo className="w-7 h-7 text-primary" />
