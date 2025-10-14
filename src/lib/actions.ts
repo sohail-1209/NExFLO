@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { createEvent as createEventInData, createRegistration, updateRegistration, getRegistrationById as getRegistrationByIdData } from "./data";
+import { createEventInData, createRegistration, updateRegistration, getRegistrationById as getRegistrationByIdData } from "./data";
 import type { Registration } from "./types";
 import { getEventById } from "./data";
 
@@ -46,7 +46,6 @@ export async function createEvent(prevState: any, formData: FormData) {
     });
     revalidatePath("/admin");
     
-    // This was missing. We need to redirect on success.
     if (newEvent.id) {
         redirect(`/admin/events/${newEvent.id}`);
     }

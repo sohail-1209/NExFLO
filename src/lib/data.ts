@@ -1,4 +1,5 @@
 
+
 import {
   collection,
   doc,
@@ -17,7 +18,7 @@ import { initializeFirebase } from "@/firebase";
 import type { Event, Registration } from './types';
 
 // Initialize Firebase services
-const { firestore, firebaseApp } = initializeFirebase();
+const { firestore, storage } = initializeFirebase();
 const db = firestore;
 
 // Type converters for Firestore
@@ -100,9 +101,8 @@ export const getRegistrationById = async (id:string): Promise<Registration | und
     return docSnap.exists() ? docSnap.data() : undefined;
 }
 
-export const createEvent = async (eventData: Omit<Event, 'id' | 'taskPdfUrl'> & { taskPdfFile: File }): Promise<Event> => {
+export const createEventInData = async (eventData: Omit<Event, 'id' | 'taskPdfUrl'> & { taskPdfFile: File }): Promise<Event> => {
   const { taskPdfFile, ...restData } = eventData;
-  const storage = getStorage(firebaseApp);
 
   // Upload file to Firebase Storage
   const storageRef = ref(storage, `tasks/${Date.now()}-${taskPdfFile.name}`);
