@@ -1,3 +1,4 @@
+
 import type { Event } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, MessageSquare, FileText, Mail } from "lucide-react";
@@ -8,7 +9,7 @@ interface DetailsTabProps {
 }
 
 export default function DetailsTab({ event }: DetailsTabProps) {
-  const registrationUrl = `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002'}/events/${event.id}/register`;
+  const registrationUrl = `${process.env.NEXT_PUBLIC_BASE_URL}/events/${event.id}/register`;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
