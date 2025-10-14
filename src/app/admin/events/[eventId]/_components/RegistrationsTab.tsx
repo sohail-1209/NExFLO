@@ -155,24 +155,24 @@ export default function RegistrationsTab({ registrations, event }: Registrations
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Student</TableHead>
-                  <TableHead className="hidden md:table-cell">Details</TableHead>
-                  <TableHead>Submission</TableHead>
-                  <TableHead className="text-center">Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="px-2">Student</TableHead>
+                  <TableHead className="hidden md:table-cell px-2">Details</TableHead>
+                  <TableHead className="px-2">Submission</TableHead>
+                  <TableHead className="text-center px-2">Status</TableHead>
+                  <TableHead className="text-right px-2">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sortedRegistrations.map((reg) => (
                   <TableRow key={reg.id}>
-                    <TableCell>
-                      <div className="font-medium">{reg.studentName}</div>
+                    <TableCell className="p-2">
+                      <div className="font-medium break-all">{reg.studentName}</div>
                       <div className="text-sm text-muted-foreground break-all">{reg.studentEmail}</div>
                        <div className="text-sm text-muted-foreground md:hidden mt-1">
                         {reg.rollNumber}
                       </div>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell">
+                    <TableCell className="hidden md:table-cell p-2">
                       <div className="text-sm text-muted-foreground">
                         {reg.rollNumber} &bull; {reg.branch} &bull; Year {reg.yearOfStudy}
                       </div>
@@ -180,7 +180,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                         {reg.mobileNumber} &bull; {reg.gender} &bull; Laptop: {reg.laptop ? "Yes" : "No"}
                       </div>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className="p-2">
                       {reg.taskSubmission ? (
                         <Dialog>
                           <DialogTrigger asChild>
@@ -211,13 +211,13 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                         <span className="text-muted-foreground text-sm">Not submitted</span>
                       )}
                     </TableCell>
-                    <TableCell className="text-center">
+                    <TableCell className="text-center p-2">
                         <Badge className="flex items-center gap-1.5 w-fit mx-auto" style={{ backgroundColor: statusConfig[reg.status].color }}>
                             {statusConfig[reg.status].icon}
                             {statusConfig[reg.status].label}
                         </Badge>
                     </TableCell>
-                    <TableCell className="text-right">
+                    <TableCell className="text-right p-2">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" disabled={isPending}>
