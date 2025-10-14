@@ -15,6 +15,7 @@ const transporter = nodemailer.createTransport({
 
 function createEmailHtml(body: string, registration: Registration, event: Event, baseUrl: string): string {
     const taskSubmissionUrl = `${baseUrl}/tasks/${registration.id}/submit`;
+    const logoUrl = `${baseUrl}/nexus.png`;
 
     // Replace basic placeholders in the user's custom body
     let processedBody = body
@@ -36,9 +37,13 @@ function createEmailHtml(body: string, registration: Registration, event: Event,
           <meta charset="UTF-8">
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            .container { text-align: center; }
           </style>
         </head>
         <body>
+          <div class="container">
+            <img src="${logoUrl}" alt="Nexus Logo" style="max-width: 150px; margin-bottom: 20px;" />
+          </div>
           ${processedBody}
           <br><br>
           ${downloadButton}
@@ -77,7 +82,7 @@ export async function sendRegistrationEmail(registration: Registration, event: E
   }
 }
 
-export async function sendPassEmail(registration: Registration, event: Event) {
+export async function sendPassEmail(registration: Registration, event: Event, baseUrl: string) {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
     console.error("Email credentials are not set in environment variables.");
     throw new Error("Email service is not configured.");
@@ -97,6 +102,7 @@ export async function sendPassEmail(registration: Registration, event: Event) {
       eventId: event.id
     });
     const imageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`;
+    const logoUrl = `${baseUrl}/nexus.png`;
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -113,9 +119,13 @@ export async function sendPassEmail(registration: Registration, event: Event) {
             .details p { margin: 5px 0; }
             .qr-container { text-align: center; margin-top: 15px; }
             .status { text-transform: capitalize; font-weight: bold; }
+            .container { text-align: center; }
           </style>
         </head>
         <body>
+          <div class="container">
+            <img src="${logoUrl}" alt="Nexus Logo" style="max-width: 150px; margin-bottom: 20px;" />
+          </div>
           ${processedBody}
           
           <div class="details">
@@ -141,3 +151,5 @@ export async function sendPassEmail(registration: Registration, event: Event) {
     throw new Error(`Could not send pass email. Reason: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
+
+    

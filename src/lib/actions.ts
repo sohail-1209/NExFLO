@@ -224,7 +224,11 @@ export async function updateRegistrationStatus(registrationId: string, eventId: 
             const registration = await getRegistrationByIdData(registrationId);
             const event = await getEventById(eventId);
             if(registration && event) {
-                await sendPassEmail(registration, event);
+                const headersList = headers();
+                const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
+                const protocol = headersList.get('x-forwarded-proto') || 'http';
+                const baseUrl = `${protocol}://${host}`;
+                await sendPassEmail(registration, event, baseUrl);
             }
         }
         revalidatePath(`/admin/events/${eventId}`);
@@ -280,3 +284,5 @@ export async function resendRegistrationEmail(registrationId: string) {
         return { success: false, message: `Failed to send email. Please check server logs for details: ${error.message}` };
     }
 }
+
+    
