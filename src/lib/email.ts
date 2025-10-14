@@ -177,8 +177,11 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
               </div>
               <div class="card-body">
                 <p><strong>Attendee</strong>${registration.studentName}</p>
+                <p><strong>Email</strong>${registration.studentEmail}</p>
                 <p><strong>Roll Number</strong>${registration.rollNumber}</p>
                 <p><strong>Branch & Year</strong>${registration.branch} &bull; Year ${registration.yearOfStudy}</p>
+                <p><strong>Gender</strong><span style="text-transform: capitalize;">${registration.gender}</span></p>
+                <p><strong>Laptop</strong>${registration.laptop ? 'Yes' : 'No'}</p>
                 <p><strong>Status</strong><span class="status status-${registration.status}">${registration.status}</span></p>
               </div>
               <div class="qr-section">
