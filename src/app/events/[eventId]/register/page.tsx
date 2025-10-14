@@ -6,13 +6,13 @@ import { getEventById } from "@/lib/data";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { notFound } from "next/navigation";
 import type { Event } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Calendar } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ArrowLeft, Calendar } from "lucide-react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import Link from "next/link";
 
 const initialState = {
   message: "",
@@ -149,6 +149,11 @@ export default function RegisterPage({ params: paramsPromise }: { params: Promis
             <SubmitButton />
           </form>
         </CardContent>
+        <CardFooter>
+            <Button asChild variant="outline" className="w-full">
+                <Link href="/events"><ArrowLeft /> Go Back</Link>
+            </Button>
+        </CardFooter>
       </Card>
     </div>
   );

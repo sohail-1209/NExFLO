@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getEvents } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Calendar, Users } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, Users } from "lucide-react";
 import { getRegistrationsByEventId } from "@/lib/data";
 
 export default async function EventsPage() {
@@ -56,7 +56,7 @@ export default async function EventsPage() {
         <div className="mt-12 text-center">
             <Button variant="outline" asChild>
                 <Link href="/">
-                    Back to Home
+                    <ArrowLeft /> Back to Home
                 </Link>
             </Button>
         </div>

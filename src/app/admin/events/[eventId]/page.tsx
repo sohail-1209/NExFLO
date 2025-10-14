@@ -4,7 +4,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DetailsTab from "./_components/DetailsTab";
 import RegistrationsTab from "./_components/RegistrationsTab";
 import AttendanceTab from "./_components/AttendanceTab";
-import { Calendar, Users, QrCode } from "lucide-react";
+import { Calendar, Users, QrCode, ArrowLeft } from "lucide-react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 export default async function EventDetailPage({ params }: { params: { eventId: string } }) {
   const event = await getEventById(params.eventId);
@@ -15,9 +17,17 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">{event.name}</h1>
-        <p className="text-muted-foreground">{event.description}</p>
+       <div className="flex items-center gap-4">
+         <Button asChild variant="outline" size="icon">
+            <Link href="/admin">
+                <ArrowLeft />
+                <span className="sr-only">Go back</span>
+            </Link>
+        </Button>
+        <div>
+            <h1 className="text-3xl font-bold tracking-tight">{event.name}</h1>
+            <p className="text-muted-foreground">{event.description}</p>
+        </div>
       </div>
       <Tabs defaultValue="details">
         <TabsList className="grid w-full grid-cols-3">

@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { CheckCircle, Download, Upload } from "lucide-react";
+import { ArrowLeft, CheckCircle, Download, Upload } from "lucide-react";
 
 export default async function RegistrationSuccessPage({ params }: { params: { registrationId: string } }) {
   const registration = await getRegistrationById(params.registrationId);
@@ -39,18 +39,23 @@ export default async function RegistrationSuccessPage({ params }: { params: { re
             </ul>
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col sm:flex-row gap-4">
-          <Button asChild variant="secondary" className="w-full">
-            <Link href={event.taskPdfUrl} target="_blank">
-              <Download className="mr-2 h-4 w-4" />
-              Download Task
-            </Link>
-          </Button>
-          <Button asChild className="w-full">
-            <Link href={`/tasks/${registration.id}/submit`}>
-              <Upload className="mr-2 h-4 w-4" />
-              Submit Task
-            </Link>
+        <CardFooter className="flex flex-col gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 w-full">
+            <Button asChild variant="secondary" className="w-full">
+              <Link href={event.taskPdfUrl} target="_blank">
+                <Download className="mr-2 h-4 w-4" />
+                Download Task
+              </Link>
+            </Button>
+            <Button asChild className="w-full">
+              <Link href={`/tasks/${registration.id}/submit`}>
+                <Upload className="mr-2 h-4 w-4" />
+                Submit Task
+              </Link>
+            </Button>
+          </div>
+          <Button asChild variant="outline" className="w-full">
+              <Link href="/events"><ArrowLeft /> Back to Events</Link>
           </Button>
         </CardFooter>
       </Card>

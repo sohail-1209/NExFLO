@@ -10,7 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { notFound } from "next/navigation";
 import type { Event, Registration } from "@/lib/types";
 import { useToast } from "@/hooks/use-toast";
-import { CheckCircle } from "lucide-react";
+import { ArrowLeft, CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { CardFooter } from "@/components/ui/card";
 
@@ -87,7 +87,7 @@ export default function SubmitTaskPage({ params: paramsPromise }: { params: Prom
             <CardFooter>
                  <Button asChild variant="outline" className="w-full">
                     <Link href="/events">
-                        Back to Events
+                        <ArrowLeft /> Back to Events
                     </Link>
                 </Button>
             </CardFooter>
@@ -115,6 +115,11 @@ export default function SubmitTaskPage({ params: paramsPromise }: { params: Prom
             <SubmitButton />
           </form>
         </CardContent>
+         <CardFooter>
+            <Button asChild variant="outline" className="w-full">
+                <Link href={`/register/success/${params.registrationId}`}><ArrowLeft /> Go Back</Link>
+            </Button>
+        </CardFooter>
       </Card>
     </div>
   );

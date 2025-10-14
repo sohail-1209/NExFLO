@@ -3,6 +3,7 @@ import { getEventById, getRegistrationById } from "@/lib/data";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import { ArrowLeft } from "lucide-react";
 
 export default async function MyPassPage({ params }: { params: { registrationId: string } }) {
   const registration = await getRegistrationById(params.registrationId);
@@ -20,7 +21,7 @@ export default async function MyPassPage({ params }: { params: { registrationId:
       <EventPass registration={registration} event={event} />
       <Button asChild variant="outline">
         <Link href="/events">
-          Back to Events
+          <ArrowLeft /> Back to Events
         </Link>
       </Button>
     </div>
