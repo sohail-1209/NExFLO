@@ -3,7 +3,7 @@
 
 import type { Registration, Event } from "@/lib/types";
 import { updateRegistrationStatus, updateEventPassDetails } from "@/lib/actions";
-import { useTransition, useState, useActionState, useEffect } from "react";
+import { useTransition, useState, useActionState, useEffect, useMemo } from "react";
 import { useToast } from "@/hooks/use-toast";
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
@@ -60,6 +60,14 @@ export default function RegistrationsTab({ registrations, event }: Registrations
   const [selectedRegForDenial, setSelectedRegForDenial] = useState<Registration | null>(null);
   const [denyConfirmationText, setDenyConfirmationText] = useState("");
 
+  const sortedRegistrations = useMemo(() => {
+    return [...registrations].sort((a, b) => {
+      const aTime = a.taskSubmittedAt?.getTime() ?? 0;
+      const bTime = b.taskSubmittedAt?.getTime() ?? 0;
+      return bTime - aTime;
+    });
+  }, [registrations]);
+
 
   const updatePassDetailsWithId = updateEventPassDetails.bind(null, event.id);
   const [passState, passFormAction] = useActionState(updatePassDetailsWithId, passInitialState);
@@ -101,7 +109,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
             <CardTitle>Manage Registrations</CardTitle>
-            <CardDescription>Review submissions and manage attendee status.</CardDescription>
+            <CardDescription>Review submissions and manage attendee status. Sorted by most recent submission.</CardDescription>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
               <DialogTrigger asChild>
@@ -153,7 +161,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
               </TableRow>
             </TableHeader>
             <TableBody>
-              {registrations.map((reg) => (
+              {sortedRegistrations.map((reg) => (
                 <TableRow key={reg.id}>
                   <TableCell>
                     <div className="font-medium">{reg.studentName}</div>
@@ -179,7 +187,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                           <DialogHeader>
                             <DialogTitle>Task Submission for {reg.studentName}</DialogTitle>
                             <DialogDescription>
-                              The following URL was submitted for the task. You can copy it or open it in a new tab.
+                              Submitted on: {reg.taskSubmittedAt?.toLocaleString()}
                             </DialogDescription>
                           </DialogHeader>
                            <div className="p-4 bg-muted rounded-md text-sm break-all">

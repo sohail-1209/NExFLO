@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { CheckCircle, UserCheck, VideoOff, XCircle, Clock, List, QrCode } from "lucide-react";
+import { CheckCircle, UserCheck, VideoOff, XCircle, Clock, List, QrCode, Download } from "lucide-react";
 import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 import jsQR from "jsqr";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -22,6 +22,7 @@ const statusConfig = {
     booked: { label: 'Booked', color: 'bg-green-500', icon: <CheckCircle className="h-3 w-3" /> },
     waitlisted: { label: 'Waitlisted', color: 'bg-yellow-500', icon: <List className="h-3 w-3" /> },
     pending: { label: 'Pending', color: 'bg-gray-500', icon: <Clock className="h-3 w-3" /> },
+    denied: { label: 'Denied', color: 'bg-red-500', icon: <XCircle className="h-3 w-3" /> },
 };
 
 
@@ -34,7 +35,7 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  const bookedRegistrations = registrations.filter(r => r.status === 'booked');
+  const relevantRegistrations = registrations.filter(r => r.status === 'booked' || r.status === 'waitlisted');
 
   useEffect(() => {
     const getCameraPermission = async () => {
@@ -138,7 +139,7 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
         description: result.message,
       });
       // Update local state to reflect check-in
-       setScannedRegistration(prev => prev ? {...prev, attended: true, status: 'booked'} : null);
+       setScannedRegistration(prev => prev ? {...prev, attended: true, status: 'booked', attendedAt: new Date()} : null);
     } else {
       toast({
         title: "Check-in Failed",
@@ -152,6 +153,44 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
     setScannedId("");
     setScannedRegistration(null);
     setError(null);
+  }
+
+  const downloadCSV = () => {
+    const headers = [
+      "ID", "Student Name", "Email", "Roll Number", "Gender", 
+      "Branch", "Year of Study", "Mobile Number", "Laptop", "Status", 
+      "Registered At", "Task Submission", "Task Submitted At", 
+      "Attended", "Attended At"
+    ];
+
+    const rows = relevantRegistrations.map(reg => [
+      reg.id,
+      `"${reg.studentName}"`,
+      reg.studentEmail,
+      reg.rollNumber,
+      reg.gender,
+      `"${reg.branch}"`,
+      reg.yearOfStudy,
+      reg.mobileNumber,
+      reg.laptop ? "Yes" : "No",
+      reg.status,
+      reg.registeredAt ? reg.registeredAt.toISOString() : "N/A",
+      reg.taskSubmission || "N/A",
+      reg.taskSubmittedAt ? reg.taskSubmittedAt.toISOString() : "N/A",
+      reg.attended ? "Yes" : "No",
+      reg.attendedAt ? reg.attendedAt.toISOString() : "N/A"
+    ].join(","));
+
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers.join(","), ...rows].join("\n");
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", `event-${eventId}-attendance.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   }
 
   return (
@@ -243,30 +282,49 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
 
        <div className="md:col-span-2">
         <Card>
-            <CardHeader>
-            <CardTitle>Attendance Sheet</CardTitle>
-            <CardDescription>List of all booked and checked-in attendees for this event.</CardDescription>
+            <CardHeader className="flex flex-row items-center justify-between">
+                <div>
+                    <CardTitle>Attendance Sheet</CardTitle>
+                    <CardDescription>List of all booked, waitlisted, and checked-in attendees.</CardDescription>
+                </div>
+                <Button variant="outline" onClick={downloadCSV}>
+                    <Download className="mr-2 h-4 w-4" />
+                    Download CSV
+                </Button>
             </CardHeader>
             <CardContent>
             <Table>
                 <TableHeader>
                     <TableRow>
                         <TableHead>Student</TableHead>
-                        <TableHead className="text-right">Attendance Status</TableHead>
+                        <TableHead>Status</TableHead>
+                        <TableHead className="text-right">Attendance</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {bookedRegistrations.map(reg => (
+                    {relevantRegistrations.map(reg => (
                         <TableRow key={reg.id}>
                             <TableCell>
                                 <div className="font-medium">{reg.studentName}</div>
                                 <div className="text-sm text-muted-foreground">{reg.studentEmail}</div>
+                                <div className="text-xs text-muted-foreground">{reg.rollNumber} &bull; {reg.branch}</div>
+                            </TableCell>
+                             <TableCell>
+                                <Badge className="flex items-center gap-1.5 w-fit" style={{ backgroundColor: statusConfig[reg.status].color }}>
+                                    {statusConfig[reg.status].icon}
+                                    {statusConfig[reg.status].label}
+                                </Badge>
                             </TableCell>
                             <TableCell className="text-right">
                                 {reg.attended ? (
                                     <Badge variant="default" className="bg-green-500">
-                                        <CheckCircle className="mr-2 h-4 w-4" />
-                                        Checked In
+                                        <div className="flex items-center gap-2">
+                                            <CheckCircle className="h-4 w-4" />
+                                            <div>
+                                                <div>Checked In</div>
+                                                <div className="text-xs font-normal">{reg.attendedAt?.toLocaleTimeString()}</div>
+                                            </div>
+                                        </div>
                                     </Badge>
                                 ) : (
                                     <Badge variant="secondary">Not present</Badge>
@@ -274,10 +332,10 @@ export default function AttendanceTab({ registrations, eventId }: AttendanceTabP
                             </TableCell>
                         </TableRow>
                     ))}
-                    {bookedRegistrations.length === 0 && (
+                    {relevantRegistrations.length === 0 && (
                         <TableRow>
-                            <TableCell colSpan={2} className="text-center h-24">
-                                No booked registrations for this event.
+                            <TableCell colSpan={3} className="text-center h-24">
+                                No booked or waitlisted registrations for this event.
                             </TableCell>
                         </TableRow>
                     )}

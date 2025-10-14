@@ -23,7 +23,9 @@ export type Registration = {
   mobileNumber: string;
   status: 'pending' | 'booked' | 'waitlisted' | 'denied';
   taskSubmission: string | null;
+  taskSubmittedAt: Date | null;
   registeredAt: Date;
   attended: boolean;
+  attendedAt: Date | null;
   laptop: boolean;
 };

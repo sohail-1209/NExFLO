@@ -206,7 +206,10 @@ export async function submitTask(registrationId: string, prevState: any, formDat
             };
         }
 
-        await updateRegistration(registrationId, { taskSubmission: validatedFields.data.taskSubmission });
+        await updateRegistration(registrationId, { 
+            taskSubmission: validatedFields.data.taskSubmission,
+            taskSubmittedAt: new Date(),
+         });
         revalidatePath(`/admin`); // Revalidate admin pages
         return { message: "Task submitted successfully!", errors: {} };
     } catch (e: any) {
@@ -248,7 +251,10 @@ export async function markAttendance(registrationId: string, eventId: string): P
         }
         
         // Update both attended and status if they were waitlisted
-        const updates: Partial<Registration> = { attended: true };
+        const updates: Partial<Registration> = { 
+            attended: true,
+            attendedAt: new Date(),
+        };
         if (registration.status === 'waitlisted') {
             updates.status = 'booked';
         }

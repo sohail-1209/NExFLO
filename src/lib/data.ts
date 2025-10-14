@@ -48,10 +48,12 @@ const eventConverter = {
 
 const registrationConverter = {
   toFirestore: (registration: Omit<Registration, 'id'>) => {
-     const { registeredAt, ...rest } = registration;
+     const { registeredAt, taskSubmittedAt, attendedAt, ...rest } = registration;
     return {
       ...rest,
       registeredAt: registeredAt ? Timestamp.fromDate(registeredAt) : serverTimestamp(),
+      taskSubmittedAt: taskSubmittedAt ? Timestamp.fromDate(taskSubmittedAt) : null,
+      attendedAt: attendedAt ? Timestamp.fromDate(attendedAt) : null,
     };
   },
   fromFirestore: (snapshot: any, options: any): Registration => {
@@ -68,8 +70,10 @@ const registrationConverter = {
         mobileNumber: data.mobileNumber,
         status: data.status,
         taskSubmission: data.taskSubmission,
+        taskSubmittedAt: data.taskSubmittedAt ? data.taskSubmittedAt.toDate() : null,
         registeredAt: data.registeredAt.toDate(),
         attended: data.attended,
+        attendedAt: data.attendedAt ? data.attendedAt.toDate() : null,
         laptop: data.laptop,
     };
   },
@@ -132,13 +136,15 @@ export const updateEvent = async (id: string, updates: Partial<Omit<Event, 'id'>
 };
 
 
-export const createRegistration = async (regData: Omit<Registration, 'id' | 'registeredAt' | 'status' | 'taskSubmission' | 'attended'>): Promise<Registration> => {
+export const createRegistration = async (regData: Omit<Registration, 'id' | 'registeredAt' | 'status' | 'taskSubmission' | 'attended' | 'taskSubmittedAt' | 'attendedAt'>): Promise<Registration> => {
   const newRegistrationData: Omit<Registration, 'id'> = {
     ...regData,
     registeredAt: new Date(),
     status: 'pending',
     taskSubmission: null,
+    taskSubmittedAt: null,
     attended: false,
+    attendedAt: null,
   };
 
   const registrationsCol = collection(db, 'registrations').withConverter(registrationConverter);
