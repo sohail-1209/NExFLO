@@ -132,7 +132,19 @@ export async function registerForEvent(eventId: string, prevState: any, formData
 }
 
 const taskSubmissionSchema = z.object({
-    taskSubmission: z.string().url("Please provide a valid URL for your submission."),
+    taskSubmission: z.string().url("Please provide a valid URL.").refine(
+        (url) => {
+            try {
+                const hostname = new URL(url).hostname;
+                return hostname.includes('github.com') || hostname.includes('docs.google.com');
+            } catch {
+                return false;
+            }
+        },
+        {
+            message: "Submission must be a valid URL from either GitHub or Google Docs."
+        }
+    ),
 });
 
 export async function submitTask(registrationId: string, prevState: any, formData: FormData) {
