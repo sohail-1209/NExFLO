@@ -54,7 +54,7 @@ export async function generatePassImage(registration: Registration, event: Event
           justifyContent: 'center',
           width: '100%',
           height: '100%',
-          background: '#1e1b4b', // Using a dark indigo color
+          backgroundColor: '#1e1b4b',
         }}
       >
         <EventPass registration={registration} event={event} />
