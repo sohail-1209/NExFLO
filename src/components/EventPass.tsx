@@ -15,6 +15,7 @@ export default function EventPass({ registration, event }: EventPassProps) {
     registrationId: registration.id,
     studentName: registration.studentName,
     studentEmail: registration.studentEmail,
+    rollNumber: registration.rollNumber,
     eventId: event.id
   });
 
@@ -36,6 +37,7 @@ export default function EventPass({ registration, event }: EventPassProps) {
         <div>
           <p className="text-sm text-muted-foreground">Attendee</p>
           <p className="font-semibold text-lg">{registration.studentName}</p>
+          <p className="text-sm text-muted-foreground">{registration.rollNumber}</p>
         </div>
         
         <div>

@@ -12,6 +12,11 @@ export type Registration = {
   eventId: string;
   studentName: string;
   studentEmail: string;
+  rollNumber: string;
+  gender: string;
+  branch: string;
+  yearOfStudy: number;
+  mobileNumber: string;
   status: 'pending' | 'booked' | 'waitlisted';
   taskSubmission: string | null;
   registeredAt: Date;

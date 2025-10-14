@@ -48,6 +48,7 @@ export default function RegistrationsTab({ registrations, eventId }: Registratio
           <TableHeader>
             <TableRow>
               <TableHead>Student</TableHead>
+              <TableHead>Details</TableHead>
               <TableHead>Submission</TableHead>
               <TableHead className="text-center">Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
@@ -59,6 +60,14 @@ export default function RegistrationsTab({ registrations, eventId }: Registratio
                 <TableCell>
                   <div className="font-medium">{reg.studentName}</div>
                   <div className="text-sm text-muted-foreground">{reg.studentEmail}</div>
+                </TableCell>
+                <TableCell>
+                  <div className="text-sm text-muted-foreground">
+                    {reg.rollNumber} &bull; {reg.branch} &bull; Year {reg.yearOfStudy}
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    {reg.mobileNumber} &bull; {reg.gender}
+                  </div>
                 </TableCell>
                 <TableCell>
                   {reg.taskSubmission ? (
@@ -111,7 +120,7 @@ export default function RegistrationsTab({ registrations, eventId }: Registratio
             ))}
              {registrations.length === 0 && (
                 <TableRow>
-                    <TableCell colSpan={4} className="text-center h-24">
+                    <TableCell colSpan={5} className="text-center h-24">
                         No registrations yet.
                     </TableCell>
                 </TableRow>

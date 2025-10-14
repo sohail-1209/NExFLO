@@ -45,12 +45,23 @@ export async function createEvent(prevState: any, formData: FormData) {
 const registrationSchema = z.object({
   studentName: z.string().min(2, "Name is required"),
   studentEmail: z.string().email("Invalid email address"),
+  rollNumber: z.string().min(1, "Roll number is required"),
+  gender: z.string().min(1, "Gender is required"),
+  branch: z.string().min(1, "Branch is required"),
+  yearOfStudy: z.coerce.number().min(1, "Year of study is required"),
+  mobileNumber: z.string().min(10, "A valid mobile number is required"),
 });
+
 
 export async function registerForEvent(eventId: string, prevState: any, formData: FormData) {
   const validatedFields = registrationSchema.safeParse({
     studentName: formData.get("studentName"),
     studentEmail: formData.get("studentEmail"),
+    rollNumber: formData.get("rollNumber"),
+    gender: formData.get("gender"),
+    branch: formData.get("branch"),
+    yearOfStudy: formData.get("yearOfStudy"),
+    mobileNumber: formData.get("mobileNumber"),
   });
 
   if (!validatedFields.success) {

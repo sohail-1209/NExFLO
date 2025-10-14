@@ -11,6 +11,8 @@ import { notFound } from "next/navigation";
 import type { Event } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 const initialState = {
   message: "",
@@ -31,6 +33,7 @@ export default function RegisterPage({ params: paramsPromise }: { params: Promis
 
   useEffect(() => {
     async function fetchEvent() {
+      if (!params.eventId) return;
       const eventData = await getEventById(params.eventId);
       if (!eventData) {
         notFound();
@@ -84,10 +87,50 @@ export default function RegisterPage({ params: paramsPromise }: { params: Promis
               <Input id="studentName" name="studentName" placeholder="Jane Doe" required />
               {state?.errors?.studentName && <p className="text-sm text-destructive">{state.errors.studentName[0]}</p>}
             </div>
+             <div className="space-y-2">
+              <Label htmlFor="rollNumber">Roll Number</Label>
+              <Input id="rollNumber" name="rollNumber" placeholder="e.g. 21CS001" required />
+              {state?.errors?.rollNumber && <p className="text-sm text-destructive">{state.errors.rollNumber[0]}</p>}
+            </div>
+             <div className="space-y-2">
+              <Label>Gender</Label>
+              <RadioGroup name="gender" className="flex gap-4">
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="male" id="male" />
+                  <Label htmlFor="male">Male</Label>
+                </div>
+                <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="female" id="female" />
+                  <Label htmlFor="female">Female</Label>
+                </div>
+                 <div className="flex items-center space-x-2">
+                  <RadioGroupItem value="other" id="other" />
+                  <Label htmlFor="other">Other</Label>
+                </div>
+              </RadioGroup>
+              {state?.errors?.gender && <p className="text-sm text-destructive">{state.errors.gender[0]}</p>}
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                    <Label htmlFor="branch">Branch</Label>
+                     <Input id="branch" name="branch" placeholder="e.g. Computer Science" required />
+                    {state?.errors?.branch && <p className="text-sm text-destructive">{state.errors.branch[0]}</p>}
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="yearOfStudy">Year of Study</Label>
+                    <Input id="yearOfStudy" name="yearOfStudy" type="number" placeholder="e.g. 3" required />
+                    {state?.errors?.yearOfStudy && <p className="text-sm text-destructive">{state.errors.yearOfStudy[0]}</p>}
+                </div>
+            </div>
             <div className="space-y-2">
               <Label htmlFor="studentEmail">Email Address</Label>
               <Input id="studentEmail" name="studentEmail" type="email" placeholder="jane.doe@example.com" required />
               {state?.errors?.studentEmail && <p className="text-sm text-destructive">{state.errors.studentEmail[0]}</p>}
+            </div>
+             <div className="space-y-2">
+              <Label htmlFor="mobileNumber">Mobile Number</Label>
+              <Input id="mobileNumber" name="mobileNumber" type="tel" placeholder="123-456-7890" required />
+              {state?.errors?.mobileNumber && <p className="text-sm text-destructive">{state.errors.mobileNumber[0]}</p>}
             </div>
             <SubmitButton />
           </form>
