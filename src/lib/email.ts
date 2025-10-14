@@ -84,6 +84,7 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
   }
 
   try {
+    const publicHostingUrl = process.env.FIREBASE_HOSTING_URL || baseUrl;
     let processedBody = event.passBody
       .replace(/{studentName}/g, registration.studentName)
       .replace(/{eventName}/g, event.name)
@@ -121,7 +122,7 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
             }
             .card-header {
               background-color: #BB86FC; /* Primary color */
-              padding: 30px 20px;
+              padding: 20px;
               position: relative;
               color: #121212;
             }
