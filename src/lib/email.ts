@@ -89,9 +89,6 @@ export async function sendPassEmail(registration: Registration, event: Event) {
       .replace(/{eventName}/g, event.name)
       .replace(/\n/g, "<br>");
     
-    // We get the base URL from the environment variable if available, otherwise default to a generic localhost for dev
-    const host = process.env.NEXT_PUBLIC_HOST_URL || 'http://localhost:9002';
-    
     const qrData = JSON.stringify({
       registrationId: registration.id,
       studentName: registration.studentName,
@@ -99,7 +96,7 @@ export async function sendPassEmail(registration: Registration, event: Event) {
       rollNumber: registration.rollNumber,
       eventId: event.id
     });
-    const imageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
+    const imageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`;
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -112,8 +109,10 @@ export async function sendPassEmail(registration: Registration, event: Event) {
           <meta charset="UTF-8">
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-            .details { margin: 20px 0; padding: 10px; border-left: 3px solid #7c3aed; background-color: #f8f9fa; }
+            .details { margin: 20px 0; padding: 20px; border-left: 4px solid #7c3aed; background-color: #f8f9fa; border-radius: 8px; }
             .details p { margin: 5px 0; }
+            .qr-container { text-align: center; margin-top: 15px; }
+            .status { text-transform: capitalize; font-weight: bold; }
           </style>
         </head>
         <body>
@@ -124,11 +123,12 @@ export async function sendPassEmail(registration: Registration, event: Event) {
             <p><strong>Roll Number:</strong> ${registration.rollNumber}</p>
             <p><strong>Branch:</strong> ${registration.branch}</p>
             <p><strong>Year of Study:</strong> ${registration.yearOfStudy}</p>
-            <p><strong>Status:</strong> <span style="text-transform: capitalize; font-weight: bold;">${registration.status}</span></p>
+            <p><strong>Status:</strong> <span class="status">${registration.status}</span></p>
+            <div class="qr-container">
+              <p style="font-size: 0.9em; color: #666;">Scan for event check-in:</p>
+              <img src="${imageUrl}" alt="Event Pass QR Code" style="max-width:150px;"/>
+            </div>
           </div>
-
-          <p>Please have this QR code ready for check-in:</p>
-          <img src="${imageUrl}" alt="Event Pass QR Code" style="max-width:200px;"/>
         </body>
         </html>
       `,
