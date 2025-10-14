@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
-import { createEvent as createEventInData, createRegistration, updateRegistration } from "./data";
+import { createEvent as createEventInData, createRegistration, updateRegistration, getRegistrationById as getRegistrationByIdData } from "./data";
 import type { Registration } from "./types";
 import { getEventById } from "./data";
 
@@ -47,7 +47,7 @@ export async function createEvent(prevState: any, formData: FormData) {
     return { message: "success", eventId: newEvent.id };
   } catch (e: any) {
     console.error(e);
-    return { message: `Failed to create event: ${e.message}` };
+    return { message: `Error: Failed to create event: ${e.message}` };
   }
 }
 
@@ -101,7 +101,7 @@ export async function registerForEvent(eventId: string, prevState: any, formData
     redirect(`/register/success/${newRegistration.id}`);
   } catch (e: any) {
     console.error(e);
-    return { message: `Failed to register: ${e.message}` };
+    return { message: `Error: Failed to register: ${e.message}` };
   }
 }
 
@@ -127,7 +127,7 @@ export async function submitTask(registrationId: string, prevState: any, formDat
         return { message: "Task submitted successfully!" };
     } catch (e: any) {
         console.error(e);
-        return { message: `Failed to submit task: ${e.message}` };
+        return { message: `Error: Failed to submit task: ${e.message}` };
     }
 }
 
@@ -142,16 +142,20 @@ export async function updateRegistrationStatus(registrationId: string, eventId: 
 }
 
 
-export async function markAttendance(registrationId: string, eventId: string) {
+export async function markAttendance(registrationId: string, eventId: string): Promise<{ success: boolean, message: string }> {
     try {
-        const registration = await updateRegistration(registrationId, { attended: true });
-        if (registration) {
-            revalidatePath(`/admin/events/${eventId}/attendance`);
-            return { success: true, message: `${registration.studentName} checked in.` };
+        const registration = await getRegistrationByIdData(registrationId);
+        if (!registration) {
+             return { success: false, message: 'Registration not found.' };
         }
-        return { success: false, message: 'Registration not found.' };
+        
+        await updateRegistration(registrationId, { attended: true });
+
+        revalidatePath(`/admin/events/${eventId}`);
+        revalidatePath(`/admin/events/${eventId}/attendance`);
+        return { success: true, message: `${registration.studentName} checked in.` };
     } catch (e: any) {
         console.error(e);
-        return { success: false, message: `Failed to mark attendance: ${e.message}` };
+        return { success: false, message: `Error: Failed to mark attendance: ${e.message}` };
     }
 }
