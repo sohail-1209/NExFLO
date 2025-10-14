@@ -159,7 +159,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                   <TableHead className="hidden md:table-cell px-1">Details</TableHead>
                   <TableHead className="px-1">Submission</TableHead>
                   <TableHead className="text-center px-1">Status</TableHead>
-                  <TableHead className="text-right pr-1"></TableHead>
+                  <TableHead className="text-right"></TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -217,7 +217,7 @@ export default function RegistrationsTab({ registrations, event }: Registrations
                             {statusConfig[reg.status].label}
                         </Badge>
                     </TableCell>
-                    <TableCell className="text-right pr-1">
+                    <TableCell className="text-right">
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" disabled={isPending}>
@@ -301,4 +301,5 @@ export default function RegistrationsTab({ registrations, event }: Registrations
     
 
     
+
 
