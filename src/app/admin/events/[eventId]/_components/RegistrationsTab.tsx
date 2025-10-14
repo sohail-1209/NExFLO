@@ -1,8 +1,9 @@
+
 "use client";
 
 import type { Registration } from "@/lib/types";
 import { updateRegistrationStatus } from "@/lib/actions";
-import { useTransition } from "react";
+import { useTransition, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
@@ -14,6 +15,16 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import Link from "next/link";
 
 interface RegistrationsTabProps {
@@ -71,11 +82,29 @@ export default function RegistrationsTab({ registrations, eventId }: Registratio
                 </TableCell>
                 <TableCell>
                   {reg.taskSubmission ? (
-                    <Button variant="outline" size="sm" asChild>
-                      <a href={reg.taskSubmission} target="_blank" rel="noopener noreferrer">
-                        View Task <ExternalLink className="ml-2 h-3 w-3" />
-                      </a>
-                    </Button>
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                         <Button variant="outline" size="sm">
+                          View Task <ExternalLink className="ml-2 h-3 w-3" />
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>Task Submission for {reg.studentName}</AlertDialogTitle>
+                          <AlertDialogDescription>
+                            The following URL was submitted for the task. You can copy it or open it in a new tab.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                         <div className="p-4 bg-muted rounded-md text-sm break-all">
+                            <Link href={reg.taskSubmission} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                {reg.taskSubmission}
+                            </Link>
+                        </div>
+                        <AlertDialogFooter>
+                          <AlertDialogAction>Close</AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   ) : (
                     <span className="text-muted-foreground text-sm">Not submitted</span>
                   )}
