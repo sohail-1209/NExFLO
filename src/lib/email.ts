@@ -126,7 +126,7 @@ export async function sendPassEmail(registration: Registration, event: Event) {
             <p><strong>Status:</strong> <span class="status">${registration.status}</span></p>
             <div class="qr-container">
               <p style="font-size: 0.9em; color: #666;">Scan for event check-in:</p>
-              <img src="${imageUrl}" alt="Event Pass QR Code" style="max-width:150px;"/>
+              <img src="${imageUrl}" alt="Event Pass QR Code" style="max-width:150px; border-radius: 8px;"/>
             </div>
           </div>
         </body>
