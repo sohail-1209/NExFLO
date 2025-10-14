@@ -110,9 +110,18 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
           <style>
             body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
             .container { text-align: center; }
-            .details { margin: 20px 0; padding: 20px; border-left: 4px solid #7c3aed; background-image: linear-gradient(to right, #f8f9fa, #e9ecef); border-radius: 8px; text-align: left;}
-            .details p { margin: 5px 0; }
-            .qr-container { text-align: center; margin-top: 15px; }
+            .details { 
+              margin: 20px auto; 
+              padding: 20px; 
+              background-color: #f9f9f9; 
+              border: 1px solid #eee;
+              border-radius: 8px; 
+              text-align: left;
+              max-width: 400px;
+            }
+            .details p { margin: 8px 0; }
+            .details strong { color: #555; }
+            .qr-container { text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #eee; }
             .status { text-transform: capitalize; font-weight: bold; }
           </style>
         </head>
@@ -151,5 +160,3 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
     throw new Error(`Could not send pass email. Reason: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
-
-    
