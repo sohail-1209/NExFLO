@@ -53,11 +53,11 @@ export default async function AdminDashboard() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Event</TableHead>
+                  <TableHead className="pl-4">Event</TableHead>
                   <TableHead className="hidden sm:table-cell">Date</TableHead>
                   <TableHead className="text-center">Registrations</TableHead>
                   <TableHead className="hidden sm:table-cell text-center">Status</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
+                  <TableHead className="text-right pr-4">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -66,7 +66,7 @@ export default async function AdminDashboard() {
                   const isUpcoming = event.date > new Date();
                   return (
                     <TableRow key={event.id}>
-                      <TableCell className="py-2 px-4">
+                      <TableCell className="py-2 pl-4">
                         <div className="font-medium break-all">{event.name}</div>
                         <div className="text-sm text-muted-foreground hidden md:inline break-all">
                           {event.description.substring(0, 50)}...
@@ -77,25 +77,25 @@ export default async function AdminDashboard() {
                           </Badge>
                         </div>
                       </TableCell>
-                      <TableCell className="hidden sm:table-cell py-2 px-4">
+                      <TableCell className="hidden sm:table-cell py-2 px-2">
                         {event.date.toLocaleDateString("en-US", {
                           year: "numeric",
                           month: "long",
                           day: "numeric",
                         })}
                       </TableCell>
-                      <TableCell className="text-center py-2 px-4">
+                      <TableCell className="text-center py-2 px-2">
                         <div className="flex items-center justify-center gap-2">
                           <Users className="h-4 w-4 text-muted-foreground" />
                           <span>{registrations.length}</span>
                         </div>
                       </TableCell>
-                      <TableCell className="hidden sm:table-cell text-center py-2 px-4">
+                      <TableCell className="hidden sm:table-cell text-center py-2 px-2">
                         <Badge variant={isUpcoming ? "default" : "secondary"}>
                           {isUpcoming ? "Upcoming" : "Finished"}
                         </Badge>
                       </TableCell>
-                      <TableCell className="text-right py-2 px-4">
+                      <TableCell className="text-right py-2 pr-4">
                         <Button asChild variant="ghost" size="icon">
                           <Link href={`/admin/events/${event.id}`}>
                             <ArrowRight className="h-4 w-4" />
