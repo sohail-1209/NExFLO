@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useActionState, useEffect, useState, use, useTransition } from "react";
+import { useActionState, useEffect, useState, use, useTransition, useRef } from "react";
 import { registerForEvent, suggestEmailCorrection } from "@/lib/actions";
 import { getEventById } from "@/lib/data";
 import { Button } from "@/components/ui/button";
@@ -16,18 +16,22 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 
 const initialState = {
   message: "",
   errors: {},
 };
-
-function SubmitButton({ isPastEvent }: { isPastEvent: boolean }) {
-  return <Button type="submit" className="w-full" disabled={isPastEvent}>
-      {isPastEvent ? "Registration Closed" : "Register"}
-  </Button>;
-}
 
 export default function RegisterPage({ params: paramsPromise }: { params: { eventId: string } }) {
   const params = use(paramsPromise);
@@ -36,6 +40,8 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
   const [email, setEmail] = useState('');
   const [emailSuggestion, setEmailSuggestion] = useState<string | null>(null);
   const [isCheckingEmail, startEmailCheck] = useTransition();
+  const [showSuggestionDialog, setShowSuggestionDialog] = useState(false);
+  const formRef = useRef<HTMLFormElement>(null);
 
   const { toast } = useToast();
   
@@ -67,24 +73,38 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
     }
   }, [state, toast]);
 
-  const handleEmailBlur = () => {
-    if (email && email.includes('@')) {
-      startEmailCheck(async () => {
-        setEmailSuggestion(null);
-        const { suggestion } = await suggestEmailCorrection({ email });
-        if (suggestion) {
-          setEmailSuggestion(suggestion);
-        }
-      });
+  const handleSubmit = async (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    if (!email || !formRef.current?.checkValidity()) {
+        formRef.current?.reportValidity();
+        return;
     }
+
+    startEmailCheck(async () => {
+        const { suggestion } = await suggestEmailCorrection({ email });
+        if (suggestion && suggestion !== email) {
+            setEmailSuggestion(suggestion);
+            setShowSuggestionDialog(true);
+        } else {
+            // No suggestion or suggestion is same as email, submit form
+            formRef.current?.requestSubmit();
+        }
+    });
   };
 
-  const handleSuggestionClick = () => {
+  const handleUseSuggestion = () => {
     if (emailSuggestion) {
       setEmail(emailSuggestion);
-      setEmailSuggestion(null);
     }
+    setShowSuggestionDialog(false);
+    // Give react time to update the email value before submitting
+    setTimeout(() => formRef.current?.requestSubmit(), 50); 
   };
+  
+  const handleKeepOriginal = () => {
+      setShowSuggestionDialog(false);
+      formRef.current?.requestSubmit();
+  }
 
   if (loading) {
     return (
@@ -129,7 +149,7 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
                     <AlertDescription>The date for this event has already passed.</AlertDescription>
                 </Alert>
             )}
-          <form action={formAction} className="space-y-4">
+          <form ref={formRef} action={formAction} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="studentName">Full Name</Label>
               <Input id="studentName" name="studentName" placeholder="Jane Doe" required disabled={isPastEvent} />
@@ -181,21 +201,8 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
                 disabled={isPastEvent} 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                onBlur={handleEmailBlur}
               />
                {state?.errors?.studentEmail && <p className="text-sm text-destructive">{state.errors.studentEmail[0]}</p>}
-               {isCheckingEmail && <p className="text-xs text-muted-foreground flex items-center gap-1.5 pt-1"><Sparkles className="h-3 w-3 animate-pulse" />Checking for typos...</p>}
-               {emailSuggestion && !isCheckingEmail && (
-                 <Button
-                    type="button"
-                    variant="link"
-                    size="sm"
-                    className="text-primary h-auto p-0 text-xs"
-                    onClick={handleSuggestionClick}
-                  >
-                    Did you mean: <span className="font-semibold">{emailSuggestion}</span>?
-                  </Button>
-               )}
             </div>
              <div className="space-y-2">
               <Label htmlFor="mobileNumber">Mobile Number</Label>
@@ -216,7 +223,15 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
               </RadioGroup>
               {state?.errors?.laptop && <p className="text-sm text-destructive">{state.errors.laptop[0]}</p>}
             </div>
-            <SubmitButton isPastEvent={isPastEvent} />
+            
+            <Button type="button" onClick={handleSubmit} className="w-full" disabled={isPastEvent || isCheckingEmail}>
+                {isCheckingEmail ? (
+                    <>
+                        <Sparkles className="mr-2 h-4 w-4 animate-pulse" />
+                        Checking...
+                    </>
+                ) : isPastEvent ? "Registration Closed" : "Register"}
+            </Button>
           </form>
         </CardContent>
         <CardFooter>
@@ -225,7 +240,29 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
             </Button>
         </CardFooter>
       </Card>
+      
+       <AlertDialog open={showSuggestionDialog} onOpenChange={setShowSuggestionDialog}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle className="flex items-center gap-2">
+                <Sparkles className="text-primary"/> Email Suggestion
+              </AlertDialogTitle>
+              <AlertDialogDescription>
+                We noticed a potential typo in your email address.
+                Did you mean <strong className="text-foreground">{emailSuggestion}</strong>?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel onClick={handleKeepOriginal}>
+                No, use "{email}"
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={handleUseSuggestion}>
+                Yes, use suggestion
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+
     </div>
   );
 }
-
