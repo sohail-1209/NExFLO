@@ -13,25 +13,17 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-function createEmailHtml(body: string, registration: Registration, event: Event, baseUrl: string): string {
+function createRegistrationEmailHtml(body: string, registration: Registration, event: Event, baseUrl: string): string {
     const taskSubmissionUrl = `${baseUrl}/tasks/${registration.id}/submit`;
     
-    // Use a publicly accessible placeholder URL for the logo
-    const logoUrl = 'https://api.dicebear.com/8.x/initials/svg?seed=Nexus&backgroundColor=7c3aed';
-
-    // Replace basic placeholders in the user's custom body
     let processedBody = body
       .replace(/{studentName}/g, registration.studentName)
-      .replace(/{eventName}/g, event.name);
+      .replace(/{eventName}/g, event.name)
+      .replace(/\n/g, "<br>");
 
-    // Convert newlines to <br> tags for HTML formatting
-    processedBody = processedBody.replace(/\n/g, "<br>");
-
-    // Generate the HTML for the buttons
     const downloadButton = `<a href="${event.taskPdfUrl}" target="_blank" rel="noopener noreferrer" style="background-color:#7c3aed;color:#ffffff;padding:12px 24px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;margin-top:10px;">Download Task PDF</a>`;
     const submissionButton = `<a href="${taskSubmissionUrl}" target="_blank" rel="noopener noreferrer" style="background-color:#7c3aed;color:#ffffff;padding:12px 24px;text-decoration:none;border-radius:5px;font-weight:bold;display:inline-block;margin-top:10px;">Submit Your Task Here</a>`;
     
-    // Construct the final HTML, explicitly adding the buttons after the main body
     const finalHtml = `
       <!DOCTYPE html>
       <html>
@@ -44,7 +36,7 @@ function createEmailHtml(body: string, registration: Registration, event: Event,
         </head>
         <body>
           <div class="container">
-            <img src="${logoUrl}" alt="Nexus Logo" style="max-width: 100px; margin-bottom: 20px;" />
+            <img src="cid:nexuslogo" alt="Nexus Logo" style="max-width: 100px; margin-bottom: 20px;" />
             ${processedBody}
             <br><br>
             ${downloadButton}
@@ -65,13 +57,18 @@ export async function sendRegistrationEmail(registration: Registration, event: E
     throw new Error("Email service is not configured.");
   }
   
-  const emailHtml = createEmailHtml(event.mailBody, registration, event, baseUrl);
+  const emailHtml = createRegistrationEmailHtml(event.mailBody, registration, event, baseUrl);
   
   const mailOptions = {
     from: process.env.EMAIL_USER,
     to: registration.studentEmail,
     subject: event.mailSubject.replace(/{eventName}/g, event.name),
     html: emailHtml,
+    attachments: [{
+        filename: 'nexus.png',
+        path: 'https://api.dicebear.com/8.x/initials/svg?seed=N&backgroundColor=7c3aed&radius=0',
+        cid: 'nexuslogo' 
+    }]
   };
 
   try {
@@ -79,7 +76,6 @@ export async function sendRegistrationEmail(registration: Registration, event: E
     console.log("Registration email sent successfully:", info.response);
   } catch (error) {
     console.error("Failed to send registration email:", error);
-    // Re-throw the error to be caught by the calling server action
     throw new Error(`Could not send email. Reason: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
@@ -103,8 +99,7 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
       rollNumber: registration.rollNumber,
       eventId: event.id
     });
-    const imageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`;
-    const logoUrl = 'https://api.dicebear.com/8.x/initials/svg?seed=Nexus&backgroundColor=7c3aed';
+    const qrCodeUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(qrData)}`;
 
     const mailOptions = {
       from: process.env.EMAIL_USER,
@@ -126,7 +121,7 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
         </head>
         <body>
           <div class="container">
-            <img src="${logoUrl}" alt="Nexus Logo" style="max-width: 100px; margin-bottom: 20px;" />
+            <img src="cid:nexuslogo" alt="Nexus Logo" style="max-width: 100px; margin-bottom: 20px;" />
             ${processedBody}
             
             <div class="details">
@@ -137,13 +132,25 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
               <p><strong>Status:</strong> <span class="status">${registration.status}</span></p>
               <div class="qr-container">
                 <p style="font-size: 0.9em; color: #666;">Scan for event check-in:</p>
-                <img src="${imageUrl}" alt="Event Pass QR Code" style="max-width:150px; border-radius: 8px;"/>
+                <img src="cid:qrcodepass" alt="Event Pass QR Code" style="max-width:150px; border-radius: 8px;"/>
               </div>
             </div>
           </div>
         </body>
         </html>
       `,
+      attachments: [
+        {
+            filename: 'nexus.png',
+            path: 'https://api.dicebear.com/8.x/initials/svg?seed=N&backgroundColor=7c3aed&radius=0',
+            cid: 'nexuslogo'
+        },
+        {
+            filename: 'qr-code.png',
+            path: qrCodeUrl,
+            cid: 'qrcodepass'
+        }
+      ]
     };
 
     const info = await transporter.sendMail(mailOptions);
