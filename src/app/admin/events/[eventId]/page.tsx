@@ -1,6 +1,7 @@
 
 import { getEventById, getRegistrationsByEventId } from "@/lib/data";
 import { notFound } from "next/navigation";
+import { headers } from 'next/headers';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DetailsTab from "./_components/DetailsTab";
 import RegistrationsTab from "./_components/RegistrationsTab";
@@ -15,7 +16,11 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
     notFound();
   }
   const registrations = await getRegistrationsByEventId(params.eventId);
-  const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:9002';
+  
+  const headersList = headers();
+  const host = headersList.get('host') || "";
+  const protocol = headersList.get('x-forwarded-proto') || 'http';
+  const baseUrl = `${protocol}://${host}`;
 
   return (
     <div className="space-y-6">
