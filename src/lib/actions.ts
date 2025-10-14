@@ -126,7 +126,8 @@ export async function registerForEvent(eventId: string, prevState: any, formData
       throw e;
     }
     console.error(e);
-    return { message: `Error: Failed to register: ${e.message}` };
+    // Return a more specific error message if it's an email issue
+    return { message: `Error: Failed to register. ${e.message}` };
   }
 }
 
@@ -204,10 +205,10 @@ export async function resendRegistrationEmail(registrationId: string) {
 
         await sendRegistrationEmail(registration, event, baseUrl);
 
-        return { success: true, message: `Email resent to ${registration.studentEmail}` };
+        return { success: true, message: `Email sent successfully to ${registration.studentEmail}. Please check your inbox (and spam folder).` };
 
     } catch (error: any) {
         console.error("Failed to resend email:", error);
-        return { success: false, message: "Failed to resend email." };
+        return { success: false, message: `Failed to send email. Please check server logs for details: ${error.message}` };
     }
 }

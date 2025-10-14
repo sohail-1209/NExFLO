@@ -3,6 +3,7 @@
 
 import nodemailer from "nodemailer";
 import type { Registration, Event } from "./types";
+import 'dotenv/config';
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -26,6 +27,11 @@ function replacePlaceholders(body: string, registration: Registration, event: Ev
 
 
 export async function sendRegistrationEmail(registration: Registration, event: Event, baseUrl: string) {
+  if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.error("Email credentials are not set in environment variables.");
+    throw new Error("Email service is not configured.");
+  }
+  
   const emailHtml = replacePlaceholders(event.mailBody, registration, event, baseUrl);
   
   const mailOptions = {
@@ -36,11 +42,11 @@ export async function sendRegistrationEmail(registration: Registration, event: E
   };
 
   try {
-    await transporter.sendMail(mailOptions);
-    console.log("Registration email sent to:", registration.studentEmail);
+    const info = await transporter.sendMail(mailOptions);
+    console.log("Registration email sent successfully:", info.response);
   } catch (error) {
     console.error("Failed to send registration email:", error);
-    // We don't want to block the registration if the email fails,
-    // so we just log the error for now.
+    // Re-throw the error to be caught by the calling server action
+    throw new Error(`Could not send email. Reason: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
