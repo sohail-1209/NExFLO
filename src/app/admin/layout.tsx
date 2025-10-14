@@ -1,4 +1,5 @@
 
+
 "use client";
 
 import { useUser } from "@/firebase/auth/use-user";
@@ -200,6 +201,13 @@ export default function AdminLayout({
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
+        <header className="sticky top-0 z-10 flex h-14 items-center justify-between gap-4 border-b bg-background px-4 sm:px-6 md:hidden">
+            <SidebarTrigger />
+            <div className="flex items-center gap-2">
+                <Logo className="w-6 h-6 text-primary" />
+                <span className="font-semibold">EventFlow</span>
+            </div>
+        </header>
         <main className="min-h-screen p-4 sm:p-6 lg:p-8">{children}</main>
       </SidebarInset>
     </SidebarProvider>
