@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import type { Event } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Calendar, Sparkles } from "lucide-react";
@@ -16,6 +16,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import Link from "next/link";
 import { useToast } from "@/hooks/use-toast";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,11 +31,12 @@ import {
 
 const initialState = {
   message: "",
-  errors: {},
+  errors: {} as Record<string, string[]>,
 };
 
 export default function RegisterPage({ params: paramsPromise }: { params: { eventId: string } }) {
   const params = use(paramsPromise);
+  const router = useRouter();
   const [event, setEvent] = useState<Event | null>(null);
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState('');
@@ -48,7 +50,6 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
   const registerForEventWithId = registerForEvent.bind(null, params.eventId);
   const [state, formAction] = useActionState(registerForEventWithId, initialState);
   
-  const isPastEvent = event ? new Date() > event.date : false;
 
   useEffect(() => {
     async function fetchEvent() {
@@ -57,17 +58,21 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
       if (!eventData) {
         notFound();
       }
+      if (!eventData.isLive || new Date() > eventData.date) {
+        router.push('/events/closed');
+        return;
+      }
       setEvent(eventData);
       setLoading(false);
     }
     fetchEvent();
-  }, [params.eventId]);
+  }, [params.eventId, router]);
   
   useEffect(() => {
     if (state.message && state.message.startsWith("Error")) {
       toast({
         title: "Registration Error",
-        description: state.message,
+        description: state.message.replace("Error: ", ""),
         variant: "destructive"
       })
     }
@@ -131,6 +136,9 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
     );
   }
 
+  const isPastEvent = event ? new Date() > event.date : false;
+  const yearOptions = event?.allowedYears?.length ? event.allowedYears : [1, 2, 3, 4, 5];
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
       <Card className="w-full max-w-md">
@@ -143,22 +151,16 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
           </div>
         </CardHeader>
         <CardContent>
-            {isPastEvent && (
-                <Alert variant="destructive" className="mb-4">
-                    <AlertTitle>Registration Closed</AlertTitle>
-                    <AlertDescription>The date for this event has already passed.</AlertDescription>
-                </Alert>
-            )}
           <form ref={formRef} action={formAction} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="studentName">Full Name</Label>
               <Input id="studentName" name="studentName" placeholder="Jane Doe" required disabled={isPastEvent} />
-              {state?.errors?.studentName && <p className="text-sm text-destructive">{state.errors.studentName[0]}</p>}
+              {state?.errors?.studentName && <p className="text-sm text-destructive mt-1">{state.errors.studentName[0]}</p>}
             </div>
              <div className="space-y-2">
               <Label htmlFor="rollNumber">Roll Number</Label>
               <Input id="rollNumber" name="rollNumber" placeholder="e.g. 21CS001" required disabled={isPastEvent} />
-              {state?.errors?.rollNumber && <p className="text-sm text-destructive">{state.errors.rollNumber[0]}</p>}
+              {state?.errors?.rollNumber && <p className="text-sm text-destructive mt-1">{state.errors.rollNumber[0]}</p>}
             </div>
              <div className="space-y-2">
               <Label>Gender</Label>
@@ -176,18 +178,29 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
                   <Label htmlFor="other">Other</Label>
                 </div>
               </RadioGroup>
-              {state?.errors?.gender && <p className="text-sm text-destructive">{state.errors.gender[0]}</p>}
+              {state?.errors?.gender && <p className="text-sm text-destructive mt-1">{state.errors.gender[0]}</p>}
             </div>
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="branch">Branch</Label>
                      <Input id="branch" name="branch" placeholder="e.g. Computer Science" required disabled={isPastEvent} />
-                    {state?.errors?.branch && <p className="text-sm text-destructive">{state.errors.branch[0]}</p>}
+                    {state?.errors?.branch && <p className="text-sm text-destructive mt-1">{state.errors.branch[0]}</p>}
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="yearOfStudy">Year of Study</Label>
-                    <Input id="yearOfStudy" name="yearOfStudy" type="number" placeholder="e.g. 3" required disabled={isPastEvent} />
-                    {state?.errors?.yearOfStudy && <p className="text-sm text-destructive">{state.errors.yearOfStudy[0]}</p>}
+                     <Select name="yearOfStudy" required disabled={isPastEvent}>
+                        <SelectTrigger>
+                            <SelectValue placeholder="Select your year" />
+                        </SelectTrigger>
+                        <SelectContent>
+                             {yearOptions.map(year => (
+                                <SelectItem key={year} value={year.toString()}>
+                                     {year === 5 ? 'Other' : `${year}${year === 1 ? 'st' : year === 2 ? 'nd' : year === 3 ? 'rd' : 'th'} Year`}
+                                </SelectItem>
+                            ))}
+                        </SelectContent>
+                    </Select>
+                    {state?.errors?.yearOfStudy && <p className="text-sm text-destructive mt-1">{state.errors.yearOfStudy[0]}</p>}
                 </div>
             </div>
             <div className="space-y-2">
@@ -202,12 +215,12 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
-               {state?.errors?.studentEmail && <p className="text-sm text-destructive">{state.errors.studentEmail[0]}</p>}
+               {state?.errors?.studentEmail && <p className="text-sm text-destructive mt-1">{state.errors.studentEmail[0]}</p>}
             </div>
              <div className="space-y-2">
               <Label htmlFor="mobileNumber">Mobile Number</Label>
               <Input id="mobileNumber" name="mobileNumber" type="tel" placeholder="123-456-7890" required disabled={isPastEvent} />
-              {state?.errors?.mobileNumber && <p className="text-sm text-destructive">{state.errors.mobileNumber[0]}</p>}
+              {state?.errors?.mobileNumber && <p className="text-sm text-destructive mt-1">{state.errors.mobileNumber[0]}</p>}
             </div>
              <div className="space-y-2">
               <Label>Will you bring a laptop?</Label>
@@ -221,7 +234,7 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
                   <Label htmlFor="laptop-no">No</Label>
                 </div>
               </RadioGroup>
-              {state?.errors?.laptop && <p className="text-sm text-destructive">{state.errors.laptop[0]}</p>}
+              {state?.errors?.laptop && <p className="text-sm text-destructive mt-1">{state.errors.laptop[0]}</p>}
             </div>
             
             <Button type="button" onClick={handleSubmit} className="w-full" disabled={isPastEvent || isCheckingEmail}>

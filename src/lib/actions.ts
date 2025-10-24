@@ -20,13 +20,15 @@ const eventSchema = z.object({
   confirmationMessage: z.string().min(10, "Confirmation message must be at least 10 characters long"),
   mailSubject: z.string().min(5, "Mail subject must be at least 5 characters long"),
   mailBody: z.string().min(20, "Mail body must be at least 20 characters long"),
-  taskPdfUrl: z.instanceof(File).refine(file => file.size > 0, "A task PDF is required.").or(z.string().url()),
+  taskPdfUrl: z.instanceof(File).optional(),
   appMail: z.string().email().optional().or(z.literal('')),
   appPass: z.string().optional(),
+  allowedYears: z.array(z.coerce.number()).optional(),
 });
 
 export async function createEvent(prevState: any, formData: FormData) {
-  const validatedFields = eventSchema.safeParse({
+  
+  const rawData = {
     name: formData.get("name"),
     description: formData.get("description"),
     date: formData.get("date"),
@@ -37,10 +39,18 @@ export async function createEvent(prevState: any, formData: FormData) {
     taskPdfUrl: formData.get("taskPdfUrl"),
     appMail: formData.get("appMail"),
     appPass: formData.get("appPass"),
-  });
+    allowedYears: formData.getAll("allowedYears"),
+  };
+
+  // If taskPdfUrl is an empty file, set it to null so validation passes
+  if (rawData.taskPdfUrl instanceof File && rawData.taskPdfUrl.size === 0) {
+      rawData.taskPdfUrl = null;
+  }
+
+  const validatedFields = eventSchema.safeParse(rawData);
 
   if (!validatedFields.success) {
-    console.log(validatedFields.error.flatten().fieldErrors);
+    console.error('Validation Errors:', validatedFields.error.flatten().fieldErrors);
     return {
       errors: validatedFields.error.flatten().fieldErrors,
       message: "Error: Please check your input.",
@@ -53,24 +63,25 @@ export async function createEvent(prevState: any, formData: FormData) {
     const newEvent = await createEventInData({
       ...eventData,
       date: new Date(validatedFields.data.date),
-      taskPdfFile: taskPdfUrl as File,
+      taskPdfFile: taskPdfUrl || null,
       passSubject: "Your Event Pass for {eventName}",
       passBody: "Hi {studentName},\n\nHere is your event pass. Please have it ready for check-in.\n\nThank you!",
     });
+
     revalidatePath("/admin");
     
     if (newEvent.id) {
         redirect(`/admin/events/${newEvent.id}`);
     }
 
-    return { message: "success", eventId: newEvent.id };
+    return { message: "success", eventId: newEvent.id, errors: {} };
 
   } catch (e: any) {
     if (e.message.includes('NEXT_REDIRECT')) {
       throw e;
     }
     console.error(e);
-    return { message: `Error: Failed to create event: ${e.message}` };
+    return { message: `Error: Failed to create event: ${e.message}`, errors: {} };
   }
 }
 
@@ -120,11 +131,8 @@ const registrationSchema = z.object({
 
 export async function registerForEvent(eventId: string, prevState: any, formData: FormData) {
   const event = await getEventById(eventId);
-  if (!event || new Date() > event.date) {
-    return {
-      errors: {},
-      message: "Error: Registration for this event has closed.",
-    };
+  if (!event || new Date() > event.date || !event.isLive) {
+    redirect('/events/closed');
   }
   
   const validatedFields = registrationSchema.safeParse({
@@ -144,20 +152,34 @@ export async function registerForEvent(eventId: string, prevState: any, formData
       message: "Error: Please check your input.",
     };
   }
+  
+  // Check year restriction
+  if (event.allowedYears.length > 0 && !event.allowedYears.includes(validatedFields.data.yearOfStudy)) {
+    return {
+      errors: { yearOfStudy: ["Registration is not open for your year of study."] },
+      message: "Error: Registration is not open for your year of study.",
+    };
+  }
+
 
   try {
+    const taskRequired = !!event.taskPdfUrl;
     const newRegistration = await createRegistration({
       eventId,
       ...validatedFields.data,
-    });
+    }, taskRequired);
 
     const headersList = headers();
     const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
     const protocol = headersList.get('x-forwarded-proto') || 'http';
     const baseUrl = `${protocol}://${host}`;
 
-    // Send the confirmation email
-    await sendRegistrationEmail(newRegistration, event, baseUrl);
+    if (taskRequired) {
+        await sendRegistrationEmail(newRegistration, event, baseUrl);
+    } else {
+        await sendPassEmail(newRegistration, event, baseUrl);
+    }
+
 
     revalidatePath(`/admin/events/${eventId}`);
     redirect(`/register/success/${newRegistration.id}`);
@@ -299,8 +321,13 @@ export async function resendRegistrationEmail(registrationId: string) {
         const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
         const protocol = headersList.get('x-forwarded-proto') || 'http';
         const baseUrl = `${protocol}://${host}`;
+        
+        if (event.taskPdfUrl) {
+            await sendRegistrationEmail(registration, event, baseUrl);
+        } else {
+             await sendPassEmail(registration, event, baseUrl);
+        }
 
-        await sendRegistrationEmail(registration, event, baseUrl);
 
         return { success: true, message: `Email sent successfully to ${registration.studentEmail}. Please check your inbox (and spam folder).` };
 
@@ -407,5 +434,18 @@ export async function sendBulkPasses(prevState: any, formData: FormData) {
   } catch (e: any) {
     console.error("Failed to send bulk passes:", e);
     return { message: `Error: Failed to send emails: ${e.message}` };
+  }
+}
+
+
+export async function toggleEventStatus(eventId: string, isLive: boolean) {
+  try {
+    await updateEvent(eventId, { isLive });
+    revalidatePath(`/admin/events/${eventId}`);
+    revalidatePath(`/events/${eventId}/register`);
+    return { success: true, message: `Event status updated.` };
+  } catch (e: any) {
+    console.error("Failed to toggle event status", e);
+    return { success: false, message: `Failed to update status: ${e.message}` };
   }
 }

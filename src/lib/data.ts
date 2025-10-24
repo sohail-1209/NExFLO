@@ -23,7 +23,7 @@ const db = firestore;
 
 // Type converters for Firestore
 const eventConverter = {
-  toFirestore: (event: Omit<Event, 'id'>) => {
+  toFirestore: (event: Partial<Omit<Event, 'id'>>) => {
     const data: any = { ...event };
      if (event.date) {
         data.date = Timestamp.fromDate(event.date);
@@ -31,6 +31,10 @@ const eventConverter = {
     // Remove undefined fields so Firestore doesn't store them
     if (data.appMail === undefined) delete data.appMail;
     if (data.appPass === undefined) delete data.appPass;
+    if (data.taskPdfUrl === undefined) delete data.taskPdfUrl;
+    if (data.allowedYears === undefined) delete data.allowedYears;
+
+
     return data;
   },
   fromFirestore: (snapshot: any, options: any): Event => {
@@ -42,13 +46,15 @@ const eventConverter = {
       date: data.date.toDate(),
       venue: data.venue,
       confirmationMessage: data.confirmationMessage,
-      taskPdfUrl: data.taskPdfUrl,
+      taskPdfUrl: data.taskPdfUrl || null,
       mailSubject: data.mailSubject,
       mailBody: data.mailBody,
       passSubject: data.passSubject,
       passBody: data.passBody,
       appMail: data.appMail,
       appPass: data.appPass,
+      isLive: data.isLive === undefined ? true : data.isLive, // Default to true if not set
+      allowedYears: data.allowedYears || [], // Default to empty array
     };
   },
 };
@@ -120,21 +126,26 @@ export const getRegistrationById = async (id:string): Promise<Registration | und
     return docSnap.exists() ? docSnap.data() : undefined;
 }
 
-type CreateEventData = Omit<Event, 'id' | 'taskPdfUrl'> & { 
-  taskPdfFile: File;
+type CreateEventData = Omit<Event, 'id' | 'taskPdfUrl' | 'isLive'> & { 
+  taskPdfFile: File | null;
 };
 
 export const createEventInData = async (eventData: CreateEventData): Promise<Event> => {
   const { taskPdfFile, ...restData } = eventData as any;
 
-  // Upload task PDF to Firebase Storage
-  const taskPdfStorageRef = ref(storage, `tasks/${Date.now()}-${taskPdfFile.name}`);
-  const taskUploadResult = await uploadBytes(taskPdfStorageRef, taskPdfFile);
-  const taskPdfUrl = await getDownloadURL(taskUploadResult.ref);
-
-  const newEventData = {
+  let taskPdfUrl: string | null = null;
+  if (taskPdfFile && taskPdfFile.size > 0) {
+    const taskPdfStorageRef = ref(storage, `tasks/${Date.now()}-${taskPdfFile.name}`);
+    const taskUploadResult = await uploadBytes(taskPdfStorageRef, taskPdfFile);
+    taskPdfUrl = await getDownloadURL(taskUploadResult.ref);
+  }
+  
+  const newEventData: Omit<Event, 'id'> = {
     ...restData,
     taskPdfUrl,
+    isLive: true, // Default to live
+    passSubject: restData.passSubject || "Your Event Pass for {eventName}",
+    passBody: restData.passBody || "Hi {studentName},\n\nHere is your event pass. Please have it ready for check-in.\n\nThank you!",
   };
 
   const eventsCol = collection(db, 'events').withConverter(eventConverter);
@@ -145,15 +156,16 @@ export const createEventInData = async (eventData: CreateEventData): Promise<Eve
 
 export const updateEvent = async (id: string, updates: Partial<Omit<Event, 'id'>>) => {
     const eventDocRef = doc(db, 'events', id);
-    await updateDoc(eventDocRef, updates);
+    const convertedUpdates = eventConverter.toFirestore(updates);
+    await updateDoc(eventDocRef, convertedUpdates);
 };
 
 
-export const createRegistration = async (regData: Omit<Registration, 'id' | 'registeredAt' | 'status' | 'taskSubmission' | 'attended' | 'taskSubmittedAt' | 'attendedAt'>): Promise<Registration> => {
+export const createRegistration = async (regData: Omit<Registration, 'id' | 'registeredAt' | 'status' | 'taskSubmission' | 'attended' | 'taskSubmittedAt' | 'attendedAt'>, taskRequired: boolean): Promise<Registration> => {
   const newRegistrationData: Omit<Registration, 'id'> = {
     ...regData,
     registeredAt: new Date(),
-    status: 'pending',
+    status: taskRequired ? 'pending' : 'booked',
     taskSubmission: null,
     taskSubmittedAt: null,
     attended: false,

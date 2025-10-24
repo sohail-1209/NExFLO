@@ -6,13 +6,15 @@ export type Event = {
   date: Date;
   venue: string;
   confirmationMessage: string;
-  taskPdfUrl: string;
+  taskPdfUrl: string | null;
   mailSubject: string;
   mailBody: string;
   passSubject: string;
   passBody: string;
   appMail?: string;
   appPass?: string;
+  isLive: boolean;
+  allowedYears: number[];
 };
 
 export type Registration = {

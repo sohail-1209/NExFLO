@@ -1,12 +1,15 @@
+
 import Link from "next/link";
 import { getEvents } from "@/lib/data";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Calendar, Users } from "lucide-react";
 import { getRegistrationsByEventId } from "@/lib/data";
+import { Badge } from "@/components/ui/badge";
 
 export default async function EventsPage() {
-  const events = await getEvents();
+  const allEvents = await getEvents();
+  const liveEvents = allEvents.filter(event => event.isLive && event.date > new Date());
 
   return (
     <div className="bg-background min-h-screen">
@@ -17,9 +20,9 @@ export default async function EventsPage() {
         </div>
       </header>
       <main className="container mx-auto px-4 sm:px-6 lg:px-8 pb-16">
-        {events.length > 0 ? (
+        {liveEvents.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {events.map(async (event) => {
+            {liveEvents.map(async (event) => {
               const registrations = await getRegistrationsByEventId(event.id);
               return (
               <Card key={event.id} className="flex flex-col">

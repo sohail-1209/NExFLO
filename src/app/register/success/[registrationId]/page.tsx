@@ -1,13 +1,13 @@
 
 "use client";
 
-import { useEffect, useState, use, useActionState } from "react";
+import { useEffect, useState, use } from "react";
 import { getRegistrationById, getEventById } from "@/lib/data";
 import { notFound } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle, Mail, Send } from "lucide-react";
+import { ArrowLeft, CheckCircle, Mail, Send, Ticket } from "lucide-react";
 import type { Event, Registration } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { resendRegistrationEmail } from "@/lib/actions";
@@ -82,6 +82,7 @@ export default function RegistrationSuccessPage({ params: paramsPromise }: { par
   if (!data) return null;
 
   const { registration, event } = data;
+  const taskRequired = !!event.taskPdfUrl;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-background">
@@ -97,17 +98,26 @@ export default function RegistrationSuccessPage({ params: paramsPromise }: { par
         </CardHeader>
         <CardContent className="space-y-4">
             <p className="text-muted-foreground">{event.confirmationMessage}</p>
-            <div className="p-4 bg-muted/50 rounded-lg text-left">
-                <h3 className="font-semibold flex items-center gap-2"><Mail className="h-4 w-4" />What's Next?</h3>
-                <p className="text-sm text-muted-foreground mt-2">
-                    We've sent a confirmation to <span className="font-semibold text-foreground">{registration.studentEmail}</span>. Please check your inbox for the event task and a link to submit your work. Your spot will be confirmed upon approval of your submission.
-                </p>
-            </div>
+            {taskRequired ? (
+              <div className="p-4 bg-muted/50 rounded-lg text-left">
+                  <h3 className="font-semibold flex items-center gap-2"><Mail className="h-4 w-4" />What's Next?</h3>
+                  <p className="text-sm text-muted-foreground mt-2">
+                      We've sent a confirmation to <span className="font-semibold text-foreground">{registration.studentEmail}</span>. Please check your inbox for the event task and a link to submit your work. Your spot will be confirmed upon approval of your submission.
+                  </p>
+              </div>
+            ) : (
+               <div className="p-4 bg-muted/50 rounded-lg text-left">
+                  <h3 className="font-semibold flex items-center gap-2"><Ticket className="h-4 w-4" />Your Pass is on its Way!</h3>
+                  <p className="text-sm text-muted-foreground mt-2">
+                      We've sent your official event pass to <span className="font-semibold text-foreground">{registration.studentEmail}</span>. Please check your inbox and have it ready for check-in.
+                  </p>
+              </div>
+            )}
              <div className="text-sm text-muted-foreground">
                 <p>Didn't receive the email?</p>
                 <Button variant="link" onClick={handleResendEmail} className="text-primary">
                     <Send className="mr-2 h-4 w-4" />
-                    Resend Confirmation Email
+                    Resend Email
                 </Button>
             </div>
         </CardContent>

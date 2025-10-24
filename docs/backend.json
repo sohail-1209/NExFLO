@@ -58,9 +58,18 @@
         "appPass": {
             "type": "string",
             "description": "Optional app password for the custom email address."
+        },
+        "isLive": {
+            "type": "boolean",
+            "description": "Whether the event registration is open."
+        },
+        "allowedYears": {
+          "type": "array",
+          "items": { "type": "number" },
+          "description": "Array of student years allowed to register."
         }
       },
-      "required": ["name", "description", "date", "venue", "confirmationMessage", "taskPdfUrl", "mailSubject", "mailBody", "passSubject", "passBody"]
+      "required": ["name", "description", "date", "venue", "confirmationMessage", "mailSubject", "mailBody", "passSubject", "passBody", "isLive"]
     },
     "Registration": {
       "title": "Registration",
