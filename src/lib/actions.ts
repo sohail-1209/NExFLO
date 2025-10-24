@@ -42,7 +42,7 @@ export async function createEvent(prevState: any, formData: FormData) {
     allowedYears: formData.getAll("allowedYears"),
   };
 
-  // If taskPdfUrl is an empty file, set it to null so validation passes
+  // If taskPdfUrl is an empty file, set it to undefined so validation passes
   if (rawData.taskPdfUrl instanceof File && rawData.taskPdfUrl.size === 0) {
       rawData.taskPdfUrl = undefined;
   }
@@ -448,6 +448,7 @@ export async function toggleEventStatus(eventId: string, isLive: boolean) {
     await updateEvent(eventId, { isLive });
     revalidatePath(`/admin/events/${eventId}`);
     revalidatePath(`/events/${eventId}/register`);
+    revalidatePath('/admin');
     revalidatePath('/events');
     return { success: true, message: `Event status updated.` };
   } catch (e: any) {
@@ -455,3 +456,6 @@ export async function toggleEventStatus(eventId: string, isLive: boolean) {
     return { success: false, message: `Failed to update status: ${e.message}` };
   }
 }
+
+
+    
