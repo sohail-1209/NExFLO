@@ -131,10 +131,15 @@ const registrationSchema = z.object({
 
 export async function registerForEvent(eventId: string, prevState: any, formData: FormData) {
   const event = await getEventById(eventId);
-  if (!event || !event.isLive) {
-    redirect('/events/closed');
+  if (!event) {
+    // Event not found, though this is unlikely if the page loaded
+    return { message: "Error: Event not found." };
   }
   
+  if (!event.isLive) {
+    redirect('/events/closed');
+  }
+
   const validatedFields = registrationSchema.safeParse({
     studentName: formData.get("studentName"),
     studentEmail: formData.get("studentEmail"),
@@ -450,5 +455,3 @@ export async function toggleEventStatus(eventId: string, isLive: boolean) {
     return { success: false, message: `Failed to update status: ${e.message}` };
   }
 }
-
-    
