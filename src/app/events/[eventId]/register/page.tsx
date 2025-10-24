@@ -58,7 +58,7 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
       if (!eventData) {
         notFound();
       }
-      if (!eventData.isLive || new Date() > eventData.date) {
+      if (!eventData.isLive) {
         router.push('/events/closed');
         return;
       }
@@ -136,7 +136,7 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
     );
   }
 
-  const isPastEvent = event ? new Date() > event.date : false;
+  const isRegistrationDisabled = !event?.isLive;
   const yearOptions = event?.allowedYears?.length ? event.allowedYears : [1, 2, 3, 4, 5];
 
   return (
@@ -154,17 +154,17 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
           <form ref={formRef} action={formAction} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="studentName">Full Name</Label>
-              <Input id="studentName" name="studentName" placeholder="Jane Doe" required disabled={isPastEvent} />
+              <Input id="studentName" name="studentName" placeholder="Jane Doe" required disabled={isRegistrationDisabled} />
               {state?.errors?.studentName && <p className="text-sm text-destructive mt-1">{state.errors.studentName[0]}</p>}
             </div>
              <div className="space-y-2">
               <Label htmlFor="rollNumber">Roll Number</Label>
-              <Input id="rollNumber" name="rollNumber" placeholder="e.g. 21CS001" required disabled={isPastEvent} />
+              <Input id="rollNumber" name="rollNumber" placeholder="e.g. 21CS001" required disabled={isRegistrationDisabled} />
               {state?.errors?.rollNumber && <p className="text-sm text-destructive mt-1">{state.errors.rollNumber[0]}</p>}
             </div>
              <div className="space-y-2">
               <Label>Gender</Label>
-              <RadioGroup name="gender" className="flex gap-4" disabled={isPastEvent}>
+              <RadioGroup name="gender" className="flex gap-4" disabled={isRegistrationDisabled}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="male" id="male" />
                   <Label htmlFor="male">Male</Label>
@@ -183,12 +183,12 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
             <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                     <Label htmlFor="branch">Branch</Label>
-                     <Input id="branch" name="branch" placeholder="e.g. Computer Science" required disabled={isPastEvent} />
+                     <Input id="branch" name="branch" placeholder="e.g. Computer Science" required disabled={isRegistrationDisabled} />
                     {state?.errors?.branch && <p className="text-sm text-destructive mt-1">{state.errors.branch[0]}</p>}
                 </div>
                  <div className="space-y-2">
                     <Label htmlFor="yearOfStudy">Year of Study</Label>
-                     <Select name="yearOfStudy" required disabled={isPastEvent}>
+                     <Select name="yearOfStudy" required disabled={isRegistrationDisabled}>
                         <SelectTrigger>
                             <SelectValue placeholder="Select your year" />
                         </SelectTrigger>
@@ -211,7 +211,7 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
                 type="email" 
                 placeholder="jane.doe@example.com" 
                 required 
-                disabled={isPastEvent} 
+                disabled={isRegistrationDisabled} 
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -219,12 +219,12 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
             </div>
              <div className="space-y-2">
               <Label htmlFor="mobileNumber">Mobile Number</Label>
-              <Input id="mobileNumber" name="mobileNumber" type="tel" placeholder="123-456-7890" required disabled={isPastEvent} />
+              <Input id="mobileNumber" name="mobileNumber" type="tel" placeholder="123-456-7890" required disabled={isRegistrationDisabled} />
               {state?.errors?.mobileNumber && <p className="text-sm text-destructive mt-1">{state.errors.mobileNumber[0]}</p>}
             </div>
              <div className="space-y-2">
               <Label>Will you bring a laptop?</Label>
-              <RadioGroup name="laptop" className="flex gap-4" disabled={isPastEvent}>
+              <RadioGroup name="laptop" className="flex gap-4" disabled={isRegistrationDisabled}>
                 <div className="flex items-center space-x-2">
                   <RadioGroupItem value="true" id="laptop-yes" />
                   <Label htmlFor="laptop-yes">Yes</Label>
@@ -237,13 +237,13 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
               {state?.errors?.laptop && <p className="text-sm text-destructive mt-1">{state.errors.laptop[0]}</p>}
             </div>
             
-            <Button type="button" onClick={handleSubmit} className="w-full" disabled={isPastEvent || isCheckingEmail}>
+            <Button type="button" onClick={handleSubmit} className="w-full" disabled={isRegistrationDisabled || isCheckingEmail}>
                 {isCheckingEmail ? (
                     <>
                         <Sparkles className="mr-2 h-4 w-4 animate-pulse" />
                         Checking...
                     </>
-                ) : isPastEvent ? "Registration Closed" : "Register"}
+                ) : isRegistrationDisabled ? "Registration Closed" : "Register"}
             </Button>
           </form>
         </CardContent>
@@ -279,3 +279,5 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
     </div>
   );
 }
+
+    

@@ -44,7 +44,7 @@ export async function createEvent(prevState: any, formData: FormData) {
 
   // If taskPdfUrl is an empty file, set it to null so validation passes
   if (rawData.taskPdfUrl instanceof File && rawData.taskPdfUrl.size === 0) {
-      rawData.taskPdfUrl = null;
+      rawData.taskPdfUrl = undefined;
   }
 
   const validatedFields = eventSchema.safeParse(rawData);
@@ -131,7 +131,7 @@ const registrationSchema = z.object({
 
 export async function registerForEvent(eventId: string, prevState: any, formData: FormData) {
   const event = await getEventById(eventId);
-  if (!event || new Date() > event.date || !event.isLive) {
+  if (!event || !event.isLive) {
     redirect('/events/closed');
   }
   
@@ -443,9 +443,12 @@ export async function toggleEventStatus(eventId: string, isLive: boolean) {
     await updateEvent(eventId, { isLive });
     revalidatePath(`/admin/events/${eventId}`);
     revalidatePath(`/events/${eventId}/register`);
+    revalidatePath('/events');
     return { success: true, message: `Event status updated.` };
   } catch (e: any) {
     console.error("Failed to toggle event status", e);
     return { success: false, message: `Failed to update status: ${e.message}` };
   }
 }
+
+    
