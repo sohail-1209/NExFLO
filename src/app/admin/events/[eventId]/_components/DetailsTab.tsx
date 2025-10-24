@@ -10,20 +10,29 @@ import { toast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { useTransition } from "react";
+import { useTransition, useState, useEffect } from "react";
 import { toggleEventStatus } from "@/lib/actions";
 import { Badge } from "@/components/ui/badge";
 
 interface DetailsTabProps {
   event: Event;
-  baseUrl: string;
+  baseUrl: string; // This will be initially empty
 }
 
-export default function DetailsTab({ event, baseUrl }: DetailsTabProps) {
-  const registrationUrl = `${baseUrl}/events/${event.id}/register`;
+export default function DetailsTab({ event }: DetailsTabProps) {
+  const [registrationUrl, setRegistrationUrl] = useState("");
   const [isPending, startTransition] = useTransition();
+
+  useEffect(() => {
+    // Construct the URL on the client side to ensure it's always correct and stable.
+    if (typeof window !== "undefined") {
+      const url = `${window.location.origin}/events/${event.id}/register`;
+      setRegistrationUrl(url);
+    }
+  }, [event.id]);
   
   const copyToClipboard = () => {
+    if (!registrationUrl) return;
     navigator.clipboard.writeText(registrationUrl);
     toast({
         title: "Copied to clipboard!",
@@ -154,13 +163,13 @@ export default function DetailsTab({ event, baseUrl }: DetailsTabProps) {
             <CardDescription>Scan to open the registration form.</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-col justify-center items-center gap-4">
-            <QRCodeDisplay url={registrationUrl} />
+            {registrationUrl ? <QRCodeDisplay url={registrationUrl} /> : <div className="w-[250px] h-[250px] bg-muted rounded-md animate-pulse" />}
             <div 
               className="p-2 bg-muted rounded-md text-sm text-center break-all"
             >
-              <p className="text-muted-foreground">{registrationUrl}</p>
+              <p className="text-muted-foreground">{registrationUrl || "Generating link..."}</p>
             </div>
-             <Button onClick={copyToClipboard} variant="outline" size="sm">
+             <Button onClick={copyToClipboard} variant="outline" size="sm" disabled={!registrationUrl}>
                 <LinkIcon className="mr-2 h-4 w-4"/>
                 Copy Link
              </Button>

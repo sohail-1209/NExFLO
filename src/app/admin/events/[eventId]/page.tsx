@@ -1,7 +1,6 @@
 
 import { getEventById, getRegistrationsByEventId } from "@/lib/data";
 import { notFound } from "next/navigation";
-import { headers } from 'next/headers';
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -14,11 +13,9 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
     notFound();
   }
   const registrations = await getRegistrationsByEventId(params.eventId);
-  
-  const headersList = headers();
-  const host = headersList.get('x-forwarded-host') || headersList.get('host');
-  const protocol = headersList.get('x-forwarded-proto') || 'http';
-  const baseUrl = `${protocol}://${host}`;
+
+  // Base URL will be determined on the client to ensure stability
+  const baseUrl = ""; 
 
   return (
     <div className="space-y-6">
