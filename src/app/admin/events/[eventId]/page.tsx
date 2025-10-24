@@ -14,10 +14,9 @@ export default async function EventDetailPage({ params }: { params: { eventId: s
   }
   const registrations = await getRegistrationsByEventId(params.eventId);
   
-  const headersList = headers();
-  const host = headersList.get('x-forwarded-host') || headersList.get('host') || "";
-  const protocol = headersList.get('x-forwarded-proto') || 'http';
-  const baseUrl = `${protocol}://${host}`;
+  // Using a static domain ensures the QR code is consistent.
+  // Replace this with your actual domain when deploying.
+  const baseUrl = "https://your-domain.com";
 
   return (
     <div className="space-y-6">
