@@ -9,13 +9,14 @@ import { Badge } from "@/components/ui/badge";
 
 export default async function EventsPage() {
   const allEvents = await getEvents();
-  const liveEvents = allEvents.filter(event => event.isLive && event.date > new Date());
+  // Show all events that are marked as "live", regardless of their date.
+  const liveEvents = allEvents.filter(event => event.isLive);
 
   return (
     <div className="bg-background min-h-screen">
       <header className="py-8">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center">Upcoming Events</h1>
+          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight text-center">Available Events</h1>
           <p className="mt-2 text-md md:text-lg text-muted-foreground text-center">Find your next learning opportunity.</p>
         </div>
       </header>
@@ -24,6 +25,7 @@ export default async function EventsPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {liveEvents.map(async (event) => {
               const registrations = await getRegistrationsByEventId(event.id);
+              const isPast = new Date() > event.date;
               return (
               <Card key={event.id} className="flex flex-col">
                 <CardHeader>
@@ -39,11 +41,14 @@ export default async function EventsPage() {
                     <Users className="h-4 w-4" />
                     <span>{registrations.length} registered</span>
                   </div>
+                   <div className="flex items-center gap-2">
+                    <Badge variant={isPast ? "secondary" : "default"}>{isPast ? "Finished" : "Upcoming"}</Badge>
+                  </div>
                 </CardContent>
                 <CardFooter>
-                  <Button asChild className="w-full">
+                  <Button asChild className="w-full" disabled={isPast}>
                     <Link href={`/events/${event.id}/register`}>
-                      Register Now <ArrowRight className="ml-2 h-4 w-4" />
+                      {isPast ? "Registration Closed" : "Register Now"} <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>
                   </Button>
                 </CardFooter>
