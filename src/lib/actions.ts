@@ -46,6 +46,13 @@ export async function createEvent(prevState: any, formData: FormData) {
   if (rawData.taskPdfUrl instanceof File && rawData.taskPdfUrl.size === 0) {
       rawData.taskPdfUrl = undefined;
   }
+  
+  // If allowedYears is present but empty, zod will fail unless it's optional.
+  // We can remove it if it's empty to make validation smoother.
+  if (Array.isArray(rawData.allowedYears) && rawData.allowedYears.length === 0) {
+    delete (rawData as any).allowedYears;
+  }
+
 
   const validatedFields = eventSchema.safeParse(rawData);
 
@@ -457,6 +464,8 @@ export async function toggleEventStatus(eventId: string, isLive: boolean) {
   }
 }
 
+
+    
 
     
 
