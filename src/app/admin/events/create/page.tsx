@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useActionState, useEffect } from "react";
+import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { createEvent } from "@/lib/actions";
 import { Button } from "@/components/ui/button";
@@ -12,8 +12,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter }
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft, Mail, Shield, Calendar as CalendarIcon, Users } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 
 const initialState = {
   message: "",
@@ -25,6 +25,8 @@ const initialState = {
 export default function CreateEventPage() {
   const [state, formAction] = useActionState(createEvent, initialState);
   const { toast } = useToast();
+  const [showCustomEmail, setShowCustomEmail] = useState(false);
+
 
   useEffect(() => {
     if (state?.message && state.message.startsWith("Error")) {
@@ -123,29 +125,31 @@ export default function CreateEventPage() {
             
              <Separator />
 
-            <Collapsible>
-              <CollapsibleTrigger asChild>
-                  <Button variant="link" className="p-0 flex items-center gap-2">
-                      <Shield className="w-5 h-5" /> 
-                      Custom Email Sender (Optional)
-                  </Button>
-              </CollapsibleTrigger>
-               <p className="text-sm text-muted-foreground">Click to provide credentials if you want to send emails from a specific Gmail account. Otherwise, the default system email will be used.</p>
-              <CollapsibleContent className="pt-4 space-y-4">
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                          <Label htmlFor="appMail">Custom App Email</Label>
-                          <Input id="appMail" name="appMail" type="email" placeholder="your-email@gmail.com" />
-                           {state?.errors?.appMail && <p className="text-destructive text-sm mt-1">{state.errors.appMail[0]}</p>}
-                      </div>
-                      <div className="space-y-2">
-                          <Label htmlFor="appPass">Custom App Password</Label>
-                          <Input id="appPass" name="appPass" type="password" placeholder="16-digit app password" />
-                          {state?.errors?.appPass && <p className="text-destructive text-sm mt-1">{state.errors.appPass[0]}</p>}
-                      </div>
-                   </div>
-              </CollapsibleContent>
-            </Collapsible>
+            <div className="space-y-4">
+                <div className="flex items-center space-x-2">
+                    <Switch id="custom-email-toggle" checked={showCustomEmail} onCheckedChange={setShowCustomEmail} />
+                    <Label htmlFor="custom-email-toggle" className="flex items-center gap-2 cursor-pointer">
+                        <Shield className="w-5 h-5" />
+                        Use Custom Email Sender (Optional)
+                    </Label>
+                </div>
+                 <p className="text-sm text-muted-foreground">Enable this to send emails from a specific Gmail account. Otherwise, the default system email will be used.</p>
+                
+                {showCustomEmail && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                        <div className="space-y-2">
+                            <Label htmlFor="appMail">Custom App Email</Label>
+                            <Input id="appMail" name="appMail" type="email" placeholder="your-email@gmail.com" />
+                            {state?.errors?.appMail && <p className="text-destructive text-sm mt-1">{state.errors.appMail[0]}</p>}
+                        </div>
+                        <div className="space-y-2">
+                            <Label htmlFor="appPass">Custom App Password</Label>
+                            <Input id="appPass" name="appPass" type="password" placeholder="16-digit app password" />
+                            {state?.errors?.appPass && <p className="text-destructive text-sm mt-1">{state.errors.appPass[0]}</p>}
+                        </div>
+                    </div>
+                )}
+            </div>
           </CardContent>
           <CardFooter className="flex justify-between">
               <Button asChild variant="outline">
@@ -157,3 +161,5 @@ export default function CreateEventPage() {
     </Card>
   );
 }
+
+    

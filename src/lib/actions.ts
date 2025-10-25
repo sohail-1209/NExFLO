@@ -24,11 +24,26 @@ const eventSchema = z.object({
   appMail: z.string().email().optional().or(z.literal('')),
   appPass: z.string().optional(),
   allowedYears: z.array(z.coerce.number()).optional(),
+}).superRefine((data, ctx) => {
+  if (data.appMail && !data.appPass) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['appPass'],
+      message: 'Password is required if custom email is provided.',
+    });
+  }
+  if (!data.appMail && data.appPass) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      path: ['appMail'],
+      message: 'Email is required if password is provided.',
+    });
+  }
 });
 
 export async function createEvent(prevState: any, formData: FormData) {
   
-  const rawData = {
+  const rawData: any = {
     name: formData.get("name"),
     description: formData.get("description"),
     date: formData.get("date"),
@@ -37,20 +52,25 @@ export async function createEvent(prevState: any, formData: FormData) {
     mailSubject: formData.get("mailSubject"),
     mailBody: formData.get("mailBody"),
     taskPdfUrl: formData.get("taskPdfUrl"),
-    appMail: formData.get("appMail"),
-    appPass: formData.get("appPass"),
     allowedYears: formData.getAll("allowedYears"),
   };
+  
+  // Only include appMail and appPass if they are provided
+  if (formData.has("appMail")) {
+    rawData.appMail = formData.get("appMail");
+  }
+   if (formData.has("appPass")) {
+    rawData.appPass = formData.get("appPass");
+  }
 
   // If taskPdfUrl is an empty file, set it to undefined so validation passes
   if (rawData.taskPdfUrl instanceof File && rawData.taskPdfUrl.size === 0) {
       rawData.taskPdfUrl = undefined;
   }
   
-  // If allowedYears is present but empty, zod will fail unless it's optional.
-  // We can remove it if it's empty to make validation smoother.
+  // Handle allowedYears: if it's empty, remove it before validation
   if (Array.isArray(rawData.allowedYears) && rawData.allowedYears.length === 0) {
-    delete (rawData as any).allowedYears;
+    delete rawData.allowedYears;
   }
 
 
@@ -464,6 +484,8 @@ export async function toggleEventStatus(eventId: string, isLive: boolean) {
   }
 }
 
+
+    
 
     
 
