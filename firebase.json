@@ -12,5 +12,8 @@
         "function": "nextApp"
       }
     ]
+  },
+  "functions": {
+    "source": "functions"
   }
 }
