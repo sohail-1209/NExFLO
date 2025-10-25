@@ -7,7 +7,7 @@ import { notFound, useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle, Download, Upload } from "lucide-react";
+import { ArrowLeft, CheckCircle, Download, Upload, Info, Share2, Github } from "lucide-react";
 import type { Event, Registration } from "@/lib/types";
 import { submitTask } from "@/lib/actions";
 import { useToast } from "@/hooks/use-toast";
@@ -15,6 +15,12 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
 
 const initialState = {
   message: "",
@@ -120,6 +126,39 @@ export default function TaskSubmissionPage({ params: paramsPromise }: { params: 
                 </AlertDescription>
               </Alert>
 
+               <div className="space-y-4">
+                <h3 className="font-semibold flex items-center gap-2"><Info className="h-5 w-5 text-primary" /> Submission Instructions</h3>
+                 <Accordion type="single" collapsible className="w-full">
+                  <AccordionItem value="google-docs">
+                    <AccordionTrigger>
+                        <div className="flex items-center gap-2">
+                            <Share2 className="h-4 w-4" /> How to Share a Google Doc
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <ol className="list-decimal list-inside space-y-2 text-muted-foreground text-sm">
+                        <li>Click the blue "Share" button in the top-right corner.</li>
+                        <li>Under "General access", change "Restricted" to <span className="font-semibold text-foreground">"Anyone with the link"</span>.</li>
+                        <li>Ensure the role next to it is set to <span className="font-semibold text-foreground">"Viewer"</span>.</li>
+                        <li>Click "Copy link" and paste it in the form below.</li>
+                      </ol>
+                    </AccordionContent>
+                  </AccordionItem>
+                  <AccordionItem value="github">
+                    <AccordionTrigger>
+                         <div className="flex items-center gap-2">
+                            <Github className="h-4 w-4" /> How to Share a GitHub Repo
+                        </div>
+                    </AccordionTrigger>
+                    <AccordionContent>
+                      <p className="text-muted-foreground text-sm">
+                        Simply copy the main URL of your public GitHub repository (e.g., <code className="bg-muted px-1 py-0.5 rounded-sm">https://github.com/username/repo-name</code>) and paste it in the form below. Make sure your repository is set to "Public".
+                      </p>
+                    </AccordionContent>
+                  </AccordionItem>
+                </Accordion>
+              </div>
+
               <form action={formAction} className="space-y-4 text-left">
                 <div className="space-y-2">
                   <Label htmlFor="email">Your Email Address</Label>
@@ -127,8 +166,8 @@ export default function TaskSubmissionPage({ params: paramsPromise }: { params: 
                   {state?.errors?.email && <p className="text-sm text-destructive">{state.errors.email[0]}</p>}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="taskSubmission">Submission URL</Label>
-                  <Input id="taskSubmission" name="taskSubmission" type="url" placeholder="https://your-project-link.com" required />
+                  <Label htmlFor="taskSubmission">Submission URL (Google Docs or GitHub)</Label>
+                  <Input id="taskSubmission" name="taskSubmission" type="url" placeholder="https://docs.google.com/document/d/..." required />
                   {state?.errors?.taskSubmission && <p className="text-sm text-destructive">{state.errors.taskSubmission[0]}</p>}
                 </div>
                 <SubmitButton />
