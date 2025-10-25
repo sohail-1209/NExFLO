@@ -7,6 +7,7 @@ import {
   type ReactNode,
 } from 'react';
 import type { FirebaseServices } from '@/firebase';
+import { FirebaseErrorListener } from '@/components/FirebaseErrorListener';
 
 const FirebaseContext = createContext<FirebaseServices | undefined>(undefined);
 
@@ -18,6 +19,7 @@ export function FirebaseProvider({ children, ...value }: FirebaseProviderProps) 
   return (
     <FirebaseContext.Provider value={value}>
       {children}
+      {process.env.NODE_ENV === 'development' && <FirebaseErrorListener />}
     </FirebaseContext.Provider>
   );
 }

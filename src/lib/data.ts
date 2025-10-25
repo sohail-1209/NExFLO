@@ -16,6 +16,8 @@ import {
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { initializeFirebase } from "@/firebase";
 import type { Event, Registration } from './types';
+import { errorEmitter } from "@/firebase/error-emitter";
+import { FirestorePermissionError } from "@/firebase/errors";
 
 // Initialize Firebase services
 const { firestore, storage } = initializeFirebase();
@@ -149,8 +151,21 @@ export const createEventInData = async (eventData: CreateEventData): Promise<Eve
   };
 
   const eventsCol = collection(db, 'events').withConverter(eventConverter);
-  const docRef = await addDoc(eventsCol, newEventData);
   
+  // The addDoc promise is handled by the .catch block, no need to await here
+  const docRefPromise = addDoc(eventsCol, newEventData).catch(error => {
+      const permissionError = new FirestorePermissionError({
+          path: eventsCol.path,
+          operation: 'create',
+          requestResourceData: newEventData,
+      });
+      errorEmitter.emit('permission-error', permissionError);
+      // Re-throw the original error to ensure the UI knows something went wrong
+      throw error;
+  });
+
+  const docRef = await docRefPromise;
+
   return { ...newEventData, id: docRef.id, date: newEventData.date };
 };
 
