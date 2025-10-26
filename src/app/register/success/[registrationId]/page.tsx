@@ -3,11 +3,11 @@
 
 import { useEffect, useState, use } from "react";
 import { getRegistrationById, getEventById } from "@/lib/data";
-import { notFound } from "next/navigation";
+import { notFound, useRouter } from "next/navigation";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { ArrowLeft, CheckCircle, Mail, Send, Ticket } from "lucide-react";
+import { CheckCircle, Mail, Send, Ticket } from "lucide-react";
 import type { Event, Registration } from "@/lib/types";
 import { Skeleton } from "@/components/ui/skeleton";
 import { resendRegistrationEmail } from "@/lib/actions";
@@ -21,6 +21,7 @@ const initialState = {
 
 export default function RegistrationSuccessPage({ params: paramsPromise }: { params: { registrationId: string } }) {
   const params = use(paramsPromise);
+  const router = useRouter();
   const [data, setData] = useState<{ registration: Registration, event: Event } | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -57,6 +58,14 @@ export default function RegistrationSuccessPage({ params: paramsPromise }: { par
     }
     fetchData();
   }, [params.registrationId]);
+
+  useEffect(() => {
+    // Prevent user from going back
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = function () {
+      window.history.pushState(null, "", window.location.href);
+    };
+  }, []);
 
   if (loading) {
     return (
@@ -122,9 +131,7 @@ export default function RegistrationSuccessPage({ params: paramsPromise }: { par
             </div>
         </CardContent>
         <CardFooter className="flex flex-col gap-4">
-          <Button asChild variant="outline" className="w-full">
-            <Link href="/events"><ArrowLeft /> Back to Events</Link>
-          </Button>
+            <p className="text-xs text-muted-foreground">You can now safely close this window.</p>
         </CardFooter>
       </Card>
     </div>
