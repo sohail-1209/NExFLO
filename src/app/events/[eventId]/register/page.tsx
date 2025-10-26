@@ -67,6 +67,14 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
     }
     fetchEvent();
   }, [params.eventId, router]);
+
+  useEffect(() => {
+    // Prevent user from going back
+    window.history.pushState(null, "", window.location.href);
+    window.onpopstate = function () {
+      window.history.pushState(null, "", window.location.href);
+    };
+  }, []);
   
   useEffect(() => {
     if (state.message && state.message.startsWith("Error")) {
@@ -247,11 +255,7 @@ export default function RegisterPage({ params: paramsPromise }: { params: { even
             </Button>
           </form>
         </CardContent>
-        <CardFooter>
-            <Button asChild variant="outline" className="w-full">
-                <Link href="/events"><ArrowLeft /> Go Back</Link>
-            </Button>
-        </CardFooter>
+        
       </Card>
       
        <AlertDialog open={showSuggestionDialog} onOpenChange={setShowSuggestionDialog}>
