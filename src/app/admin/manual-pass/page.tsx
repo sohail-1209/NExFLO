@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Send, UploadCloud, Users, Shield } from "lucide-react";
+import { Send, UploadCloud, Users, Shield, Palette } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import Papa from "papaparse";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -144,6 +144,22 @@ export default function ManualPassPage() {
                 <Switch id="sendWithoutPass" name="sendWithoutPass" />
                 <Label htmlFor="sendWithoutPass">Send normal email (without pass attachment)</Label>
             </div>
+            
+            <Separator/>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium flex items-center gap-2"><Palette className="w-5 h-5" /> Email & Pass Styling</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="primaryColor">Primary Color</Label>
+                  <Input id="primaryColor" name="primaryColor" type="color" defaultValue="#BB86FC" />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="accentColor">Accent Color (Text)</Label>
+                  <Input id="accentColor" name="accentColor" type="color" defaultValue="#121212" />
+                </div>
+              </div>
+            </div>
 
             <Separator/>
             <Collapsible>
@@ -229,6 +245,21 @@ export default function ManualPassPage() {
                     <Label htmlFor="bulk_sendWithoutPass">Send normal email (without pass attachment)</Label>
                 </div>
                 
+                <Separator/>
+                 <div className="space-y-4">
+                  <h3 className="text-lg font-medium flex items-center gap-2"><Palette className="w-5 h-5" /> Email & Pass Styling</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="bulk_primaryColor">Primary Color</Label>
+                      <Input id="bulk_primaryColor" name="primaryColor" type="color" defaultValue="#BB86FC" />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="bulk_accentColor">Accent Color (Text)</Label>
+                      <Input id="bulk_accentColor" name="accentColor" type="color" defaultValue="#121212" />
+                    </div>
+                  </div>
+                </div>
+
                 <Separator />
                 <Collapsible>
                     <CollapsibleTrigger asChild>

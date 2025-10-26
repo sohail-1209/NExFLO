@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft, Mail, Shield, Calendar as CalendarIcon, Users } from "lucide-react";
+import { ArrowLeft, Mail, Shield, Calendar as CalendarIcon, Users, Palette } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Switch } from "@/components/ui/switch";
@@ -122,6 +122,24 @@ export default function CreateEventPage() {
                   {state?.errors?.taskPdfUrl && <p className="text-destructive text-sm mt-1">{state.errors.taskPdfUrl[0]}</p>}
               </div>
             </div>
+
+            <Separator />
+            <div className="space-y-4">
+              <h3 className="text-lg font-medium flex items-center gap-2"><Palette className="w-5 h-5" /> Email & Pass Styling</h3>
+              <p className="text-sm text-muted-foreground">Customize the colors of the email and pass for this event. Uses theme colors if left blank.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="primaryColor">Primary Color</Label>
+                  <Input id="primaryColor" name="primaryColor" type="color" defaultValue="#BB86FC" />
+                  {state?.errors?.primaryColor && <p className="text-destructive text-sm mt-1">{state.errors.primaryColor[0]}</p>}
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="accentColor">Accent Color (Text on Primary)</Label>
+                  <Input id="accentColor" name="accentColor" type="color" defaultValue="#121212" />
+                  {state?.errors?.accentColor && <p className="text-destructive text-sm mt-1">{state.errors.accentColor[0]}</p>}
+                </div>
+              </div>
+            </div>
             
              <Separator />
 
@@ -161,5 +179,3 @@ export default function CreateEventPage() {
     </Card>
   );
 }
-
-    

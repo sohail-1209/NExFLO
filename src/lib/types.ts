@@ -15,6 +15,8 @@ export type Event = {
   appPass?: string;
   isLive: boolean;
   allowedYears: number[];
+  primaryColor?: string;
+  accentColor?: string;
 };
 
 export type Registration = {

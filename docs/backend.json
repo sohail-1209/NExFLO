@@ -67,6 +67,14 @@
           "type": "array",
           "items": { "type": "number" },
           "description": "Array of student years allowed to register."
+        },
+        "primaryColor": {
+          "type": "string",
+          "description": "Primary color for event branding in emails and passes."
+        },
+        "accentColor": {
+            "type": "string",
+            "description": "Accent color for event branding in emails and passes."
         }
       },
       "required": ["name", "description", "date", "venue", "confirmationMessage", "mailSubject", "mailBody", "passSubject", "passBody", "isLive"]

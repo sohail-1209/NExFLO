@@ -35,6 +35,8 @@ const eventConverter = {
     if (data.appPass === undefined) delete data.appPass;
     if (data.taskPdfUrl === undefined) delete data.taskPdfUrl;
     if (data.allowedYears === undefined) delete data.allowedYears;
+    if (data.primaryColor === undefined) delete data.primaryColor;
+    if (data.accentColor === undefined) delete data.accentColor;
 
 
     return data;
@@ -57,6 +59,8 @@ const eventConverter = {
       appPass: data.appPass,
       isLive: data.isLive === undefined ? true : data.isLive, // Default to true if not set
       allowedYears: data.allowedYears || [], // Default to empty array
+      primaryColor: data.primaryColor,
+      accentColor: data.accentColor,
     };
   },
 };

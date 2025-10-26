@@ -32,14 +32,16 @@ function getTransporter(customMail?: string | null, customPass?: string | null) 
 
 function createRegistrationEmailHtml(body: string, registration: Registration, event: Event, baseUrl: string): string {
     const taskSubmissionUrl = `${baseUrl}/tasks/${registration.id}/submit`;
+    const primaryColor = event.primaryColor || '#BB86FC';
+    const accentColor = event.accentColor || '#121212';
     
     let processedBody = body
       .replace(/{studentName}/g, registration.studentName)
       .replace(/{eventName}/g, event.name)
       .replace(/\n/g, "<br>");
 
-    const downloadButton = `<a href="${event.taskPdfUrl}" target="_blank" rel="noopener noreferrer" style="background-color:#BB86FC;color:#121212;padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block;margin:10px 5px;">Download Task PDF</a>`;
-    const submissionButton = `<a href="${taskSubmissionUrl}" target="_blank" rel="noopener noreferrer" style="background-color:#BB86FC;color:#121212;padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block;margin:10px 5px;">Submit Your Task</a>`;
+    const downloadButton = `<a href="${event.taskPdfUrl}" target="_blank" rel="noopener noreferrer" style="background-color:${primaryColor};color:${accentColor};padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block;margin:10px 5px;">Download Task PDF</a>`;
+    const submissionButton = `<a href="${taskSubmissionUrl}" target="_blank" rel="noopener noreferrer" style="background-color:${primaryColor};color:${accentColor};padding:12px 24px;text-decoration:none;border-radius:8px;font-weight:bold;display:inline-block;margin:10px 5px;">Submit Your Task</a>`;
     
     const finalHtml = `
       <!DOCTYPE html>
@@ -76,7 +78,7 @@ function createRegistrationEmailHtml(body: string, registration: Registration, e
             .card-header h2 {
                 margin: 0;
                 font-size: 28px;
-                color: #BB86FC;
+                color: ${primaryColor};
             }
              .card-header p {
                 margin: 4px 0 0;
@@ -143,6 +145,8 @@ export async function sendRegistrationEmail(registration: Registration, event: E
 
 export async function sendPassEmail(registration: Registration, event: Event, baseUrl: string) {
     const transporter = getTransporter(event.appMail, event.appPass);
+    const primaryColor = event.primaryColor || '#BB86FC';
+    const accentColor = event.accentColor || '#121212';
 
     try {
         let processedBody = event.passBody
@@ -181,10 +185,10 @@ export async function sendPassEmail(registration: Registration, event: Event, ba
                     text-align: left;
                     }
                     .card-header {
-                    background-color: #BB86FC; /* Primary color */
+                    background-color: ${primaryColor};
                     padding: 20px 20px 10px 20px;
                     position: relative;
-                    color: #121212;
+                    color: ${accentColor};
                     }
                     .card-header h2 {
                         margin: 0;
@@ -283,10 +287,14 @@ export interface ManualPassDetails {
     sendWithoutPass: boolean;
     appMail?: string | null;
     appPass?: string | null;
+    primaryColor?: string;
+    accentColor?: string;
 }
 
 export async function sendManualPassEmail(details: ManualPassDetails, baseUrl: string) {
     const transporter = getTransporter(details.appMail, details.appPass);
+    const primaryColor = details.primaryColor || '#BB86FC';
+    const accentColor = details.accentColor || '#121212';
     
     let processedBody = details.emailBody
       .replace(/{studentName}/g, details.studentName)
@@ -334,10 +342,10 @@ export async function sendManualPassEmail(details: ManualPassDetails, baseUrl: s
               text-align: left;
             }
             .card-header {
-              background-color: #BB86FC; /* Primary color */
+              background-color: ${primaryColor};
               padding: 20px 20px 10px 20px;
               position: relative;
-              color: #121212;
+              color: ${accentColor};
             }
             .card-header h2 {
                 margin: 0;
@@ -420,9 +428,11 @@ export interface BulkEmailDetails {
     sendWithoutPass: boolean;
     appMail?: string | null;
     appPass?: string | null;
+    primaryColor?: string;
+    accentColor?: string;
 }
 
-function replacePlaceholders(template: string, attendee: AttendeeData, eventDetails: Omit<BulkEmailDetails, 'eventDate' | 'sendWithoutPass' | 'emailSubject' | 'emailBody' | 'appMail' | 'appPass'> & {date: Date}): string {
+function replacePlaceholders(template: string, attendee: AttendeeData, eventDetails: Omit<BulkEmailDetails, 'eventDate' | 'sendWithoutPass' | 'emailSubject' | 'emailBody' | 'appMail' | 'appPass' | 'primaryColor' | 'accentColor'> & {date: Date}): string {
     let result = template;
     const allPlaceholders = {...attendee, ...eventDetails};
 
@@ -439,6 +449,7 @@ function replacePlaceholders(template: string, attendee: AttendeeData, eventDeta
 
 export async function sendBulkPassesEmail(attendees: AttendeeData[], details: BulkEmailDetails, baseUrl: string) {
     const transporter = getTransporter(details.appMail, details.appPass);
+    const primaryColor = details.primaryColor || '#BB86FC';
     
     // Process each attendee. Don't await here to send emails in parallel.
     for (const attendee of attendees) {
@@ -483,7 +494,7 @@ export async function sendBulkPassesEmail(attendees: AttendeeData[], details: Bu
                 });
                 
                 html = `
-                    <!DOCTYPE html><html><head><style>body{font-family:Arial,sans-serif;background-color:#f4f4f4;color:#333;}.card{background-color:#fff;max-width:400px;margin:20px auto;border-radius:16px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.1);}.card-header{background-color:#BB86FC;color:#121212;padding:20px;font-size:24px;} .card-body{padding:20px;} .qr-section{text-align:center;padding:20px;border-top:1px dashed #ddd;}</style></head>
+                    <!DOCTYPE html><html><head><style>body{font-family:Arial,sans-serif;background-color:#f4f4f4;color:#333;}.card{background-color:#fff;max-width:400px;margin:20px auto;border-radius:16px;overflow:hidden;box-shadow:0 10px 25px rgba(0,0,0,0.1);}.card-header{background-color:${primaryColor};color:#121212;padding:20px;font-size:24px;} .card-body{padding:20px;} .qr-section{text-align:center;padding:20px;border-top:1px dashed #ddd;}</style></head>
                     <body><div class="email-container">${html}<div class="card"><div class="card-header">${details.eventName}</div><div class="card-body"><strong>Attendee:</strong> ${studentName}<br><strong>Date:</strong> ${details.eventDate.toLocaleString()}<br><strong>Venue:</strong> ${details.eventVenue}</div><div class="qr-section"><p>Scan this for check-in</p><img src="cid:qrcodepass" alt="QR Code"/></div></div></div></body></html>`;
 
             }

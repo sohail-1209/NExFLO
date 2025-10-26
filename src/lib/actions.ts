@@ -24,6 +24,8 @@ const eventSchema = z.object({
   appMail: z.string().email().optional().or(z.literal('')),
   appPass: z.string().optional(),
   allowedYears: z.array(z.coerce.number()).optional(),
+  primaryColor: z.string().optional(),
+  accentColor: z.string().optional(),
 }).superRefine((data, ctx) => {
   if (data.appMail && !data.appPass) {
     ctx.addIssue({
@@ -53,6 +55,8 @@ export async function createEvent(prevState: any, formData: FormData) {
     mailBody: formData.get("mailBody"),
     taskPdfUrl: formData.get("taskPdfUrl"),
     allowedYears: formData.getAll("allowedYears"),
+    primaryColor: formData.get("primaryColor"),
+    accentColor: formData.get("accentColor"),
   };
   
   // Only include appMail and appPass if they are provided
@@ -394,6 +398,8 @@ const manualPassSchema = z.object({
   sendWithoutPass: z.preprocess((val) => val === 'on', z.boolean()),
   appMail: z.string().email().optional().or(z.literal('')),
   appPass: z.string().optional(),
+  primaryColor: z.string().optional(),
+  accentColor: z.string().optional(),
 });
 
 export async function sendManualPass(prevState: any, formData: FormData) {
@@ -483,12 +489,3 @@ export async function toggleEventStatus(eventId: string, isLive: boolean) {
     return { success: false, message: `Failed to update status: ${e.message}` };
   }
 }
-
-
-    
-
-    
-
-    
-
-    
